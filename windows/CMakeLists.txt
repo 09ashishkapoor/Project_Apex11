@@ -1,10 +1,9 @@
-# Project-level configuration.
 cmake_minimum_required(VERSION 3.14)
-project(adya_mahakaali_sadhana LANGUAGES CXX)
+project(sadhana_for_a_khyapa LANGUAGES CXX)
 
 # The name of the executable created for the application. Change this to change
 # the on-disk name of your application.
-set(BINARY_NAME "adya_mahakaali_sadhana")
+set(BINARY_NAME "sadhana_for_a_khyapa")
 
 # Explicitly opt in to modern CMake behaviors to avoid warnings with recent
 # versions of CMake.
@@ -52,11 +51,9 @@ add_subdirectory(${FLUTTER_MANAGED_DIR})
 # Application build; see runner/CMakeLists.txt.
 add_subdirectory("runner")
 
-
 # Generated plugin build rules, which manage building the plugins and adding
 # them to the application.
 include(flutter/generated_plugins.cmake)
-
 
 # === Installation ===
 # Support files are copied into place next to the executable, so that it can

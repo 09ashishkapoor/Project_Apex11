@@ -1,93 +1,130 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/services.dart';
+
+import '../models/deity.dart';
+import '../models/sadhana_stats.dart';
+import '../services/sadhana_repository.dart';
+import '../theme/app_theme.dart';
 
 class SadhanaTrackerScreen extends StatefulWidget {
-  const SadhanaTrackerScreen({Key? key}) : super(key: key);
+  const SadhanaTrackerScreen({
+    super.key,
+    required this.repository,
+  });
+
+  final SadhanaRepository repository;
 
   @override
   State<SadhanaTrackerScreen> createState() => _SadhanaTrackerScreenState();
 }
 
 class _SadhanaTrackerScreenState extends State<SadhanaTrackerScreen> {
-  final List<String> deities = [
-    'Batuk Bhairav',
-    'Swarnaakarshana Bhairav',
-    'Skanda Bhairav',
-    'Adya MahaKaali',
-  ];
-
-  final Map<String, String> deityImages = {
-    'Batuk Bhairav': 'assets/images/batuk.jpg',
-    'Swarnaakarshana Bhairav': 'assets/images/swarna.jpg',
-    'Skanda Bhairav': 'assets/images/skanda.jpg',
-    'Adya MahaKaali': 'assets/images/maha.jpg',
-  };
-
-  Map<String, int> sadhanaCounts = {};
-
-  @override
-  void initState() {
-    super.initState();
-    _loadSadhanaData();
-  }
-
-  Future<void> _loadSadhanaData() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      for (var deity in deities) {
-        sadhanaCounts[deity] = prefs.getInt('$deity-count') ?? 0;
-      }
-    });
-  }
-
-  Future<void> _resetSadhanaCount(String deity) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('$deity-count', 0);
-    setState(() {
-      sadhanaCounts[deity] = 0;
-    });
-  }
+  SadhanaRepository get _repository => widget.repository;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Sadhana Tracker'),
-        backgroundColor: Colors.black,
-        centerTitle: true,
-        elevation: 0,
+        actions: [
+          IconButton(
+            onPressed: _showExportDialog,
+            icon: const Icon(Icons.download_rounded),
+            tooltip: 'Export backup JSON',
+          ),
+          IconButton(
+            onPressed: _showImportDialog,
+            icon: const Icon(Icons.upload_rounded),
+            tooltip: 'Import backup JSON',
+          ),
+          IconButton(
+            onPressed: _confirmResetAll,
+            icon: const Icon(Icons.delete_sweep_rounded),
+            tooltip: 'Reset all tracked sessions',
+          ),
+        ],
       ),
-      backgroundColor: Colors.black,
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Text(
-              'Your Spiritual Journey',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
+      body: StreamBuilder<SadhanaStats>(
+        stream: _repository.watchStats(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Text(
+                  'Unable to load tracker data. ${snapshot.error}',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Track your progress in each deity\'s sadhana',
-              style: TextStyle(fontSize: 16, color: Colors.white70),
-            ),
-            const SizedBox(height: 20),
-            Expanded(
-              child: ListView.builder(
-                itemCount: deities.length,
-                itemBuilder: (context, index) {
-                  final deity = deities[index];
-                  final count = sadhanaCounts[deity] ?? 0;
-                  final imagePath = deityImages[deity] ?? '';
+            );
+          }
 
-                  return _buildDeityCard(deity, count, imagePath);
-                },
+          if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          final stats = snapshot.data!;
+          final bottomInset = MediaQuery.of(context).padding.bottom;
+          return ListView(
+            padding: EdgeInsets.fromLTRB(16, 16, 16, bottomInset + 24),
+            children: [
+              Text(
+                'Your Spiritual Journey',
+                style: Theme.of(context).textTheme.headlineSmall,
               ),
+              const SizedBox(height: 8),
+              Text(
+                'Live totals are computed from completed sessions.',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              const SizedBox(height: 16),
+              _buildOverviewCard(stats),
+              const SizedBox(height: 16),
+              Text(
+                'Per-deity totals',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              const SizedBox(height: 8),
+              ...stats.perDeity.map(_buildDeityCard),
+              const SizedBox(height: 8),
+              Text(
+                'Recent completed sessions',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              const SizedBox(height: 8),
+              _buildRecentSessionsCard(stats.recentSessions),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildOverviewCard(SadhanaStats stats) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Aggregates', style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                    child: _buildMetric('Today', stats.todayTotal.toString())),
+                const SizedBox(width: 12),
+                Expanded(
+                  child:
+                      _buildMetric('Lifetime', stats.lifetimeTotal.toString()),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildMetric(
+                      'Malas of 108', stats.completedMalas.toString()),
+                ),
+              ],
             ),
           ],
         ),
@@ -95,138 +132,391 @@ class _SadhanaTrackerScreenState extends State<SadhanaTrackerScreen> {
     );
   }
 
-  Widget _buildDeityCard(String deity, int count, String imagePath) {
-    final percentage = count / 108;
-    final percentageText = '${(percentage * 100).toStringAsFixed(1)}%';
-    final rounds = (count / 108).floor();
-    final remainingForNextRound = 108 - (count % 108);
+  Widget _buildMetric(String label, String value) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppTheme.templeShadow,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppTheme.antiqueGold.withValues(alpha: 0.2)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(value, style: Theme.of(context).textTheme.titleLarge),
+          const SizedBox(height: 4),
+          Text(label, style: Theme.of(context).textTheme.bodySmall),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDeityCard(DeitySadhanaStats deityStats) {
+    final deity = deityStats.deity;
+    final cycleCount = deityStats.totalCount % deity.defaultTargetCount;
+    final progress = deity.defaultTargetCount == 0
+        ? 0.0
+        : cycleCount / deity.defaultTargetCount;
+    final remaining = deity.defaultTargetCount - cycleCount;
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      color: Colors.grey[900],
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      elevation: 4,
+      margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
-        padding: const EdgeInsets.all(12.0),
+        padding: const EdgeInsets.all(12),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(12),
                   child: Image.asset(
-                    imagePath,
-                    width: 60,
-                    height: 60,
+                    deity.imageAsset,
+                    width: 56,
+                    height: 56,
                     fit: BoxFit.cover,
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        deity,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
+                        deity.displayName,
+                        style: Theme.of(context).textTheme.titleMedium,
                       ),
+                      const SizedBox(height: 2),
                       Text(
-                        '$count chants completed',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.orange[300],
-                        ),
+                        '${deityStats.totalCount} chants · ${deityStats.completedMalas} malas',
+                        style: Theme.of(context).textTheme.bodyMedium,
                       ),
                     ],
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.refresh, color: Colors.white70),
-                  onPressed: () => _showResetDialog(deity),
+                  onPressed: () => _confirmResetDeity(deity),
+                  icon: const Icon(Icons.refresh_rounded),
+                  tooltip: 'Reset only ${deity.displayName} session history',
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 10),
             LinearProgressIndicator(
-              value: percentage > 1 ? 1 : percentage,
+              value: progress,
               minHeight: 10,
-              backgroundColor: Colors.grey[800],
-              valueColor: AlwaysStoppedAnimation<Color>(
-                _getProgressColor(percentage),
-              ),
-              borderRadius: BorderRadius.circular(5),
+              borderRadius: BorderRadius.circular(100),
             ),
             const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Progress: $percentageText',
-                  style: const TextStyle(fontSize: 12, color: Colors.white70),
-                ),
-                Text(
-                  'Rounds: $rounds',
-                  style: const TextStyle(fontSize: 12, color: Colors.white70),
-                ),
-              ],
+            Text(
+              cycleCount == 0
+                  ? 'Next mala starts at ${deity.defaultTargetCount} chants.'
+                  : '$remaining chants remaining for the next mala.',
+              style: Theme.of(context).textTheme.bodySmall,
             ),
-            if (count % 108 != 0)
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: Text(
-                  '$remainingForNextRound more for next round',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.orange[200],
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
-              ),
           ],
         ),
       ),
     );
   }
 
-  Color _getProgressColor(double percentage) {
-    if (percentage < 0.3) return Colors.red;
-    if (percentage < 0.6) return Colors.orange;
-    if (percentage < 1) return Colors.yellow;
-    return Colors.green;
+  Widget _buildRecentSessionsCard(List<RecentSadhanaSession> recentSessions) {
+    if (recentSessions.isEmpty) {
+      return Card(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Text(
+            'No completed sessions yet. Finish a session to build your history.',
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+        ),
+      );
+    }
+
+    return Card(
+      child: ListView.separated(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: recentSessions.length,
+        separatorBuilder: (_, __) =>
+            Divider(color: AppTheme.antiqueGold.withValues(alpha: 0.14)),
+        itemBuilder: (context, index) {
+          final session = recentSessions[index];
+          return ListTile(
+            leading: ClipRRect(
+              borderRadius: BorderRadius.circular(18),
+              child: Image.asset(
+                session.deity.imageAsset,
+                width: 36,
+                height: 36,
+                fit: BoxFit.cover,
+              ),
+            ),
+            title: Text(
+                '${session.deity.displayName} · ${session.completedCount} chants'),
+            subtitle: Text(
+              '${session.mode.label} · ${_formatDuration(session.durationSeconds)} · ${_formatDateTime(session.endedAt ?? session.startedAt)}',
+            ),
+            trailing: Text('${(session.completedCount / 108).floor()} malas'),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+          );
+        },
+      ),
+    );
   }
 
-  void _showResetDialog(String deity) {
-    showDialog(
+  Future<void> _confirmResetAll() async {
+    final shouldReset = await showDialog<bool>(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            backgroundColor: Colors.grey[900],
-            title: Text(
-              'Reset $deity Sadhana?',
-              style: const TextStyle(color: Colors.white),
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Reset all session history?'),
+          content: const Text(
+            'This deletes every tracked session for every deity. Totals and recent history will be fully cleared.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: const Text('Cancel'),
             ),
-            content: Text(
-              'Are you sure you want to reset your $deity sadhana count?',
-              style: const TextStyle(color: Colors.white70),
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, true),
+              child: const Text('Delete all'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldReset != true) return;
+
+    await _repository.resetAllSessions();
+    if (!mounted) return;
+    _showMessage('All session history deleted.');
+  }
+
+  Future<void> _confirmResetDeity(Deity deity) async {
+    final shouldReset = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text('Reset ${deity.displayName}?'),
+          content: Text(
+            'This deletes all tracked sessions for ${deity.displayName} only. Other deity histories remain untouched.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, true),
+              child: const Text('Delete deity history'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldReset != true) return;
+
+    await _repository.resetDeitySessions(deity.id);
+    if (!mounted) return;
+    _showMessage('${deity.displayName} session history deleted.');
+  }
+
+  Future<void> _showExportDialog() async {
+    try {
+      final payload = await _repository.exportSessionsJson();
+      if (!mounted) return;
+
+      final controller = TextEditingController(text: payload);
+      await showDialog<void>(
+        context: context,
+        builder: (dialogContext) {
+          return AlertDialog(
+            title: const Text('Export backup JSON'),
+            content: SizedBox(
+              width: double.maxFinite,
+              child: TextField(
+                controller: controller,
+                readOnly: true,
+                maxLines: 14,
+                minLines: 8,
+                decoration: const InputDecoration(
+                  labelText: 'Backup payload',
+                  alignLabelWithHint: true,
+                ),
+              ),
             ),
             actions: [
               TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Cancel'),
+                onPressed: () async {
+                  await Clipboard.setData(ClipboardData(text: controller.text));
+                  if (!mounted) return;
+                  _showMessage('Backup copied to clipboard.');
+                },
+                child: const Text('Copy'),
               ),
               TextButton(
-                onPressed: () {
-                  _resetSadhanaCount(deity);
-                  Navigator.pop(context);
-                },
-                child: const Text('Reset', style: TextStyle(color: Colors.red)),
+                onPressed: () => Navigator.pop(dialogContext),
+                child: const Text('Close'),
               ),
             ],
+          );
+        },
+      );
+      controller.dispose();
+    } on Object catch (error) {
+      if (!mounted) return;
+      _showMessage('Export failed: $error', isError: true);
+    }
+  }
+
+  Future<void> _showImportDialog() async {
+    final controller = TextEditingController();
+
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Import backup JSON'),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: controller,
+                  maxLines: 12,
+                  minLines: 8,
+                  decoration: const InputDecoration(
+                    labelText: 'Paste backup payload',
+                    alignLabelWithHint: true,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton.icon(
+                    onPressed: () async {
+                      final clipboard =
+                          await Clipboard.getData(Clipboard.kTextPlain);
+                      controller.text = clipboard?.text?.trim() ?? '';
+                    },
+                    icon: const Icon(Icons.content_paste_rounded),
+                    label: const Text('Paste from clipboard'),
+                  ),
+                ),
+              ],
+            ),
           ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                final navigator = Navigator.of(dialogContext);
+                final raw = controller.text.trim();
+                if (raw.isEmpty) {
+                  _showMessage('Paste backup JSON before importing.',
+                      isError: true);
+                  return;
+                }
+
+                await _importBackup(raw, BackupImportMode.merge);
+                if (!mounted) return;
+                navigator.pop();
+              },
+              child: const Text('Import merge'),
+            ),
+            TextButton(
+              onPressed: () async {
+                final navigator = Navigator.of(dialogContext);
+                final raw = controller.text.trim();
+                if (raw.isEmpty) {
+                  _showMessage('Paste backup JSON before importing.',
+                      isError: true);
+                  return;
+                }
+
+                final shouldReplace = await showDialog<bool>(
+                  context: context,
+                  builder: (replaceContext) {
+                    return AlertDialog(
+                      title: const Text('Replace all existing sessions?'),
+                      content: const Text(
+                        'Replace import deletes current session history first, then imports the backup payload.',
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(replaceContext, false),
+                          child: const Text('Cancel'),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.pop(replaceContext, true),
+                          child: const Text('Replace now'),
+                        ),
+                      ],
+                    );
+                  },
+                );
+
+                if (shouldReplace != true) return;
+
+                await _importBackup(raw, BackupImportMode.replace);
+                if (!mounted) return;
+                navigator.pop();
+              },
+              child: const Text('Import replace'),
+            ),
+          ],
+        );
+      },
     );
+
+    controller.dispose();
+  }
+
+  Future<void> _importBackup(String rawJson, BackupImportMode mode) async {
+    try {
+      final result = await _repository.importSessionsJson(rawJson, mode: mode);
+      if (!mounted) return;
+      final modeLabel =
+          result.mode == BackupImportMode.merge ? 'merge' : 'replace';
+      _showMessage('Imported ${result.importedCount} sessions via $modeLabel.');
+    } on FormatException catch (error) {
+      if (!mounted) return;
+      _showMessage('Import failed: ${error.message}', isError: true);
+    } on Object catch (error) {
+      if (!mounted) return;
+      _showMessage('Import failed: $error', isError: true);
+    }
+  }
+
+  void _showMessage(String message, {bool isError = false}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isError ? Colors.red.shade700 : null,
+      ),
+    );
+  }
+
+  String _formatDuration(int seconds) {
+    final minutes = seconds ~/ 60;
+    final remSeconds = seconds % 60;
+    return '${minutes}m ${remSeconds.toString().padLeft(2, '0')}s';
+  }
+
+  String _formatDateTime(DateTime value) {
+    final month = value.month.toString().padLeft(2, '0');
+    final day = value.day.toString().padLeft(2, '0');
+    final hour = value.hour.toString().padLeft(2, '0');
+    final minute = value.minute.toString().padLeft(2, '0');
+    return '${value.year}-$month-$day $hour:$minute';
   }
 }

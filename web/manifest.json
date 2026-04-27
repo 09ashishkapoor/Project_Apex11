@@ -1,11 +1,11 @@
 {
-    "name": "adya_mahakaali_sadhana",
-    "short_name": "adya_mahakaali_sadhana",
+    "name": "Sadhana for a Khyapa",
+    "short_name": "Sadhana",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#0D0506",
+    "theme_color": "#8B2635",
+    "description": "A local-first mantra japa and sadhana tracker with bundled devotional audio.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

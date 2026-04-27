@@ -1,4 +1,4 @@
-package com.example.adya_mahakaali_sadhana
+package com.jaikhyapaparampara.sadhana
 
 import io.flutter.embedding.android.FlutterActivity
 

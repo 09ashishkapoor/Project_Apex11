@@ -1,661 +1,740 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
+
 import 'package:audioplayers/audioplayers.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/material.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
+
+import '../models/deity.dart';
+import '../models/sadhana_session.dart';
+import '../services/sadhana_repository.dart';
 
 class SadhanaSessionScreen extends StatefulWidget {
-  final String deityName;
-  final String deityImage;
-  final String mantraAudio;
-  final String mantraText;
-
   const SadhanaSessionScreen({
     super.key,
-    required this.deityName,
-    required this.deityImage,
-    required this.mantraAudio,
-    required this.mantraText,
+    required this.deity,
+    required this.repository,
   });
+
+  final Deity deity;
+  final SadhanaRepository repository;
 
   @override
   State<SadhanaSessionScreen> createState() => _SadhanaSessionScreenState();
 }
 
 class _SadhanaSessionScreenState extends State<SadhanaSessionScreen> {
-  int _counter = 0;
-  late AudioPlayer _audioPlayer;
+  static const int _defaultTimedMinutes = 5;
+
+  late final AudioPlayer _audioPlayer;
+  late final TextEditingController _targetController;
+  late final TextEditingController _durationController;
+
+  StreamSubscription<PlayerState>? _playerStateSubscription;
+  StreamSubscription<void>? _playerCompleteSubscription;
+  Timer? _countdownTimer;
+  Stopwatch _sessionStopwatch = Stopwatch();
+
+  SadhanaSessionMode _mode = SadhanaSessionMode.manual;
+  SadhanaSessionStatus? _status;
+  int? _sessionId;
+
+  late int _targetCount;
+  int _completedCount = 0;
+  Duration _timedDuration = const Duration(minutes: _defaultTimedMinutes);
+  Duration _remainingDuration = const Duration(minutes: _defaultTimedMinutes);
+
   bool _isPlaying = false;
   bool _showMantra = false;
-  bool _showGlow = false;
-  bool _isAutoMode = false;
-  int _manualTargetCount = 108;
-  int _autoDurationMinutes = 5;
-  late Duration _remainingTime;
-  bool _isTimerRunning = false;
+  DateTime? _currentTimedChantStartedAt;
+
+  bool get _isActive => _status == SadhanaSessionStatus.active;
+  bool get _isPaused => _status == SadhanaSessionStatus.paused;
+  bool get _isTimed => _mode == SadhanaSessionMode.timed;
+
+  Duration get _elapsed =>
+      Duration(seconds: _sessionStopwatch.elapsed.inSeconds);
+
+  Deity get _deity => widget.deity;
+  SadhanaRepository get _repository => widget.repository;
 
   @override
   void initState() {
     super.initState();
+    _targetCount = _deity.defaultTargetCount;
+    _targetController = TextEditingController(text: _targetCount.toString());
+    _durationController = TextEditingController(text: '$_defaultTimedMinutes');
+    _timedDuration = const Duration(minutes: _defaultTimedMinutes);
+    _remainingDuration = _timedDuration;
+
     _audioPlayer = AudioPlayer();
-    _remainingTime = Duration(minutes: _autoDurationMinutes);
-    _setupAudioListeners();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _showModeSelectionDialog();
-    });
+    _listenAudioPlayer();
   }
 
-  void _setupAudioListeners() {
-    _audioPlayer.onPlayerStateChanged.listen((state) {
-      if (mounted) {
-        setState(() {
-          _isPlaying = state == PlayerState.playing;
-          _showMantra = _isPlaying;
-          _showGlow = _isPlaying;
-        });
-      }
+  void _listenAudioPlayer() {
+    _playerStateSubscription =
+        _audioPlayer.onPlayerStateChanged.listen((state) {
+      if (!mounted) return;
+      setState(() {
+        _isPlaying = state == PlayerState.playing;
+        _showMantra = _isPlaying || _isActive;
+      });
     });
 
-    _audioPlayer.onPlayerComplete.listen((_) {
-      if (mounted) {
-        setState(() {
-          _isPlaying = false;
-          _showMantra = false;
-          _showGlow = false;
-          _counter++;
-        });
+    _playerCompleteSubscription =
+        _audioPlayer.onPlayerComplete.listen((_) async {
+      if (!mounted) return;
 
-        if (!_isAutoMode && _counter >= _manualTargetCount) {
-          _showCompletionDialog();
-        } else if (_isAutoMode && _isTimerRunning) {
-          _playMantra();
+      if (_mode == SadhanaSessionMode.timed) {
+        final startedAt = _currentTimedChantStartedAt;
+        final stillWithinWindow =
+            startedAt != null && _remainingDuration.inSeconds > 0 && _isActive;
+        if (!stillWithinWindow) {
+          return;
         }
       }
+
+      await _incrementProgress();
+
+      if (_mode == SadhanaSessionMode.timed && _isActive) {
+        await _startSingleChant();
+      }
     });
   }
 
-  Future<void> _playMantra() async {
-    if (_isPlaying) return;
+  String _audioRelativePath(String assetPath) {
+    if (assetPath.startsWith('assets/')) {
+      return assetPath.substring('assets/'.length);
+    }
+    return assetPath;
+  }
+
+  Future<void> _startSingleChant() async {
+    if (!_isActive || _isPlaying) return;
+    if (_mode == SadhanaSessionMode.timed &&
+        _remainingDuration.inSeconds <= 0) {
+      return;
+    }
 
     try {
+      _currentTimedChantStartedAt =
+          _mode == SadhanaSessionMode.timed ? DateTime.now() : null;
       await _audioPlayer.stop();
-      // Try multiple possible audio paths
-      try {
-        await _audioPlayer.play(
-          AssetSource('assets/audio/${widget.mantraAudio}'),
-        );
-      } catch (firstError) {
-        debugPrint('First attempt failed: $firstError');
-        try {
-          await _audioPlayer.play(AssetSource('audio/${widget.mantraAudio}'));
-        } catch (secondError) {
-          debugPrint('Second attempt failed: $secondError');
-          rethrow;
-        }
-      }
-
-      if (mounted) {
-        setState(() {
-          _isPlaying = true;
-        });
-      }
-    } catch (e) {
-      debugPrint('Final audio error: $e');
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text(
-                  'Failed to play audio:',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                Text('File: ${widget.mantraAudio}'),
-                Text('Error: ${e.toString()}'),
-                const Text('Check pubspec.yaml and file location'),
-              ],
-            ),
-            duration: const Duration(seconds: 5),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
+      await _audioPlayer
+          .play(AssetSource(_audioRelativePath(_deity.audioAsset)));
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text('Unable to play ${_deity.displayName} chant audio.')),
+      );
     }
   }
 
-  Future<void> _saveSadhanaCount() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('${widget.deityName}-count', _counter);
+  int _parsePositiveInt(
+    TextEditingController controller,
+    int fallback,
+    String fieldName,
+  ) {
+    final parsed = int.tryParse(controller.text.trim());
+    if (parsed == null || parsed <= 0) {
+      controller.text = fallback.toString();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text(
+                  '$fieldName must be a positive number. Using $fallback.')),
+        );
+      }
+      return fallback;
+    }
+    return parsed;
+  }
+
+  Future<void> _startSession() async {
+    if (_isActive || _isPaused) return;
+
+    final target = _parsePositiveInt(
+      _targetController,
+      _deity.defaultTargetCount,
+      'Target count',
+    );
+    final durationMinutes = _parsePositiveInt(
+      _durationController,
+      _defaultTimedMinutes,
+      'Timed duration',
+    );
+    final duration = Duration(minutes: durationMinutes);
+
+    _targetCount = target;
+    _timedDuration = duration;
+    _remainingDuration = duration;
+    _completedCount = 0;
+    _sessionStopwatch = Stopwatch()..start();
+
+    final id = await _repository.startSession(
+      deity: _deity,
+      mode: _mode,
+      targetCount: _targetCount,
+      durationSeconds:
+          _mode == SadhanaSessionMode.timed ? duration.inSeconds : 0,
+    );
+
+    setState(() {
+      _sessionId = id;
+      _status = SadhanaSessionStatus.active;
+      _showMantra = _mode != SadhanaSessionMode.manual;
+    });
+
+    await WakelockPlus.enable();
+
+    if (_mode == SadhanaSessionMode.timed) {
+      _startCountdownTimer();
+      await _startSingleChant();
+    }
+  }
+
+  void _startCountdownTimer() {
+    _countdownTimer?.cancel();
+    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
+      if (!_isActive || !_isTimed) {
+        timer.cancel();
+        return;
+      }
+
+      if (_remainingDuration.inSeconds <= 1) {
+        setState(() {
+          _remainingDuration = Duration.zero;
+        });
+        timer.cancel();
+        await _audioPlayer.stop();
+        await _completeSession(dueToTimer: true);
+        return;
+      }
+
+      setState(() {
+        _remainingDuration -= const Duration(seconds: 1);
+      });
+    });
+  }
+
+  Future<void> _incrementProgress() async {
+    if (!_isActive || _sessionId == null) return;
+
+    final nextCount = _completedCount + 1;
+    final durationSeconds = _elapsed.inSeconds;
+    await _repository.updateProgress(
+      sessionId: _sessionId!,
+      completedCount: nextCount,
+      durationSeconds: durationSeconds,
+    );
+
+    if (!mounted) return;
+    setState(() {
+      _completedCount = nextCount;
+    });
+
+    if ((_mode == SadhanaSessionMode.manual ||
+            _mode == SadhanaSessionMode.audio) &&
+        _completedCount >= _targetCount) {
+      await _completeSession();
+    }
+  }
+
+  Future<void> _manualTap() async {
+    if (!_isActive || _mode != SadhanaSessionMode.manual) return;
+    await _incrementProgress();
+  }
+
+  Future<void> _pauseSession() async {
+    if (!_isActive || _sessionId == null) return;
+
+    _countdownTimer?.cancel();
+    _sessionStopwatch.stop();
+    await _audioPlayer.stop();
+    await _repository.pauseSession(
+      sessionId: _sessionId!,
+      completedCount: _completedCount,
+      durationSeconds: _elapsed.inSeconds,
+    );
+
+    if (!mounted) return;
+    setState(() {
+      _status = SadhanaSessionStatus.paused;
+      _isPlaying = false;
+      _showMantra = false;
+    });
+
+    await WakelockPlus.disable();
+  }
+
+  Future<void> _resumeSession() async {
+    if (!_isPaused || _sessionId == null) return;
+
+    _sessionStopwatch.start();
+    await _repository.resumeSession(
+      sessionId: _sessionId!,
+      completedCount: _completedCount,
+      durationSeconds: _elapsed.inSeconds,
+    );
+
+    if (!mounted) return;
+    setState(() {
+      _status = SadhanaSessionStatus.active;
+      _showMantra = _mode != SadhanaSessionMode.manual;
+    });
+
+    await WakelockPlus.enable();
+
+    if (_mode == SadhanaSessionMode.timed) {
+      _startCountdownTimer();
+      await _startSingleChant();
+    }
+  }
+
+  Future<void> _completeSession({bool dueToTimer = false}) async {
+    if (_sessionId == null ||
+        (_status != SadhanaSessionStatus.active &&
+            _status != SadhanaSessionStatus.paused)) {
+      return;
+    }
+
+    _countdownTimer?.cancel();
+    _sessionStopwatch.stop();
+    await _audioPlayer.stop();
+    await _repository.completeSession(
+      sessionId: _sessionId!,
+      completedCount: _completedCount,
+      durationSeconds: _elapsed.inSeconds,
+    );
+
+    final finalCount = _completedCount;
+    final mode = _mode;
+    final timedMinutes = _timedDuration.inMinutes;
+
+    if (!mounted) return;
+    setState(() {
+      _status = SadhanaSessionStatus.completed;
+      _isPlaying = false;
+      _showMantra = false;
+      _sessionId = null;
+    });
+
+    await WakelockPlus.disable();
+
+    if (!mounted) return;
+    await showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(dueToTimer ? 'Timed session complete' : 'Sadhana complete'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Deity: ${_deity.displayName}'),
+            Text('Mode: ${mode.label}'),
+            Text('Completed chants: $finalCount'),
+            if (mode == SadhanaSessionMode.timed)
+              Text('Configured duration: $timedMinutes minutes')
+            else
+              Text('Target: $_targetCount'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _resetSession() async {
+    final isRunning = _status == SadhanaSessionStatus.active;
+    final isPaused = _status == SadhanaSessionStatus.paused;
+    if (_sessionId != null && (isRunning || isPaused)) {
+      _countdownTimer?.cancel();
+      _sessionStopwatch.stop();
+      await _audioPlayer.stop();
+      await _repository.cancelSession(
+        sessionId: _sessionId!,
+        completedCount: _completedCount,
+        durationSeconds: _elapsed.inSeconds,
+      );
+    }
+
+    if (!mounted) return;
+    setState(() {
+      _sessionId = null;
+      _status = null;
+      _completedCount = 0;
+      _targetCount = _deity.defaultTargetCount;
+      _targetController.text = _targetCount.toString();
+      _timedDuration = const Duration(minutes: _defaultTimedMinutes);
+      _durationController.text = '$_defaultTimedMinutes';
+      _remainingDuration = _timedDuration;
+      _isPlaying = false;
+      _showMantra = false;
+    });
+
+    _sessionStopwatch = Stopwatch();
+    await WakelockPlus.disable();
+  }
+
+  Widget _buildModeSelector() {
+    return SegmentedButton<SadhanaSessionMode>(
+      segments: SadhanaSessionMode.values
+          .map(
+            (mode) => ButtonSegment<SadhanaSessionMode>(
+              value: mode,
+              label: Text(mode.label),
+            ),
+          )
+          .toList(growable: false),
+      selected: {_mode},
+      onSelectionChanged: _isActive || _isPaused
+          ? null
+          : (selection) {
+              setState(() {
+                _mode = selection.first;
+                if (_mode != SadhanaSessionMode.timed) {
+                  _showMantra = false;
+                }
+              });
+            },
+    );
+  }
+
+  String _formatDuration(Duration duration) {
+    final minutes = duration.inMinutes;
+    final seconds = duration.inSeconds % 60;
+    return '$minutes:${seconds.toString().padLeft(2, '0')}';
   }
 
   @override
   Widget build(BuildContext context) {
+    final progressDenominator = _mode == SadhanaSessionMode.timed
+        ? (_timedDuration.inSeconds == 0 ? 1 : _timedDuration.inSeconds)
+        : (_targetCount == 0 ? 1 : _targetCount);
+    final progressNumerator = _mode == SadhanaSessionMode.timed
+        ? (_timedDuration.inSeconds - _remainingDuration.inSeconds)
+            .clamp(0, _timedDuration.inSeconds)
+        : _completedCount.clamp(0, _targetCount);
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.deityName),
-        backgroundColor: Colors.black,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: _showModeSelectionDialog,
-            tooltip: 'Change chanting mode',
-          ),
-        ],
-      ),
-      backgroundColor: Colors.black,
+      appBar: AppBar(title: Text(_deity.displayName)),
       body: SafeArea(
-        child: Column(
-          children: [
-            // Divine Image with Glow Effect
-            Flexible(
-              flex: 3,
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15),
-                    boxShadow:
-                        _showGlow
-                            ? [
-                              BoxShadow(
-                                color: Colors.orange.withOpacity(0.8),
-                                blurRadius: 25,
-                                spreadRadius: 3,
-                              ),
-                              BoxShadow(
-                                color: Colors.deepOrange.withOpacity(0.6),
-                                blurRadius: 40,
-                                spreadRadius: 5,
-                              ),
-                            ]
-                            : [
-                              BoxShadow(
-                                color: Colors.deepOrange.withOpacity(0.3),
-                                blurRadius: 15,
-                                spreadRadius: 1,
-                              ),
-                            ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(15),
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        Image.asset(
-                          widget.deityImage,
-                          fit: BoxFit.cover,
-                          errorBuilder:
-                              (context, error, stackTrace) => const Center(
-                                child: Icon(
-                                  Icons.error,
-                                  color: Colors.red,
-                                  size: 50,
-                                ),
-                              ),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final imageCardWidth = constraints.maxWidth < 360
+                ? 148.0
+                : constraints.maxWidth < 420
+                    ? 168.0
+                    : 196.0;
+            final compactControls = constraints.maxWidth < 380;
+            final actionButtonWidth = compactControls
+                ? (constraints.maxWidth - 40) / 2
+                : null;
+            final manualPrimaryLabel = compactControls ? 'Count' : 'Add Chant';
+            final audioIdleLabel = compactControls ? 'Play Chant' : 'Play Single Chant';
+            final timedIdleLabel = compactControls ? 'Auto Ready' : 'Auto mode running';
+            final activeAudioLabel = compactControls ? 'Chanting' : 'Chanting…';
+            final activeTimedLabel = compactControls ? 'Auto On' : 'Auto chanting…';
+
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight - 32),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: imageCardWidth,
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surface,
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(
+                            color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.32),
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.12),
+                              blurRadius: 18,
+                              spreadRadius: 1,
+                            ),
+                          ],
                         ),
-                        if (_showMantra)
-                          Container(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.bottomCenter,
-                                end: Alignment.topCenter,
-                                colors: [
-                                  Colors.black.withOpacity(0.5),
-                                  Colors.transparent,
-                                ],
-                              ),
+                        child: AspectRatio(
+                          aspectRatio: 3 / 4,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(18),
+                            child: Image.asset(
+                              _deity.imageAsset,
+                              fit: BoxFit.contain,
                             ),
                           ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-            // Mantra at Feet
-            if (_showMantra)
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.7),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    widget.mantraText,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-
-            // Counter and Button Section
-            Flexible(
-              flex: 2,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    if (_isAutoMode) ...[
-                      const Text(
-                        'Remaining Time:',
-                        style: TextStyle(fontSize: 16, color: Colors.white70),
+                        ),
                       ),
+                    ),
+                    const SizedBox(height: 12),
+                    if (_showMantra)
                       Text(
-                        '${_remainingTime.inMinutes}:${(_remainingTime.inSeconds % 60).toString().padLeft(2, '0')}',
-                        style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                        _deity.mantraText,
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                    const SizedBox(height: 12),
+                    _buildModeSelector(),
+                    const SizedBox(height: 12),
+                    if (_mode != SadhanaSessionMode.timed) ...[
+                      TextField(
+                        controller: _targetController,
+                        enabled: !_isActive && !_isPaused,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(
+                          labelText: 'Target count',
+                          helperText: 'Used for manual/audio sessions',
                         ),
                       ),
                       const SizedBox(height: 8),
                     ],
-                    Stack(
-                      alignment: Alignment.center,
+                    if (_mode == SadhanaSessionMode.timed) ...[
+                      TextField(
+                        controller: _durationController,
+                        enabled: !_isActive && !_isPaused,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(
+                          labelText: 'Timed duration (minutes)',
+                          helperText: 'Used for timed auto sessions',
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                    ],
+                    const SizedBox(height: 10),
+                    LinearProgressIndicator(
+                      value: progressNumerator / progressDenominator,
+                      minHeight: 8,
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
                       children: [
-                        SizedBox(
-                          width: 85,
-                          height: 85,
-                          child: CircularProgressIndicator(
-                            value:
-                                _isAutoMode
-                                    ? 1 -
-                                        (_remainingTime.inSeconds /
-                                            (_autoDurationMinutes * 60))
-                                    : _counter / _manualTargetCount,
-                            strokeWidth: 6,
-                            backgroundColor: Colors.grey.withOpacity(0.2),
-                            color: Colors.deepOrange,
+                        Expanded(
+                          child: _SessionInfoChip(
+                            label: _mode == SadhanaSessionMode.timed
+                                ? 'Remaining'
+                                : 'Count',
+                            value: _mode == SadhanaSessionMode.timed
+                                ? _formatDuration(_remainingDuration)
+                                : '$_completedCount / $_targetCount',
                           ),
                         ),
-                        Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              '$_counter',
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                            Text(
-                              _isAutoMode ? 'chants' : 'of $_manualTargetCount',
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: Colors.white70,
-                              ),
-                            ),
-                          ],
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: _SessionInfoChip(
+                            label: 'Elapsed',
+                            value: _formatDuration(_elapsed),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      alignment: WrapAlignment.center,
+                      children: [
+                        _SessionActionButton(
+                          label: 'Start',
+                          icon: Icons.play_arrow_rounded,
+                          width: actionButtonWidth,
+                          compact: compactControls,
+                          onPressed: (_isActive || _isPaused) ? null : _startSession,
+                        ),
+                        _SessionActionButton(
+                          label: 'Pause',
+                          icon: Icons.pause_rounded,
+                          width: actionButtonWidth,
+                          compact: compactControls,
+                          onPressed: _isActive ? _pauseSession : null,
+                        ),
+                        _SessionActionButton(
+                          label: 'Resume',
+                          icon: Icons.play_circle_outline_rounded,
+                          width: actionButtonWidth,
+                          compact: compactControls,
+                          onPressed: _isPaused ? _resumeSession : null,
+                        ),
+                        _SessionActionButton(
+                          label: 'Complete',
+                          icon: Icons.check_circle_outline_rounded,
+                          width: actionButtonWidth,
+                          compact: compactControls,
+                          onPressed:
+                              (_isActive || _isPaused) ? _completeSession : null,
+                        ),
+                        _SessionActionButton(
+                          label: 'Reset',
+                          icon: Icons.refresh_rounded,
+                          width: actionButtonWidth,
+                          compact: compactControls,
+                          outlined: true,
+                          onPressed: _resetSession,
                         ),
                       ],
                     ),
                     const SizedBox(height: 12),
-                    if (!_isAutoMode || !_isTimerRunning)
+                    if (_mode == SadhanaSessionMode.manual)
                       SizedBox(
                         width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: _playMantra,
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            backgroundColor:
-                                _isPlaying
-                                    ? Colors.orange[800]
-                                    : Colors.deepOrange,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(25),
-                            ),
-                          ),
-                          child: Text(
-                            _isPlaying ? 'Chanting...' : 'Chant Mantra',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                        child: FilledButton(
+                          onPressed: _isActive ? _manualTap : null,
+                          child: Text(manualPrimaryLabel, textAlign: TextAlign.center),
                         ),
-                      ),
-                    if (_isAutoMode && _isTimerRunning)
+                      )
+                    else
                       SizedBox(
                         width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: _stopAutoMode,
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            backgroundColor: Colors.red,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(25),
-                            ),
-                          ),
-                          child: const Text(
-                            'Stop',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
+                        child: FilledButton(
+                          onPressed: (_isActive && _mode == SadhanaSessionMode.audio)
+                              ? _startSingleChant
+                              : null,
+                          child: Text(
+                            _mode == SadhanaSessionMode.audio
+                                ? (_isPlaying ? activeAudioLabel : audioIdleLabel)
+                                : (_isPlaying ? activeTimedLabel : timedIdleLabel),
+                            textAlign: TextAlign.center,
                           ),
                         ),
                       ),
                   ],
                 ),
               ),
-            ),
-          ],
+            );
+          },
         ),
       ),
     );
   }
 
-  Future<void> _showModeSelectionDialog() async {
-    await showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder:
-          (context) => AlertDialog(
-            backgroundColor: Colors.black.withOpacity(0.9),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-              side: const BorderSide(color: Colors.deepOrange, width: 2),
-            ),
-            title: const Text(
-              'Select Chanting Mode',
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    _setManualMode();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepOrange,
-                    minimumSize: const Size(double.infinity, 50),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                  ),
-                  child: const Text(
-                    'Manual Chanting',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ),
-                const SizedBox(height: 15),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    _setAutoMode();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepOrange,
-                    minimumSize: const Size(double.infinity, 50),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                  ),
-                  child: const Text(
-                    'Automatic Chanting',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ),
-              ],
-            ),
-          ),
-    );
-  }
-
-  void _setManualMode() {
-    showDialog(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            backgroundColor: Colors.black.withOpacity(0.9),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-              side: const BorderSide(color: Colors.deepOrange, width: 2),
-            ),
-            title: const Text(
-              'Manual Chanting',
-              style: TextStyle(fontSize: 20, color: Colors.white),
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text(
-                  'How many times do you want to chant?',
-                  style: TextStyle(fontSize: 16, color: Colors.white70),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  keyboardType: TextInputType.number,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    hintText: 'Enter count (default 108)',
-                    hintStyle: const TextStyle(color: Colors.white70),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Colors.deepOrange),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Colors.deepOrange),
-                    ),
-                  ),
-                  onChanged: (value) {
-                    if (value.isNotEmpty) {
-                      setState(() {
-                        _manualTargetCount = int.tryParse(value) ?? 108;
-                      });
-                    }
-                  },
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Cancel'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  setState(() {
-                    _isAutoMode = false;
-                    _counter = 0;
-                  });
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepOrange,
-                ),
-                child: const Text('Confirm'),
-              ),
-            ],
-          ),
-    );
-  }
-
-  void _setAutoMode() {
-    showDialog(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            backgroundColor: Colors.black.withOpacity(0.9),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-              side: const BorderSide(color: Colors.deepOrange, width: 2),
-            ),
-            title: const Text(
-              'Automatic Chanting',
-              style: TextStyle(fontSize: 20, color: Colors.white),
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text(
-                  'For how many minutes?',
-                  style: TextStyle(fontSize: 16, color: Colors.white70),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  keyboardType: TextInputType.number,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    hintText: 'Enter minutes (default 5)',
-                    hintStyle: const TextStyle(color: Colors.white70),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Colors.deepOrange),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Colors.deepOrange),
-                    ),
-                  ),
-                  onChanged: (value) {
-                    if (value.isNotEmpty) {
-                      setState(() {
-                        _autoDurationMinutes = int.tryParse(value) ?? 5;
-                        _remainingTime = Duration(
-                          minutes: _autoDurationMinutes,
-                        );
-                      });
-                    }
-                  },
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Cancel'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  setState(() {
-                    _isAutoMode = true;
-                    _counter = 0;
-                    _startAutoMode();
-                  });
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepOrange,
-                ),
-                child: const Text('Start'),
-              ),
-            ],
-          ),
-    );
-  }
-
-  void _startAutoMode() {
-    setState(() {
-      _isTimerRunning = true;
-    });
-    _playMantra();
-    _startTimer();
-  }
-
-  void _startTimer() {
-    Future.delayed(const Duration(seconds: 1), () {
-      if (_isTimerRunning && mounted) {
-        setState(() {
-          _remainingTime = _remainingTime - const Duration(seconds: 1);
-        });
-        if (_remainingTime.inSeconds <= 0) {
-          _stopAutoMode();
-        } else {
-          _startTimer();
-        }
-      }
-    });
-  }
-
-  void _stopAutoMode() {
-    setState(() {
-      _isTimerRunning = false;
-      _isPlaying = false;
-    });
-    _audioPlayer.stop();
-    _showCompletionDialog();
-  }
-
-  void _showCompletionDialog() {
-    _saveSadhanaCount();
-    showDialog(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            backgroundColor: Colors.black.withOpacity(0.9),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-              side: const BorderSide(color: Colors.deepOrange, width: 2),
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.check_circle, color: Colors.green, size: 50),
-                const SizedBox(height: 16),
-                Text(
-                  _isAutoMode ? 'Time Complete!' : 'Sadhana Complete!',
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  _isAutoMode
-                      ? 'Completed $_counter chants in $_autoDurationMinutes minutes'
-                      : 'Completed $_manualTargetCount chants of ${widget.deityName}',
-                  style: const TextStyle(fontSize: 16, color: Colors.white70),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-            actions: [
-              Center(
-                child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepOrange,
-                    minimumSize: const Size(120, 40),
-                  ),
-                  child: const Text(
-                    'Jai Bhairav',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ),
-              ),
-            ],
-          ),
-    );
-  }
-
   @override
   void dispose() {
-    _audioPlayer.dispose();
+    _countdownTimer?.cancel();
+    _playerStateSubscription?.cancel();
+    _playerCompleteSubscription?.cancel();
+    _sessionStopwatch.stop();
+    if (_sessionId != null &&
+        (_status == SadhanaSessionStatus.active ||
+            _status == SadhanaSessionStatus.paused)) {
+      unawaited(
+        _repository.cancelSession(
+          sessionId: _sessionId!,
+          completedCount: _completedCount,
+          durationSeconds: _elapsed.inSeconds,
+        ),
+      );
+    }
+    unawaited(WakelockPlus.disable());
+    unawaited(_audioPlayer.stop());
+    unawaited(_audioPlayer.dispose());
+    _targetController.dispose();
+    _durationController.dispose();
     super.dispose();
+  }
+}
+
+
+class _SessionInfoChip extends StatelessWidget {
+  const _SessionInfoChip({
+    required this.label,
+    required this.value,
+  });
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.18),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: textTheme.bodySmall),
+          const SizedBox(height: 2),
+          Text(value, style: textTheme.titleMedium),
+        ],
+      ),
+    );
+  }
+}
+
+class _SessionActionButton extends StatelessWidget {
+  const _SessionActionButton({
+    required this.label,
+    required this.icon,
+    required this.onPressed,
+    required this.compact,
+    this.width,
+    this.outlined = false,
+  });
+
+  final String label;
+  final IconData icon;
+  final VoidCallback? onPressed;
+  final bool compact;
+  final double? width;
+  final bool outlined;
+
+  @override
+  Widget build(BuildContext context) {
+    final child = compact
+        ? (outlined
+            ? OutlinedButton(
+                onPressed: onPressed,
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(44),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                child: Text(label, textAlign: TextAlign.center),
+              )
+            : ElevatedButton(
+                onPressed: onPressed,
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(44),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                child: Text(label, textAlign: TextAlign.center),
+              ))
+        : (outlined
+            ? OutlinedButton.icon(
+                onPressed: onPressed,
+                icon: Icon(icon, size: 18),
+                label: Text(label, textAlign: TextAlign.center),
+              )
+            : ElevatedButton.icon(
+                onPressed: onPressed,
+                icon: Icon(icon, size: 18),
+                label: Text(label, textAlign: TextAlign.center),
+              ));
+
+    if (width == null) return child;
+
+    return SizedBox(
+      width: width,
+      child: child,
+    );
   }
 }
