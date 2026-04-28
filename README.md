@@ -1,5 +1,7 @@
 # MANTRINI
 
+![MANTRINI app introduction](docs/app-intro.jpg)
+
 A respectful, offline Japa companion distributed primarily as an Android APK through GitHub Releases.
 
 <div align="center">

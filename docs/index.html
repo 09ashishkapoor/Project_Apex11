@@ -180,6 +180,24 @@
         padding: 30px 0 28px;
       }
 
+      .intro-visual {
+        margin-bottom: 26px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 30px;
+        background:
+          linear-gradient(180deg, rgba(255, 248, 240, 0.04), transparent 28%),
+          linear-gradient(180deg, rgba(31, 11, 17, 0.96), rgba(11, 4, 6, 0.98));
+        box-shadow: var(--shadow);
+      }
+
+      .intro-visual img {
+        width: 100%;
+        border-radius: 22px;
+        border: 1px solid rgba(232, 196, 104, 0.16);
+        box-shadow: 0 20px 48px rgba(0, 0, 0, 0.24);
+      }
+
       .hero-grid {
         display: grid;
         grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
@@ -567,6 +585,7 @@
         .feature-card,
         .trust-grid article,
         .flow-step,
+        .intro-visual,
         .footer-panel {
           border-radius: 22px;
         }
@@ -603,6 +622,10 @@
 
     <main id="main-content">
       <section class="hero" aria-labelledby="hero-title">
+        <div class="intro-visual">
+          <img src="app-intro.jpg" alt="MANTRINI app interface preview">
+        </div>
+
         <div class="hero-grid">
           <div class="hero-copy">
             <div class="section-kicker">Focused practice. No cloud dependence.</div>
