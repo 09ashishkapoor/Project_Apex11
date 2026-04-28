@@ -4,7 +4,7 @@ const List<Deity> kDeities = [
   Deity(
     id: 'adya-mahakaali',
     mantraId: 'adya-mahakaali-japa',
-    displayName: 'Adya MahaKaali',
+    displayName: 'Adya Mahakali',
     imageAsset: 'assets/images/maha1.jpg',
     audioAsset: 'assets/audio/maha.mp3',
     mantraText: 'ॐ आद्यायै नमः',

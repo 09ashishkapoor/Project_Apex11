@@ -1,5 +1,5 @@
 name: sadhana_for_a_khyapa
-description: A local-first devotional japa and sadhana tracker with bundled mantra audio.
+description: A respectful, offline Japa companion.
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -35,3 +35,10 @@ flutter:
     - assets/images/swarna.jpg
     - assets/images/skanda.jpg
     - assets/images/maha1.jpg
+  fonts:
+    - family: NotoSansDevanagari
+      fonts:
+        - asset: assets/fonts/NotoSansDevanagari.ttf
+    - family: Cinzel
+      fonts:
+        - asset: assets/fonts/Cinzel.ttf

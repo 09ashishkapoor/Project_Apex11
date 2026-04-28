@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'data/app_database.dart';
+import 'screens/dedication_splash_screen.dart';
 import 'screens/deity_selection_screen.dart';
 import 'screens/sadhana_session_screen.dart';
 import 'screens/sadhana_tracker_screen.dart';
@@ -39,11 +40,12 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Sadhana for a Khyapa',
+      title: 'MANTRINI',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.theme,
-      initialRoute: '/welcome',
+      initialRoute: '/dedication',
       routes: {
+        '/dedication': (_) => const DedicationSplashScreen(),
         '/welcome': (_) => WelcomeScreen(repository: widget.repository),
         '/deities': (_) => DeitySelectionScreen(repository: widget.repository),
         '/tracker': (_) => SadhanaTrackerScreen(repository: widget.repository),
@@ -68,7 +70,7 @@ class _RouteErrorScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Sadhana for a Khyapa')),
+      appBar: AppBar(title: const Text('MANTRINI')),
       body: const Center(
         child: Padding(
           padding: EdgeInsets.all(24),

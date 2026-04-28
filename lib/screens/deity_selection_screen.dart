@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/deity.dart';
 import '../services/sadhana_repository.dart';
 import '../theme/app_theme.dart';
+import '../widgets/altar_widgets.dart';
 
 class DeitySelectionScreen extends StatelessWidget {
   const DeitySelectionScreen({
@@ -39,7 +40,15 @@ class DeitySelectionScreen extends StatelessWidget {
 
           return CustomScrollView(
             slivers: [
-              const SliverToBoxAdapter(child: SizedBox(height: 16)),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 18),
+                  child: Text(
+                    'Select the altar for this session',
+                    style: Theme.of(context).textTheme.sectionTitle,
+                  ),
+                ),
+              ),
               SliverPadding(
                 padding: EdgeInsets.fromLTRB(16, 0, 16, bottomInset + 24),
                 sliver: SliverGrid.builder(
@@ -47,7 +56,7 @@ class DeitySelectionScreen extends StatelessWidget {
                     crossAxisCount: crossAxisCount,
                     mainAxisSpacing: 14,
                     crossAxisSpacing: 14,
-                    childAspectRatio: width < 420 ? 0.84 : 0.9,
+                    childAspectRatio: width < 420 ? 0.78 : 0.86,
                   ),
                   itemCount: deities.length,
                   itemBuilder: (context, index) {
@@ -99,16 +108,22 @@ class _DeityCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
 
-    return Card(
-      clipBehavior: Clip.antiAlias,
+    return AltarPanel(
+      padding: EdgeInsets.zero,
       child: InkWell(
         onTap: onTap,
         child: Stack(
           fit: StackFit.expand,
           children: [
-            Image.asset(
-              deity.imageAsset,
-              fit: BoxFit.cover,
+            Padding(
+              padding: const EdgeInsets.all(7),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(7),
+                child: Image.asset(
+                  deity.imageAsset,
+                  fit: BoxFit.cover,
+                ),
+              ),
             ),
             DecoratedBox(
               decoration: const BoxDecoration(
@@ -128,18 +143,28 @@ class _DeityCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Text(
-                    deity.displayName,
-                    style: textTheme.titleLarge,
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          deity.displayName,
+                          style: textTheme.titleLarge,
+                        ),
+                      ),
+                      const Icon(
+                        Icons.arrow_forward_rounded,
+                        color: AppTheme.softGold,
+                        size: 20,
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 4),
                   Text(
                     deity.mantraText,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: textTheme.bodyMedium?.copyWith(
-                      color: AppTheme.candlelight,
-                    ),
+                    style: textTheme.mantra.copyWith(fontSize: 17),
                   ),
                   if (deity.invocation != null) ...[
                     const SizedBox(height: 4),

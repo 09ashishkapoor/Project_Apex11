@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "Jai Khyapa Parampara" "\0"
-            VALUE "FileDescription", "Sadhana for a Khyapa" "\0"
+            VALUE "FileDescription", "MANTRINI" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "sadhana_for_a_khyapa" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2026 Jai Khyapa Parampara. All rights reserved." "\0"
             VALUE "OriginalFilename", "sadhana_for_a_khyapa.exe" "\0"
-            VALUE "ProductName", "Sadhana for a Khyapa" "\0"
+            VALUE "ProductName", "MANTRINI" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

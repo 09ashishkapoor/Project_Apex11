@@ -13,6 +13,8 @@ class AppTheme {
   static const Color candlelight = Color(0xFFF4E4C1);
   static const Color parchmentText = Color(0xFFF0DCC8);
   static const Color softWhite = Color(0xFFFFF8F0);
+  static const String devanagariFont = 'NotoSansDevanagari';
+  static const String displayFont = 'Cinzel';
 
   static ThemeData get theme {
     final base = ThemeData.dark(useMaterial3: true);
@@ -40,7 +42,7 @@ class AppTheme {
       dialogTheme: DialogThemeData(
         backgroundColor: templeShadow,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(14),
           side: BorderSide(color: antiqueGold.withValues(alpha: 0.32)),
         ),
       ),
@@ -55,7 +57,7 @@ class AppTheme {
         color: cardBurgundy,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(12),
           side: BorderSide(color: antiqueGold.withValues(alpha: 0.18)),
         ),
       ),
@@ -65,15 +67,15 @@ class AppTheme {
         labelStyle: const TextStyle(color: parchmentText),
         hintStyle: TextStyle(color: parchmentText.withValues(alpha: 0.7)),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: antiqueGold.withValues(alpha: 0.22)),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: antiqueGold.withValues(alpha: 0.22)),
         ),
         focusedBorder: const OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(18)),
+          borderRadius: BorderRadius.all(Radius.circular(12)),
           borderSide: BorderSide(color: softGold, width: 1.2),
         ),
       ),
@@ -83,7 +85,7 @@ class AppTheme {
           foregroundColor: templeVoid,
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(12),
           ),
           textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
         ),
@@ -94,7 +96,7 @@ class AppTheme {
           side: BorderSide(color: antiqueGold.withValues(alpha: 0.35)),
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(12),
           ),
         ),
       ),
@@ -114,7 +116,7 @@ class AppTheme {
         contentTextStyle: const TextStyle(color: parchmentText),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(12),
           side: BorderSide(color: antiqueGold.withValues(alpha: 0.25)),
         ),
       ),
@@ -128,16 +130,19 @@ class AppTheme {
               fontSize: 30,
               fontWeight: FontWeight.w700,
               color: softWhite,
+              fontFamily: displayFont,
             ),
             headlineSmall: const TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.w700,
               color: softWhite,
+              fontFamily: displayFont,
             ),
             titleLarge: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w700,
               color: softWhite,
+              fontFamily: displayFont,
             ),
             titleMedium: const TextStyle(
               fontSize: 16,
@@ -154,4 +159,29 @@ class AppTheme {
           ),
     );
   }
+}
+
+extension AppTextStyles on TextTheme {
+  TextStyle get mantra => const TextStyle(
+        color: AppTheme.candlelight,
+        fontFamily: AppTheme.devanagariFont,
+        fontSize: 23,
+        height: 1.55,
+        fontWeight: FontWeight.w600,
+      );
+
+  TextStyle get metric => const TextStyle(
+        color: AppTheme.softWhite,
+        fontFamily: AppTheme.displayFont,
+        fontSize: 42,
+        height: 1,
+        fontWeight: FontWeight.w700,
+      );
+
+  TextStyle get sectionTitle => const TextStyle(
+        color: AppTheme.softWhite,
+        fontFamily: AppTheme.displayFont,
+        fontSize: 18,
+        fontWeight: FontWeight.w700,
+      );
 }

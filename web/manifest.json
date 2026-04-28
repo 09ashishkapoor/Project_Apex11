@@ -1,11 +1,11 @@
 {
-    "name": "Sadhana for a Khyapa",
-    "short_name": "Sadhana",
+    "name": "MANTRINI",
+    "short_name": "MANTRINI",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0D0506",
     "theme_color": "#8B2635",
-    "description": "A local-first mantra japa and sadhana tracker with bundled devotional audio.",
+    "description": "A respectful, offline Japa companion.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

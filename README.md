@@ -1,6 +1,18 @@
-# Sadhana for a Khyapa
+# MANTRINI
 
-A local-first Flutter app for mantra japa and sadhana tracking, built for Android-first sideload distribution and devotional daily practice.
+A respectful, offline Japa companion distributed primarily as an Android APK through GitHub Releases.
+
+## Download the APK
+
+MANTRINI is not distributed through the Google Play Store at this time. The recommended installation path is the signed APK attached to the latest GitHub Release for this repository.
+
+1. Open the latest GitHub Release.
+2. Download the release APK attached to that release.
+3. Transfer it to your Android device if needed.
+4. Open the APK on the device and allow installation from that trusted source when Android prompts.
+5. After installation, confirm the launcher name is `MANTRINI`.
+
+Only install APKs downloaded from GitHub release pages controlled by this project. Do not install copies from mirrors, reposts, or messaging forwards.
 
 ## What it does
 
@@ -19,6 +31,13 @@ A local-first Flutter app for mantra japa and sadhana tracking, built for Androi
 - No analytics or telemetry
 - No cloud sync
 - No social features
+
+## Licensing and assets
+
+- App source code is licensed under the MIT License. See `LICENSE`.
+- Bundled font files are licensed under the SIL Open Font License. See `assets/fonts/OFL.txt`.
+- Bundled devotional images and audio are project assets for MANTRINI distribution only. They are not licensed for reuse outside this app unless you have separate permission from the rights holder.
+- If you fork or redistribute this project, replace any image or audio asset whose rights you cannot verify.
 
 ## Development
 
@@ -85,4 +104,4 @@ After configuring signing:
 flutter build apk --release
 ```
 
-See `RELEASE.md` for sideload guidance, keystore setup, and trusted distribution notes.
+Publish the generated release APK as a GitHub Release asset. See `RELEASE.md` for sideload guidance, keystore setup, and trusted distribution notes.

@@ -45,7 +45,7 @@ flutter build apk --release
 1. Transfer the generated APK to the Android device.
 2. Enable installation from the trusted file source if Android prompts for permission.
 3. Install the APK.
-4. Open the app and confirm the launcher name is `Sadhana for a Khyapa`.
+4. Open the app and confirm the launcher name is `MANTRINI`.
 
 ## Pre-release checks
 

@@ -7,6 +7,8 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 import '../models/deity.dart';
 import '../models/sadhana_session.dart';
 import '../services/sadhana_repository.dart';
+import '../theme/app_theme.dart';
+import '../widgets/altar_widgets.dart';
 
 class SadhanaSessionScreen extends StatefulWidget {
   const SadhanaSessionScreen({
@@ -44,7 +46,6 @@ class _SadhanaSessionScreenState extends State<SadhanaSessionScreen> {
   Duration _remainingDuration = const Duration(minutes: _defaultTimedMinutes);
 
   bool _isPlaying = false;
-  bool _showMantra = false;
   DateTime? _currentTimedChantStartedAt;
 
   bool get _isActive => _status == SadhanaSessionStatus.active;
@@ -76,7 +77,6 @@ class _SadhanaSessionScreenState extends State<SadhanaSessionScreen> {
       if (!mounted) return;
       setState(() {
         _isPlaying = state == PlayerState.playing;
-        _showMantra = _isPlaying || _isActive;
       });
     });
 
@@ -182,7 +182,6 @@ class _SadhanaSessionScreenState extends State<SadhanaSessionScreen> {
     setState(() {
       _sessionId = id;
       _status = SadhanaSessionStatus.active;
-      _showMantra = _mode != SadhanaSessionMode.manual;
     });
 
     await WakelockPlus.enable();
@@ -261,7 +260,6 @@ class _SadhanaSessionScreenState extends State<SadhanaSessionScreen> {
     setState(() {
       _status = SadhanaSessionStatus.paused;
       _isPlaying = false;
-      _showMantra = false;
     });
 
     await WakelockPlus.disable();
@@ -280,7 +278,6 @@ class _SadhanaSessionScreenState extends State<SadhanaSessionScreen> {
     if (!mounted) return;
     setState(() {
       _status = SadhanaSessionStatus.active;
-      _showMantra = _mode != SadhanaSessionMode.manual;
     });
 
     await WakelockPlus.enable();
@@ -315,7 +312,6 @@ class _SadhanaSessionScreenState extends State<SadhanaSessionScreen> {
     setState(() {
       _status = SadhanaSessionStatus.completed;
       _isPlaying = false;
-      _showMantra = false;
       _sessionId = null;
     });
 
@@ -325,7 +321,9 @@ class _SadhanaSessionScreenState extends State<SadhanaSessionScreen> {
     await showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(dueToTimer ? 'Timed session complete' : 'Sadhana complete'),
+        title: Text(
+          dueToTimer ? 'Timed session complete' : 'Japa session complete',
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -374,7 +372,6 @@ class _SadhanaSessionScreenState extends State<SadhanaSessionScreen> {
       _durationController.text = '$_defaultTimedMinutes';
       _remainingDuration = _timedDuration;
       _isPlaying = false;
-      _showMantra = false;
     });
 
     _sessionStopwatch = Stopwatch();
@@ -397,9 +394,6 @@ class _SadhanaSessionScreenState extends State<SadhanaSessionScreen> {
           : (selection) {
               setState(() {
                 _mode = selection.first;
-                if (_mode != SadhanaSessionMode.timed) {
-                  _showMantra = false;
-                }
               });
             },
     );
@@ -413,6 +407,7 @@ class _SadhanaSessionScreenState extends State<SadhanaSessionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     final progressDenominator = _mode == SadhanaSessionMode.timed
         ? (_timedDuration.inSeconds == 0 ? 1 : _timedDuration.inSeconds)
         : (_targetCount == 0 ? 1 : _targetCount);
@@ -426,188 +421,210 @@ class _SadhanaSessionScreenState extends State<SadhanaSessionScreen> {
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
-            final imageCardWidth = constraints.maxWidth < 360
-                ? 148.0
-                : constraints.maxWidth < 420
-                    ? 168.0
-                    : 196.0;
-            final compactControls = constraints.maxWidth < 380;
-            final actionButtonWidth = compactControls
-                ? (constraints.maxWidth - 40) / 2
-                : null;
-            final manualPrimaryLabel = compactControls ? 'Count' : 'Add Chant';
-            final audioIdleLabel = compactControls ? 'Play Chant' : 'Play Single Chant';
-            final timedIdleLabel = compactControls ? 'Auto Ready' : 'Auto mode running';
-            final activeAudioLabel = compactControls ? 'Chanting' : 'Chanting…';
-            final activeTimedLabel = compactControls ? 'Auto On' : 'Auto chanting…';
+            final imageWidth = constraints.maxWidth < 380 ? 126.0 : 160.0;
+            final hasStarted = _status != null;
+            final isIdle = !_isActive && !_isPaused;
+            final primaryValue = _mode == SadhanaSessionMode.timed
+                ? _formatDuration(_remainingDuration)
+                : '$_completedCount';
+            final primaryLabel = _mode == SadhanaSessionMode.timed
+                ? 'Remaining'
+                : 'Completed chants';
 
             return SingleChildScrollView(
               padding: const EdgeInsets.all(16),
               child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight - 32),
+                constraints:
+                    BoxConstraints(minHeight: constraints.maxHeight - 32),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Center(
-                      child: Container(
-                        width: imageCardWidth,
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surface,
-                          borderRadius: BorderRadius.circular(24),
-                          border: Border.all(
-                            color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.32),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        FramedDeityImage(
+                          deity: _deity,
+                          width: imageWidth,
+                          fit: BoxFit.cover,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: AltarPanel(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  hasStarted
+                                      ? primaryValue
+                                      : _deity.displayName,
+                                  style: hasStarted
+                                      ? textTheme.metric
+                                      : textTheme.headlineSmall,
+                                  maxLines: hasStarted ? 1 : 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  hasStarted
+                                      ? primaryLabel
+                                      : _deity.invocation ?? '',
+                                  style: textTheme.bodyMedium,
+                                ),
+                                const SizedBox(height: 12),
+                                LinearProgressIndicator(
+                                  value:
+                                      progressNumerator / progressDenominator,
+                                  minHeight: 8,
+                                  borderRadius: BorderRadius.circular(100),
+                                ),
+                              ],
+                            ),
                           ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.12),
-                              blurRadius: 18,
-                              spreadRadius: 1,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    AltarPanel(
+                      child: Text(
+                        _deity.mantraText,
+                        textAlign: TextAlign.center,
+                        style: textTheme.mantra,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    if (isIdle) ...[
+                      AltarPanel(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text('Session Mode', style: textTheme.sectionTitle),
+                            const SizedBox(height: 12),
+                            _buildModeSelector(),
+                            const SizedBox(height: 14),
+                            if (_mode != SadhanaSessionMode.timed)
+                              TextField(
+                                controller: _targetController,
+                                keyboardType: TextInputType.number,
+                                decoration: const InputDecoration(
+                                  labelText: 'Target count',
+                                  helperText: 'Manual and audio sessions',
+                                ),
+                              )
+                            else
+                              TextField(
+                                controller: _durationController,
+                                keyboardType: TextInputType.number,
+                                decoration: const InputDecoration(
+                                  labelText: 'Timed duration (minutes)',
+                                  helperText: 'Automatic audio loop',
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      ElevatedButton.icon(
+                        onPressed: _startSession,
+                        icon: const Icon(Icons.play_arrow_rounded),
+                        label: const Text('Start'),
+                      ),
+                    ] else ...[
+                      Row(
+                        children: [
+                          Expanded(
+                            child: SessionMetric(
+                              label: _mode == SadhanaSessionMode.timed
+                                  ? 'Duration'
+                                  : 'Target',
+                              value: _mode == SadhanaSessionMode.timed
+                                  ? '${_timedDuration.inMinutes}m'
+                                  : '$_targetCount',
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: SessionMetric(
+                              label: 'Elapsed',
+                              value: _formatDuration(_elapsed),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      if (_isActive && _mode == SadhanaSessionMode.manual)
+                        _CountButton(onPressed: _manualTap)
+                      else if (_isActive && _mode == SadhanaSessionMode.audio)
+                        FilledButton.icon(
+                          onPressed: _isPlaying ? null : _startSingleChant,
+                          icon: Icon(_isPlaying
+                              ? Icons.graphic_eq_rounded
+                              : Icons.volume_up_rounded),
+                          label:
+                              Text(_isPlaying ? 'Chanting...' : 'Play Chant'),
+                        )
+                      else if (_isActive && _mode == SadhanaSessionMode.timed)
+                        FilledButton.icon(
+                          onPressed: null,
+                          icon: const Icon(Icons.graphic_eq_rounded),
+                          label: Text(
+                              _isPlaying ? 'Auto Chanting...' : 'Listening'),
+                        ),
+                      const SizedBox(height: 12),
+                      if (_isActive)
+                        Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton.icon(
+                                onPressed: _pauseSession,
+                                icon: const Icon(Icons.pause_rounded),
+                                label: const Text('Pause'),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: ElevatedButton.icon(
+                                onPressed: _completeSession,
+                                icon: const Icon(Icons.check_rounded),
+                                label: const Text('Complete'),
+                              ),
+                            ),
+                          ],
+                        )
+                      else if (_isPaused)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            ElevatedButton.icon(
+                              onPressed: _resumeSession,
+                              icon: const Icon(Icons.play_arrow_rounded),
+                              label: const Text('Resume'),
+                            ),
+                            const SizedBox(height: 10),
+                            OutlinedButton.icon(
+                              onPressed: _completeSession,
+                              icon: const Icon(
+                                  Icons.check_circle_outline_rounded),
+                              label: const Text('Complete'),
+                            ),
+                            const SizedBox(height: 10),
+                            TextButton.icon(
+                              onPressed: _resetSession,
+                              icon: const Icon(Icons.refresh_rounded),
+                              label: const Text('Reset'),
                             ),
                           ],
                         ),
-                        child: AspectRatio(
-                          aspectRatio: 3 / 4,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(18),
-                            child: Image.asset(
-                              _deity.imageAsset,
-                              fit: BoxFit.contain,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    if (_showMantra)
+                    ],
+                    if (_isPlaying) ...[
+                      const SizedBox(height: 12),
                       Text(
-                        _deity.mantraText,
+                        'Audio active',
                         textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                    const SizedBox(height: 12),
-                    _buildModeSelector(),
-                    const SizedBox(height: 12),
-                    if (_mode != SadhanaSessionMode.timed) ...[
-                      TextField(
-                        controller: _targetController,
-                        enabled: !_isActive && !_isPaused,
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                          labelText: 'Target count',
-                          helperText: 'Used for manual/audio sessions',
+                        style: textTheme.bodySmall?.copyWith(
+                          color: AppTheme.softGold,
                         ),
                       ),
-                      const SizedBox(height: 8),
                     ],
-                    if (_mode == SadhanaSessionMode.timed) ...[
-                      TextField(
-                        controller: _durationController,
-                        enabled: !_isActive && !_isPaused,
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                          labelText: 'Timed duration (minutes)',
-                          helperText: 'Used for timed auto sessions',
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                    ],
-                    const SizedBox(height: 10),
-                    LinearProgressIndicator(
-                      value: progressNumerator / progressDenominator,
-                      minHeight: 8,
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _SessionInfoChip(
-                            label: _mode == SadhanaSessionMode.timed
-                                ? 'Remaining'
-                                : 'Count',
-                            value: _mode == SadhanaSessionMode.timed
-                                ? _formatDuration(_remainingDuration)
-                                : '$_completedCount / $_targetCount',
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: _SessionInfoChip(
-                            label: 'Elapsed',
-                            value: _formatDuration(_elapsed),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      alignment: WrapAlignment.center,
-                      children: [
-                        _SessionActionButton(
-                          label: 'Start',
-                          icon: Icons.play_arrow_rounded,
-                          width: actionButtonWidth,
-                          compact: compactControls,
-                          onPressed: (_isActive || _isPaused) ? null : _startSession,
-                        ),
-                        _SessionActionButton(
-                          label: 'Pause',
-                          icon: Icons.pause_rounded,
-                          width: actionButtonWidth,
-                          compact: compactControls,
-                          onPressed: _isActive ? _pauseSession : null,
-                        ),
-                        _SessionActionButton(
-                          label: 'Resume',
-                          icon: Icons.play_circle_outline_rounded,
-                          width: actionButtonWidth,
-                          compact: compactControls,
-                          onPressed: _isPaused ? _resumeSession : null,
-                        ),
-                        _SessionActionButton(
-                          label: 'Complete',
-                          icon: Icons.check_circle_outline_rounded,
-                          width: actionButtonWidth,
-                          compact: compactControls,
-                          onPressed:
-                              (_isActive || _isPaused) ? _completeSession : null,
-                        ),
-                        _SessionActionButton(
-                          label: 'Reset',
-                          icon: Icons.refresh_rounded,
-                          width: actionButtonWidth,
-                          compact: compactControls,
-                          outlined: true,
-                          onPressed: _resetSession,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    if (_mode == SadhanaSessionMode.manual)
-                      SizedBox(
-                        width: double.infinity,
-                        child: FilledButton(
-                          onPressed: _isActive ? _manualTap : null,
-                          child: Text(manualPrimaryLabel, textAlign: TextAlign.center),
-                        ),
-                      )
-                    else
-                      SizedBox(
-                        width: double.infinity,
-                        child: FilledButton(
-                          onPressed: (_isActive && _mode == SadhanaSessionMode.audio)
-                              ? _startSingleChant
-                              : null,
-                          child: Text(
-                            _mode == SadhanaSessionMode.audio
-                                ? (_isPlaying ? activeAudioLabel : audioIdleLabel)
-                                : (_isPlaying ? activeTimedLabel : timedIdleLabel),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
                   ],
                 ),
               ),
@@ -644,97 +661,33 @@ class _SadhanaSessionScreenState extends State<SadhanaSessionScreen> {
   }
 }
 
+class _CountButton extends StatelessWidget {
+  const _CountButton({required this.onPressed});
 
-class _SessionInfoChip extends StatelessWidget {
-  const _SessionInfoChip({
-    required this.label,
-    required this.value,
-  });
-
-  final String label;
-  final String value;
+  final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.18),
+    return SizedBox(
+      height: 112,
+      child: FilledButton(
+        onPressed: onPressed,
+        style: FilledButton.styleFrom(
+          backgroundColor: AppTheme.softGold,
+          foregroundColor: AppTheme.templeVoid,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+        child: const Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.touch_app_rounded, size: 34),
+            SizedBox(height: 8),
+            Text('Count Chant'),
+          ],
         ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: textTheme.bodySmall),
-          const SizedBox(height: 2),
-          Text(value, style: textTheme.titleMedium),
-        ],
-      ),
-    );
-  }
-}
-
-class _SessionActionButton extends StatelessWidget {
-  const _SessionActionButton({
-    required this.label,
-    required this.icon,
-    required this.onPressed,
-    required this.compact,
-    this.width,
-    this.outlined = false,
-  });
-
-  final String label;
-  final IconData icon;
-  final VoidCallback? onPressed;
-  final bool compact;
-  final double? width;
-  final bool outlined;
-
-  @override
-  Widget build(BuildContext context) {
-    final child = compact
-        ? (outlined
-            ? OutlinedButton(
-                onPressed: onPressed,
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size.fromHeight(44),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-                child: Text(label, textAlign: TextAlign.center),
-              )
-            : ElevatedButton(
-                onPressed: onPressed,
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size.fromHeight(44),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-                child: Text(label, textAlign: TextAlign.center),
-              ))
-        : (outlined
-            ? OutlinedButton.icon(
-                onPressed: onPressed,
-                icon: Icon(icon, size: 18),
-                label: Text(label, textAlign: TextAlign.center),
-              )
-            : ElevatedButton.icon(
-                onPressed: onPressed,
-                icon: Icon(icon, size: 18),
-                label: Text(label, textAlign: TextAlign.center),
-              ));
-
-    if (width == null) return child;
-
-    return SizedBox(
-      width: width,
-      child: child,
     );
   }
 }

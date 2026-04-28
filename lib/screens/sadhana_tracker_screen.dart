@@ -5,6 +5,9 @@ import '../models/deity.dart';
 import '../models/sadhana_stats.dart';
 import '../services/sadhana_repository.dart';
 import '../theme/app_theme.dart';
+import '../widgets/altar_widgets.dart';
+
+enum _TrackerAction { export, import, reset }
 
 class SadhanaTrackerScreen extends StatefulWidget {
   const SadhanaTrackerScreen({
@@ -27,20 +30,43 @@ class _SadhanaTrackerScreenState extends State<SadhanaTrackerScreen> {
       appBar: AppBar(
         title: const Text('Sadhana Tracker'),
         actions: [
-          IconButton(
-            onPressed: _showExportDialog,
-            icon: const Icon(Icons.download_rounded),
-            tooltip: 'Export backup JSON',
-          ),
-          IconButton(
-            onPressed: _showImportDialog,
-            icon: const Icon(Icons.upload_rounded),
-            tooltip: 'Import backup JSON',
-          ),
-          IconButton(
-            onPressed: _confirmResetAll,
-            icon: const Icon(Icons.delete_sweep_rounded),
-            tooltip: 'Reset all tracked sessions',
+          PopupMenuButton<_TrackerAction>(
+            tooltip: 'Tracker tools',
+            icon: const Icon(Icons.more_vert_rounded),
+            onSelected: (action) {
+              switch (action) {
+                case _TrackerAction.export:
+                  _showExportDialog();
+                case _TrackerAction.import:
+                  _showImportDialog();
+                case _TrackerAction.reset:
+                  _confirmResetAll();
+              }
+            },
+            itemBuilder: (context) => const [
+              PopupMenuItem(
+                value: _TrackerAction.export,
+                child: ListTile(
+                  leading: Icon(Icons.download_rounded),
+                  title: Text('Export backup'),
+                ),
+              ),
+              PopupMenuItem(
+                value: _TrackerAction.import,
+                child: ListTile(
+                  leading: Icon(Icons.upload_rounded),
+                  title: Text('Import backup'),
+                ),
+              ),
+              PopupMenuDivider(),
+              PopupMenuItem(
+                value: _TrackerAction.reset,
+                child: ListTile(
+                  leading: Icon(Icons.delete_sweep_rounded),
+                  title: Text('Reset all history'),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -69,29 +95,23 @@ class _SadhanaTrackerScreenState extends State<SadhanaTrackerScreen> {
           return ListView(
             padding: EdgeInsets.fromLTRB(16, 16, 16, bottomInset + 24),
             children: [
-              Text(
-                'Your Spiritual Journey',
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
+              Text('Practice Ledger',
+                  style: Theme.of(context).textTheme.headlineSmall),
               const SizedBox(height: 8),
               Text(
                 'Live totals are computed from completed sessions.',
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               const SizedBox(height: 16),
-              _buildOverviewCard(stats),
+              _buildDevotionalStatsPanel(stats),
               const SizedBox(height: 16),
-              Text(
-                'Per-deity totals',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
+              Text('Per-deity totals',
+                  style: Theme.of(context).textTheme.sectionTitle),
               const SizedBox(height: 8),
               ...stats.perDeity.map(_buildDeityCard),
               const SizedBox(height: 8),
-              Text(
-                'Recent completed sessions',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
+              Text('Recent completed sessions',
+                  style: Theme.of(context).textTheme.sectionTitle),
               const SizedBox(height: 8),
               _buildRecentSessionsCard(stats.recentSessions),
             ],
@@ -101,49 +121,52 @@ class _SadhanaTrackerScreenState extends State<SadhanaTrackerScreen> {
     );
   }
 
-  Widget _buildOverviewCard(SadhanaStats stats) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Aggregates', style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                    child: _buildMetric('Today', stats.todayTotal.toString())),
-                const SizedBox(width: 12),
-                Expanded(
-                  child:
-                      _buildMetric('Lifetime', stats.lifetimeTotal.toString()),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _buildMetric(
-                      'Malas of 108', stats.completedMalas.toString()),
-                ),
-              ],
-            ),
-          ],
-        ),
+  Widget _buildDevotionalStatsPanel(SadhanaStats stats) {
+    final textTheme = Theme.of(context).textTheme;
+
+    return AltarPanel(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Today at the altar', style: textTheme.sectionTitle),
+          const SizedBox(height: 10),
+          Text(
+            stats.todayTotal.toString(),
+            style: textTheme.metric.copyWith(fontSize: 56),
+          ),
+          const SizedBox(height: 4),
+          Text('chants completed today', style: textTheme.bodyMedium),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(child: _buildMetric('Lifetime', stats.lifetimeTotal)),
+              const SizedBox(width: 12),
+              Expanded(
+                  child: _buildMetric('Malas of 108', stats.completedMalas)),
+            ],
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildMetric(String label, String value) {
+  Widget _buildMetric(String label, int value) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppTheme.templeShadow,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(10),
         border: Border.all(color: AppTheme.antiqueGold.withValues(alpha: 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(value, style: Theme.of(context).textTheme.titleLarge),
+          Text(
+            value.toString(),
+            style: Theme.of(context).textTheme.metric.copyWith(fontSize: 28),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
           const SizedBox(height: 4),
           Text(label, style: Theme.of(context).textTheme.bodySmall),
         ],
@@ -159,81 +182,76 @@ class _SadhanaTrackerScreenState extends State<SadhanaTrackerScreen> {
         : cycleCount / deity.defaultTargetCount;
     final remaining = deity.defaultTargetCount - cycleCount;
 
-    return Card(
+    return AltarPanel(
       margin: const EdgeInsets.only(bottom: 12),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.asset(
-                    deity.imageAsset,
-                    width: 56,
-                    height: 56,
-                    fit: BoxFit.cover,
-                  ),
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              SizedBox(
+                width: 58,
+                child: FramedDeityImage(
+                  deity: deity,
+                  aspectRatio: 1,
+                  fit: BoxFit.cover,
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        deity.displayName,
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        '${deityStats.totalCount} chants · ${deityStats.completedMalas} malas',
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                    ],
-                  ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      deity.displayName,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '${deityStats.totalCount} chants • ${deityStats.completedMalas} malas',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ],
                 ),
-                IconButton(
-                  onPressed: () => _confirmResetDeity(deity),
-                  icon: const Icon(Icons.refresh_rounded),
-                  tooltip: 'Reset only ${deity.displayName} session history',
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            LinearProgressIndicator(
-              value: progress,
-              minHeight: 10,
-              borderRadius: BorderRadius.circular(100),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              cycleCount == 0
-                  ? 'Next mala starts at ${deity.defaultTargetCount} chants.'
-                  : '$remaining chants remaining for the next mala.',
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
-          ],
-        ),
+              ),
+              IconButton(
+                onPressed: () => _confirmResetDeity(deity),
+                icon: const Icon(Icons.refresh_rounded),
+                tooltip: 'Reset only ${deity.displayName} session history',
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          LinearProgressIndicator(
+            value: progress,
+            minHeight: 10,
+            borderRadius: BorderRadius.circular(100),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            cycleCount == 0
+                ? 'Next mala starts at ${deity.defaultTargetCount} chants.'
+                : '$remaining chants remaining for the next mala.',
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildRecentSessionsCard(List<RecentSadhanaSession> recentSessions) {
     if (recentSessions.isEmpty) {
-      return Card(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Text(
-            'No completed sessions yet. Finish a session to build your history.',
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
+      return AltarPanel(
+        child: Text(
+          'No completed sessions yet. Finish a session to build your history.',
+          style: Theme.of(context).textTheme.bodyMedium,
         ),
       );
     }
 
-    return Card(
+    return AltarPanel(
+      padding: EdgeInsets.zero,
       child: ListView.separated(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
@@ -244,18 +262,18 @@ class _SadhanaTrackerScreenState extends State<SadhanaTrackerScreen> {
           final session = recentSessions[index];
           return ListTile(
             leading: ClipRRect(
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(8),
               child: Image.asset(
                 session.deity.imageAsset,
-                width: 36,
-                height: 36,
+                width: 38,
+                height: 38,
                 fit: BoxFit.cover,
               ),
             ),
             title: Text(
-                '${session.deity.displayName} · ${session.completedCount} chants'),
+                '${session.deity.displayName} • ${session.completedCount} chants'),
             subtitle: Text(
-              '${session.mode.label} · ${_formatDuration(session.durationSeconds)} · ${_formatDateTime(session.endedAt ?? session.startedAt)}',
+              '${session.mode.label} • ${_formatDuration(session.durationSeconds)} • ${_formatDateTime(session.endedAt ?? session.startedAt)}',
             ),
             trailing: Text('${(session.completedCount / 108).floor()} malas'),
             contentPadding:

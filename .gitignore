@@ -44,3 +44,6 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 upgradeplan.md
+PLAN1.md
+web/*.js.map
+web/*.js.deps

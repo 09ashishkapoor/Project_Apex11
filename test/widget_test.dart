@@ -120,9 +120,12 @@ void main() {
     final repository = SadhanaRepository(database);
 
     await tester.pumpWidget(MyApp(database: database, repository: repository));
+    expect(find.text('Dedicated to'), findsOneWidget);
+
+    await tester.pump(const Duration(milliseconds: 2800));
     await tester.pumpAndSettle();
 
-    expect(find.text('Sadhana for a Khyapa'), findsOneWidget);
+    expect(find.text('MANTRINI'), findsOneWidget);
     expect(find.text('Begin Japa'), findsOneWidget);
     expect(find.text('View Sadhana Tracker'), findsOneWidget);
 
