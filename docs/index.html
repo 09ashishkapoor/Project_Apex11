@@ -3,75 +3,101 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MANTRINI | Android APK Download</title>
+    <title>MANTRINI | Private Android Japa Companion</title>
     <meta
       name="description"
-      content="Download MANTRINI for Android. An offline Japa companion with four deity paths, local session history, and privacy-first design."
+      content="Download MANTRINI for Android. A private, offline Japa companion with local history, guided counting modes, and no accounts or telemetry."
+    >
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
     >
     <style>
       :root {
-        --temple-void: #0d0506;
-        --temple-shadow: #1f0b11;
-        --card-burgundy: #180a0f;
-        --temple-maroon: #8b2635;
-        --dark-wine: #4a0e17;
-        --antique-gold: #c9a962;
-        --soft-gold: #e8c468;
-        --candlelight: #f4e4c1;
-        --parchment-text: #f0dcc8;
-        --soft-white: #fff8f0;
-        --panel-shadow: 0 24px 80px rgba(0, 0, 0, 0.42);
-        --card-shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
-        --border-soft: rgba(201, 169, 98, 0.24);
-        --border-strong: rgba(232, 196, 104, 0.42);
+        --bg: #090304;
+        --bg-soft: #15070b;
+        --panel: rgba(24, 10, 15, 0.82);
+        --panel-strong: rgba(18, 7, 10, 0.92);
+        --panel-glass: rgba(255, 248, 240, 0.04);
+        --line: rgba(214, 173, 86, 0.2);
+        --line-strong: rgba(232, 196, 104, 0.45);
+        --gold: #e8c468;
+        --gold-deep: #b88a32;
+        --ink: #fff9f1;
+        --text: #f0dcc8;
+        --muted: #ccb8a4;
+        --maroon: #8b2635;
+        --rose: #5c1620;
+        --shadow: 0 24px 80px rgba(0, 0, 0, 0.38);
+        --shadow-soft: 0 18px 50px rgba(0, 0, 0, 0.24);
         --max-width: 1180px;
       }
 
-      * { box-sizing: border-box; }
+      * {
+        box-sizing: border-box;
+      }
 
-      html { scroll-behavior: smooth; }
+      html {
+        scroll-behavior: smooth;
+      }
 
       body {
         margin: 0;
         min-width: 320px;
-        font-family: Georgia, "Times New Roman", serif;
-        color: var(--parchment-text);
-        background:
-          radial-gradient(circle at top, rgba(139, 38, 53, 0.38), transparent 36%),
-          radial-gradient(circle at 20% 20%, rgba(201, 169, 98, 0.08), transparent 18%),
-          linear-gradient(180deg, var(--temple-shadow) 0%, var(--temple-void) 50%, #080203 100%);
+        color: var(--text);
+        font-family: "Manrope", sans-serif;
         line-height: 1.6;
+        background:
+          radial-gradient(circle at 15% 18%, rgba(232, 196, 104, 0.14), transparent 0 22%),
+          radial-gradient(circle at 86% 12%, rgba(139, 38, 53, 0.28), transparent 0 30%),
+          radial-gradient(circle at 50% 40%, rgba(232, 196, 104, 0.05), transparent 0 34%),
+          linear-gradient(180deg, #1a0910 0%, var(--bg) 28%, #050102 100%);
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background-image:
+          linear-gradient(rgba(255, 248, 240, 0.02) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 248, 240, 0.02) 1px, transparent 1px);
+        background-size: 80px 80px;
+        mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.34), transparent 82%);
+      }
+
+      img {
+        display: block;
+        max-width: 100%;
       }
 
       a {
-        color: var(--soft-gold);
-        text-decoration-thickness: 1px;
-        text-underline-offset: 0.18em;
+        color: inherit;
       }
-
-      a:hover { color: var(--candlelight); }
 
       a:focus-visible,
       button:focus-visible {
-        outline: 3px solid var(--soft-gold);
-        outline-offset: 3px;
-        border-radius: 12px;
+        outline: 3px solid var(--gold);
+        outline-offset: 4px;
+        border-radius: 14px;
       }
-
-      img { max-width: 100%; display: block; }
 
       .skip-link {
         position: absolute;
-        left: 12px;
-        top: -48px;
-        background: var(--soft-gold);
-        color: var(--temple-void);
+        left: 16px;
+        top: -52px;
         padding: 12px 16px;
+        color: #140709;
+        background: var(--gold);
+        font-weight: 800;
         z-index: 1000;
-        font-weight: 700;
       }
 
-      .skip-link:focus { top: 12px; }
+      .skip-link:focus {
+        top: 16px;
+      }
 
       .site-header,
       main,
@@ -81,393 +107,403 @@
       }
 
       .site-header {
-        padding: 22px 0 12px;
+        padding: 18px 0 8px;
       }
 
-      .top-bar {
+      .masthead {
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 16px;
-        padding: 14px 18px;
-        border: 1px solid var(--border-soft);
-        background: rgba(13, 5, 6, 0.68);
-        backdrop-filter: blur(8px);
-        border-radius: 18px;
-        box-shadow: var(--card-shadow);
+        padding: 16px 18px;
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        background: rgba(12, 4, 6, 0.68);
+        backdrop-filter: blur(14px);
+        box-shadow: var(--shadow-soft);
       }
 
-      .brand {
+      .brand-lockup {
         display: flex;
         flex-direction: column;
         gap: 4px;
       }
 
-      .brand-mark {
-        margin: 0;
-        font-size: 0.82rem;
-        letter-spacing: 0.28em;
+      .brand-kicker,
+      .section-kicker,
+      .pill {
         text-transform: uppercase;
-        color: var(--antique-gold);
+        letter-spacing: 0.22em;
+        font-size: 0.75rem;
+        color: var(--gold);
       }
 
-      .brand-name {
-        margin: 0;
-        color: var(--soft-white);
-        font-size: clamp(1.5rem, 3vw, 2rem);
-        letter-spacing: 0.08em;
-      }
-
-      .header-links {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-        justify-content: flex-end;
-      }
-
-      .header-links a {
-        display: inline-flex;
-        align-items: center;
-        min-height: 42px;
-        padding: 10px 14px;
-        border-radius: 999px;
-        border: 1px solid var(--border-soft);
-        background: rgba(74, 14, 23, 0.42);
-        text-decoration: none;
-      }
-
-      .hero {
-        position: relative;
-        padding: 42px 0 28px;
-      }
-
-      .hero::before,
-      .hero::after {
-        content: "";
-        position: absolute;
-        inset-inline: 0;
-        height: 1px;
-        background: linear-gradient(90deg, transparent, rgba(232, 196, 104, 0.7), transparent);
-      }
-
-      .hero::before { top: 0; }
-      .hero::after { bottom: 0; }
-
-      .hero-grid {
-        display: grid;
-        grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.95fr);
-        gap: 28px;
-        align-items: start;
-      }
-
-      .hero-copy,
-      .download-panel,
-      .card,
-      .install-strip,
-      .feature-grid article,
-      .privacy-grid article,
-      .notes-card {
-        border-radius: 24px;
-        border: 1px solid var(--border-soft);
-        background: linear-gradient(180deg, rgba(31, 11, 17, 0.94), rgba(24, 10, 15, 0.96));
-        box-shadow: var(--card-shadow);
-      }
-
-      .hero-copy {
-        padding: 34px;
-      }
-
-      .eyebrow {
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 18px;
-        padding: 8px 14px;
-        border-radius: 999px;
-        background: rgba(201, 169, 98, 0.1);
-        color: var(--candlelight);
-        text-transform: uppercase;
-        letter-spacing: 0.18em;
-        font-size: 0.8rem;
-      }
-
-      .eyebrow::before,
-      .eyebrow::after {
-        content: "✦";
-        color: var(--soft-gold);
-      }
-
+      .brand-name,
       h1,
       h2,
       h3 {
         margin: 0;
-        color: var(--soft-white);
-        line-height: 1.15;
+        color: var(--ink);
+        font-family: "Cormorant Garamond", serif;
+        line-height: 1.05;
       }
 
-      h1 {
-        font-size: clamp(2.5rem, 6vw, 4.6rem);
-        letter-spacing: 0.06em;
-        text-transform: uppercase;
+      .brand-name {
+        font-size: clamp(1.7rem, 3vw, 2.3rem);
+        letter-spacing: 0.08em;
       }
 
-      .hero-copy p {
-        margin: 18px 0 0;
-        font-size: 1.06rem;
-        max-width: 62ch;
+      .top-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: flex-end;
       }
 
-      .hero-highlight {
-        margin-top: 24px;
+      .top-nav a {
+        text-decoration: none;
+        padding: 11px 16px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: rgba(255, 248, 240, 0.03);
+        transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+      }
+
+      .top-nav a:hover {
+        transform: translateY(-1px);
+        border-color: var(--line-strong);
+        background: rgba(255, 248, 240, 0.07);
+      }
+
+      .hero {
+        position: relative;
+        padding: 30px 0 28px;
+      }
+
+      .hero-grid {
         display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 14px;
+        grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+        gap: 28px;
+        align-items: stretch;
       }
 
-      .hero-highlight div {
-        padding: 16px;
-        border-radius: 18px;
-        background: rgba(74, 14, 23, 0.46);
-        border: 1px solid rgba(232, 196, 104, 0.16);
-      }
-
-      .hero-highlight strong {
-        display: block;
-        color: var(--soft-gold);
-        font-size: 0.95rem;
-        letter-spacing: 0.04em;
-        text-transform: uppercase;
-        margin-bottom: 6px;
-      }
-
-      .download-panel {
+      .hero-copy,
+      .download-card,
+      .section-panel,
+      .trust-grid article,
+      .feature-card,
+      .flow-step,
+      .footer-panel {
         position: relative;
         overflow: hidden;
-        padding: 30px;
-        border-color: var(--border-strong);
-        box-shadow: var(--panel-shadow);
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        background:
+          linear-gradient(180deg, rgba(255, 248, 240, 0.04), transparent 28%),
+          linear-gradient(180deg, rgba(31, 11, 17, 0.96), rgba(11, 4, 6, 0.98));
+        box-shadow: var(--shadow-soft);
       }
 
-      .download-panel::before {
+      .hero-copy {
+        padding: clamp(26px, 4vw, 44px);
+      }
+
+      .hero-copy::before,
+      .download-card::before,
+      .section-panel::before {
         content: "";
         position: absolute;
         inset: 0;
-        background: radial-gradient(circle at top right, rgba(232, 196, 104, 0.14), transparent 42%);
         pointer-events: none;
+        background: radial-gradient(circle at top right, rgba(232, 196, 104, 0.12), transparent 0 36%);
       }
 
-      .download-panel h2 {
-        font-size: clamp(1.8rem, 3vw, 2.5rem);
+      .hero-copy h1 {
+        font-size: clamp(3.2rem, 7vw, 6rem);
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+        max-width: 9ch;
       }
 
-      .download-panel > p {
-        margin: 14px 0 22px;
-        color: var(--candlelight);
+      .hero-copy .lead {
+        margin: 18px 0 0;
+        max-width: 58ch;
+        font-size: 1.08rem;
+        color: var(--text);
       }
 
-      .download-counter {
-        display: inline-flex;
-        align-items: center;
-        margin-bottom: 22px;
+      .hero-copy .sublead {
+        margin: 14px 0 0;
+        max-width: 58ch;
+        color: var(--muted);
       }
 
-      .download-counter img {
-        height: 34px;
-      }
-
-      .cta-group {
-        display: grid;
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
         gap: 14px;
-        margin-bottom: 22px;
+        margin-top: 28px;
       }
 
       .button,
-      .secondary-button {
+      .button-secondary {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 10px;
-        min-height: 56px;
-        padding: 16px 20px;
+        min-height: 54px;
+        padding: 14px 20px;
         border-radius: 16px;
-        font-weight: 700;
+        font-weight: 800;
         text-decoration: none;
-        text-align: center;
+        transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
       }
 
       .button {
-        background: linear-gradient(180deg, var(--soft-gold), var(--antique-gold));
-        color: var(--temple-void);
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), 0 12px 24px rgba(232, 196, 104, 0.18);
+        color: #150609;
+        background: linear-gradient(180deg, #f0cf7d 0%, var(--gold-deep) 100%);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.38), 0 16px 34px rgba(184, 138, 50, 0.24);
       }
 
-      .button:hover { color: var(--temple-void); }
-
-      .secondary-button {
-        border: 1px solid var(--border-strong);
-        background: rgba(74, 14, 23, 0.56);
-        color: var(--parchment-text);
+      .button-secondary {
+        color: var(--ink);
+        border: 1px solid var(--line-strong);
+        background: rgba(255, 248, 240, 0.04);
       }
 
-      .qr-shell {
+      .button:hover,
+      .button-secondary:hover {
+        transform: translateY(-2px);
+      }
+
+      .hero-stats {
         display: grid;
-        grid-template-columns: 150px minmax(0, 1fr);
-        gap: 18px;
-        align-items: center;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 32px;
+      }
+
+      .stat-card {
         padding: 18px;
         border-radius: 20px;
-        background: rgba(13, 5, 6, 0.56);
-        border: 1px solid rgba(232, 196, 104, 0.18);
+        border: 1px solid rgba(232, 196, 104, 0.14);
+        background:
+          linear-gradient(180deg, rgba(255, 248, 240, 0.03), transparent),
+          rgba(92, 22, 32, 0.38);
       }
 
-      .qr-shell img {
-        width: 150px;
+      .stat-card strong {
+        display: block;
+        margin-bottom: 6px;
+        color: var(--ink);
+        font-size: 1.1rem;
+      }
+
+      .download-card {
+        padding: clamp(24px, 3vw, 34px);
+        border-color: var(--line-strong);
+        box-shadow: var(--shadow);
+      }
+
+      .download-card h2 {
+        font-size: clamp(2.2rem, 4vw, 3.4rem);
+      }
+
+      .download-copy {
+        margin: 14px 0 20px;
+        color: var(--muted);
+      }
+
+      .download-badge {
+        display: inline-flex;
+        margin-bottom: 22px;
+      }
+
+      .download-badge img {
+        height: 34px;
+      }
+
+      .download-actions {
+        display: grid;
+        gap: 12px;
+      }
+
+      .device-note {
+        margin-top: 18px;
+        padding: 16px 18px;
+        border: 1px solid rgba(232, 196, 104, 0.14);
+        border-radius: 18px;
+        background: rgba(255, 248, 240, 0.03);
+        color: var(--muted);
+      }
+
+      .qr-card {
+        display: grid;
+        grid-template-columns: 146px minmax(0, 1fr);
+        gap: 18px;
+        margin-top: 22px;
+        padding: 18px;
+        border-radius: 22px;
+        border: 1px solid rgba(232, 196, 104, 0.14);
+        background: rgba(8, 2, 4, 0.52);
+      }
+
+      .qr-card img {
+        width: 146px;
         aspect-ratio: 1;
         object-fit: cover;
         border-radius: 18px;
-        border: 1px solid rgba(201, 169, 98, 0.28);
-        background: var(--soft-white);
         padding: 10px;
+        background: #fff8f0;
       }
 
-      .qr-shell h3 {
-        font-size: 1.15rem;
-        margin-bottom: 8px;
+      .section {
+        padding: 28px 0;
       }
 
-      .small-note {
-        font-size: 0.95rem;
-        color: var(--candlelight);
-      }
-
-      section {
-        padding: 34px 0;
-      }
-
-      .section-head {
-        display: flex;
-        align-items: end;
-        justify-content: space-between;
-        gap: 16px;
-        margin-bottom: 20px;
-      }
-
-      .section-head p {
-        max-width: 58ch;
-        margin: 10px 0 0;
-      }
-
-      .install-strip {
-        padding: 22px;
-      }
-
-      .install-steps {
+      .section-heading {
         display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 18px;
+        gap: 10px;
+        margin-bottom: 18px;
       }
 
-      .install-step {
-        position: relative;
-        padding: 18px 18px 18px 70px;
-        border-radius: 18px;
-        background: rgba(74, 14, 23, 0.42);
-        border: 1px solid rgba(232, 196, 104, 0.14);
+      .section-heading h2 {
+        font-size: clamp(2.1rem, 4vw, 3.3rem);
       }
 
-      .install-step span {
-        position: absolute;
-        left: 18px;
-        top: 18px;
-        width: 38px;
-        height: 38px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        background: rgba(232, 196, 104, 0.16);
-        color: var(--soft-gold);
-        font-weight: 700;
-        border: 1px solid rgba(232, 196, 104, 0.24);
+      .section-heading p {
+        margin: 0;
+        max-width: 62ch;
+        color: var(--muted);
       }
 
+      .section-panel {
+        padding: 28px;
+      }
+
+      .flow-grid,
       .feature-grid,
-      .privacy-grid {
+      .trust-grid {
         display: grid;
         gap: 18px;
+      }
+
+      .flow-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
       }
 
       .feature-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: 1.1fr 0.9fr;
       }
 
-      .privacy-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+      .feature-column {
+        display: grid;
+        gap: 18px;
       }
 
-      .feature-grid article,
-      .privacy-grid article,
-      .notes-card {
+      .feature-card {
         padding: 24px;
       }
 
-      .feature-grid h3,
-      .privacy-grid h3,
-      .notes-card h2 {
-        margin-bottom: 12px;
+      .feature-card p,
+      .trust-grid p,
+      .flow-step p,
+      .section-panel p,
+      .section-panel li,
+      .footer-panel p {
+        color: var(--muted);
       }
 
-      ul {
+      .feature-list,
+      .install-notes {
         margin: 0;
-        padding-left: 1.15rem;
+        padding-left: 1.1rem;
       }
 
-      li + li { margin-top: 8px; }
+      .feature-list li + li,
+      .install-notes li + li {
+        margin-top: 8px;
+      }
+
+      .ritual-strip {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 22px;
+      }
+
+      .pill {
+        padding: 12px 14px;
+        border: 1px solid rgba(232, 196, 104, 0.14);
+        border-radius: 999px;
+        background: rgba(255, 248, 240, 0.03);
+        text-align: center;
+      }
+
+      .flow-step {
+        padding: 22px 20px 20px;
+      }
+
+      .flow-index {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 42px;
+        margin-bottom: 16px;
+        border-radius: 50%;
+        border: 1px solid rgba(232, 196, 104, 0.28);
+        background: rgba(232, 196, 104, 0.1);
+        color: var(--gold);
+        font-weight: 800;
+      }
+
+      .trust-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .trust-grid article {
+        padding: 24px;
+      }
 
       .callout {
-        padding: 16px 18px;
-        margin-top: 18px;
-        border-left: 3px solid var(--soft-gold);
-        border-radius: 14px;
-        background: rgba(13, 5, 6, 0.46);
-        color: var(--candlelight);
+        margin-top: 20px;
+        padding: 18px 20px;
+        border-left: 3px solid var(--gold);
+        border-radius: 16px;
+        background: rgba(255, 248, 240, 0.03);
+        color: var(--ink);
       }
 
-      .site-footer {
-        padding: 10px 0 40px;
-      }
-
-      .footer-card {
-        padding: 20px 22px;
-        border-radius: 20px;
-        border: 1px solid var(--border-soft);
-        background: rgba(13, 5, 6, 0.72);
+      .footer-panel {
         display: flex;
         flex-wrap: wrap;
         justify-content: space-between;
         gap: 16px;
-      }
-
-      .footer-card p {
-        margin: 0;
+        padding: 22px 24px 34px;
       }
 
       .footer-links {
         display: flex;
-        gap: 16px;
         flex-wrap: wrap;
+        gap: 14px;
       }
 
-      @media (max-width: 980px) {
+      .footer-links a {
+        text-decoration: none;
+        color: var(--gold);
+      }
+
+      @media (max-width: 1024px) {
         .hero-grid,
         .feature-grid,
-        .privacy-grid,
-        .install-steps {
+        .flow-grid,
+        .trust-grid,
+        .ritual-strip {
           grid-template-columns: 1fr;
         }
 
-        .hero-highlight {
-          grid-template-columns: 1fr;
+        .hero-copy h1 {
+          max-width: none;
         }
       }
 
@@ -478,70 +514,60 @@
           width: min(calc(100% - 20px), var(--max-width));
         }
 
-        .top-bar,
-        .hero-copy,
-        .download-panel,
-        .install-strip,
-        .feature-grid article,
-        .privacy-grid article,
-        .notes-card,
-        .footer-card {
-          border-radius: 20px;
-        }
-
-        .top-bar,
-        .section-head,
-        .footer-card {
+        .masthead,
+        .top-nav,
+        .footer-panel {
           flex-direction: column;
           align-items: stretch;
         }
 
-        .header-links {
+        .top-nav {
           justify-content: stretch;
         }
 
-        .header-links a { justify-content: center; }
-
-        .hero {
-          padding-top: 28px;
-        }
-
-        .hero-copy,
-        .download-panel,
-        .feature-grid article,
-        .privacy-grid article,
-        .notes-card,
-        .install-strip {
-          padding: 22px;
-        }
-
-        .qr-shell {
-          grid-template-columns: 1fr;
-          justify-items: center;
+        .top-nav a {
           text-align: center;
         }
 
-        .qr-shell img {
-          width: min(100%, 220px);
+        .hero {
+          padding-top: 22px;
         }
 
-        .install-step {
-          padding-left: 68px;
+        .hero-copy,
+        .download-card,
+        .section-panel,
+        .feature-card,
+        .trust-grid article,
+        .flow-step,
+        .footer-panel {
+          border-radius: 22px;
+        }
+
+        .hero-stats {
+          grid-template-columns: 1fr;
+        }
+
+        .qr-card {
+          grid-template-columns: 1fr;
+          justify-items: center;
+          text-align: center;
         }
       }
     </style>
   </head>
   <body>
     <a class="skip-link" href="#main-content">Skip to main content</a>
+
     <header class="site-header">
-      <div class="top-bar">
-        <div class="brand">
-          <p class="brand-mark">Offline Japa Companion</p>
-          <p class="brand-name">MANTRINI</p>
+      <div class="masthead">
+        <div class="brand-lockup">
+          <div class="brand-kicker">Private Android Practice Tool</div>
+          <div class="brand-name">MANTRINI</div>
         </div>
-        <nav class="header-links" aria-label="Primary">
-          <a href="#download">Download for Android</a>
-          <a href="https://github.com/09ashishkapoor/Project_Apex11/releases/latest">Latest release</a>
+        <nav class="top-nav" aria-label="Primary">
+          <a href="#download">Download APK</a>
+          <a href="#features">What It Offers</a>
+          <a href="https://github.com/09ashishkapoor/Project_Apex11/releases/latest">Latest Release</a>
           <a href="https://github.com/09ashishkapoor/Project_Apex11">Repository</a>
         </nav>
       </div>
@@ -551,173 +577,217 @@
       <section class="hero" aria-labelledby="hero-title">
         <div class="hero-grid">
           <div class="hero-copy">
-            <div class="eyebrow">Sacred practice, stored privately</div>
-            <h1 id="hero-title">Download MANTRINI on Android</h1>
-            <p>
-              MANTRINI is a respectful, offline Japa companion for focused daily practice.
-              It keeps your counting, history, and backups on your device so you can use it
-              without accounts, ads, telemetry, or cloud dependence.
+            <div class="section-kicker">Focused practice. No cloud dependence.</div>
+            <h1 id="hero-title">A quieter way to keep daily japa.</h1>
+            <p class="lead">
+              MANTRINI is an Android-first Japa companion built for people who want counting,
+              continuity, and devotional privacy without accounts, ads, telemetry, or social noise.
             </p>
-            <p>
-              This site is optimized for the simplest path: tap the APK button on your Android
-              phone, or scan the QR code from another screen and install from the official GitHub release.
+            <p class="sublead">
+              The site is designed around the shortest path to install: open the official APK on
+              your Android phone, or scan the QR code from another screen and continue from the
+              latest GitHub release.
             </p>
-            <div class="hero-highlight" aria-label="Highlights">
-              <div>
-                <strong>Four paths</strong>
-                <div>Bundled deity and mantra paths for current practice flows.</div>
-              </div>
-              <div>
-                <strong>Local history</strong>
-                <div>Drift and SQLite keep session records on your own device.</div>
-              </div>
-              <div>
-                <strong>No tracking</strong>
-                <div>No backend, login, analytics, payments, ads, or social layer.</div>
-              </div>
+
+            <div class="hero-actions">
+              <a class="button" href="https://github.com/09ashishkapoor/Project_Apex11/releases/latest/download/app-release.apk">Download APK Now</a>
+              <a class="button-secondary" href="#install">How Installation Works</a>
+            </div>
+
+            <div class="hero-stats" aria-label="Highlights">
+              <article class="stat-card">
+                <strong>4 devotional paths</strong>
+                <div>Bundled deity and mantra flows available inside the app.</div>
+              </article>
+              <article class="stat-card">
+                <strong>100% local history</strong>
+                <div>Session records stay on device through Drift and SQLite.</div>
+              </article>
+              <article class="stat-card">
+                <strong>No tracking layer</strong>
+                <div>No login, no analytics, no cloud account boundary.</div>
+              </article>
             </div>
           </div>
 
-          <aside class="download-panel" id="download" aria-labelledby="download-title">
-            <h2 id="download-title">Fastest Android install</h2>
-            <p>Tap the button on your Android phone. If you are on a computer, scan the QR code to open the same download on your device.</p>
-            <a class="download-counter" href="https://github.com/09ashishkapoor/Project_Apex11/releases/latest">
-              <img src="https://img.shields.io/github/downloads/09ashishkapoor/Project_Apex11/latest/total?style=for-the-badge&amp;label=APK%20downloads&amp;color=8B2635" alt="Live APK download counter for the latest MANTRINI GitHub release">
+          <aside class="download-card" id="download" aria-labelledby="download-title">
+            <div class="section-kicker">Official release channel</div>
+            <h2 id="download-title">Install on Android in minutes.</h2>
+            <p class="download-copy">
+              Use the direct APK on your phone for the fastest path. If the direct file does not
+              open immediately, use the GitHub release page and download the attached APK there.
+            </p>
+
+            <a class="download-badge" href="https://github.com/09ashishkapoor/Project_Apex11/releases/latest">
+              <img
+                src="https://img.shields.io/github/downloads/09ashishkapoor/Project_Apex11/latest/total?style=for-the-badge&amp;label=APK%20downloads&amp;color=8B2635"
+                alt="Live APK download counter for the latest MANTRINI GitHub release"
+              >
             </a>
-            <div class="cta-group">
-              <a class="button" href="https://github.com/09ashishkapoor/Project_Apex11/releases/latest/download/app-release.apk">Download APK now</a>
-              <a class="secondary-button" href="https://github.com/09ashishkapoor/Project_Apex11/releases/latest">Open latest GitHub release</a>
+
+            <div class="download-actions">
+              <a class="button" href="https://github.com/09ashishkapoor/Project_Apex11/releases/latest/download/app-release.apk">Get The Latest APK</a>
+              <a class="button-secondary" href="https://github.com/09ashishkapoor/Project_Apex11/releases/latest">Open Latest GitHub Release</a>
             </div>
-            <div class="qr-shell">
-              <img src="mantrini-download-qr.png" alt="QR code that opens the official MANTRINI Android APK download from the latest GitHub release">
+
+            <div class="device-note">
+              Install only from release pages controlled by this repository. Avoid forwarded APKs,
+              mirrors, and third-party reposts.
+            </div>
+
+            <div class="qr-card">
+              <img
+                src="mantrini-download-qr.png"
+                alt="QR code that opens the official MANTRINI Android APK download"
+              >
               <div>
                 <h3>Scan from another screen</h3>
-                <p class="small-note">
-                  Open your phone camera, point it at the QR code, then tap the download prompt.
-                  If Android asks for permission, allow installation from that trusted browser or file source.
+                <p>
+                  Open your phone camera, point it at the QR code, then follow the prompt to the
+                  official download. If Android requests permission, allow installation from that
+                  trusted browser or file source.
                 </p>
               </div>
             </div>
-            <p class="callout">
-              Install only from GitHub release pages controlled by this project. Avoid APK mirrors, reposts, or forwarded files.
-            </p>
           </aside>
         </div>
       </section>
 
-      <section aria-labelledby="install-title">
-        <div class="section-head">
-          <div>
-            <h2 id="install-title">Three simple steps</h2>
-            <p>The page keeps the Android path first because most users only need the official APK, not a developer workflow.</p>
-          </div>
+      <section class="section" id="features" aria-labelledby="features-title">
+        <div class="section-heading">
+          <div class="section-kicker">Why this page exists</div>
+          <h2 id="features-title">Built for direct distribution, not app-store theater.</h2>
+          <p>
+            MANTRINI is currently distributed through GitHub Releases, so the website puts the
+            official Android install path first and keeps the rest of the message simple and clear.
+          </p>
         </div>
-        <div class="install-strip">
-          <div class="install-steps">
-            <article class="install-step">
-              <span>1</span>
-              <h3>Download the APK</h3>
-              <p>Tap <strong>Download APK now</strong> on your Android device, or scan the QR code to open the same file there.</p>
-            </article>
-            <article class="install-step">
-              <span>2</span>
-              <h3>Open the file</h3>
-              <p>When the APK finishes downloading, open it from your browser, downloads list, or file manager.</p>
-            </article>
-            <article class="install-step">
-              <span>3</span>
-              <h3>Allow install if asked</h3>
-              <p>If Android blocks the first attempt, allow installation from that trusted source, then continue and confirm the app name is <strong>MANTRINI</strong>.</p>
-            </article>
-          </div>
-        </div>
-      </section>
 
-      <section aria-labelledby="features-title">
-        <div class="section-head">
-          <div>
-            <h2 id="features-title">What MANTRINI offers</h2>
-            <p>The app is built for focused practice, steady counting, and local record-keeping without requiring connectivity.</p>
-          </div>
-        </div>
         <div class="feature-grid">
-          <article>
-            <h3>Guided counting modes</h3>
-            <ul>
-              <li>Manual counting for direct, tactile control.</li>
-              <li>Audio-guided counting for supported chanting flow.</li>
-              <li>Timed automatic chanting for uninterrupted practice sessions.</li>
-            </ul>
-          </article>
-          <article>
-            <h3>Four bundled deity paths</h3>
-            <ul>
-              <li>Current four bundled deity and mantra paths are available inside the app.</li>
-              <li>Practice flows are designed around devotional consistency rather than internet features.</li>
-              <li>Android remains the primary supported experience for this release channel.</li>
-            </ul>
-          </article>
-          <article>
-            <h3>Private local history</h3>
-            <ul>
-              <li>Session history is stored locally in Drift and SQLite on your own device.</li>
-              <li>Today totals, lifetime totals, malas of 108, recent sessions, and per-deity counts stay available offline.</li>
-              <li>Your practice records do not require a server account.</li>
-            </ul>
-          </article>
-          <article>
-            <h3>Backup and continuity</h3>
-            <ul>
-              <li>Export session backups as JSON text.</li>
-              <li>Import backups back into the app when needed.</li>
-              <li>Keep your own archive without handing data to a cloud service.</li>
-            </ul>
-          </article>
-        </div>
-      </section>
+          <div class="section-panel">
+            <h3>What the app is for</h3>
+            <p>
+              This is a respectful, offline practice companion for repeatable daily japa. It keeps
+              the experience narrow on purpose: focused counting, session continuity, and private
+              local record-keeping without network dependence.
+            </p>
+            <div class="ritual-strip" aria-label="Core principles">
+              <div class="pill">Offline first</div>
+              <div class="pill">Private by design</div>
+              <div class="pill">Android primary</div>
+              <div class="pill">GitHub distributed</div>
+            </div>
+            <div class="callout">
+              The absence of cloud features is part of the product boundary. MANTRINI is not trying
+              to become a social, monetized, account-driven platform.
+            </div>
+          </div>
 
-      <section aria-labelledby="privacy-title">
-        <div class="section-head">
-          <div>
-            <h2 id="privacy-title">Trust and privacy by design</h2>
-            <p>MANTRINI keeps the product boundary narrow. The absence of network-driven features is part of the design, not a missing upsell path.</p>
+          <div class="feature-column">
+            <article class="feature-card">
+              <h3>Counting modes</h3>
+              <ul class="feature-list">
+                <li>Manual counting for direct control.</li>
+                <li>Audio-guided counting for supported flow.</li>
+                <li>Timed automatic chanting for uninterrupted sessions.</li>
+              </ul>
+            </article>
+            <article class="feature-card">
+              <h3>History and backup</h3>
+              <ul class="feature-list">
+                <li>Today totals, lifetime totals, malas, recent sessions, and per-deity counts.</li>
+                <li>Export backups as JSON text.</li>
+                <li>Import those backups back into the app when needed.</li>
+              </ul>
+            </article>
           </div>
         </div>
-        <div class="privacy-grid">
-          <article>
-            <h3>No account layer</h3>
-            <p>No backend, no login, no password reset flow, and no cloud profile to maintain.</p>
+      </section>
+
+      <section class="section" id="install" aria-labelledby="install-title">
+        <div class="section-heading">
+          <div class="section-kicker">Android install flow</div>
+          <h2 id="install-title">Three steps, no account creation.</h2>
+          <p>
+            Most users only need the APK. The page keeps the install sequence visible so the sideload
+            path feels predictable rather than technical.
+          </p>
+        </div>
+
+        <div class="flow-grid">
+          <article class="flow-step">
+            <div class="flow-index">1</div>
+            <h3>Download the APK</h3>
+            <p>
+              Tap the direct download on your Android phone, or scan the QR code to open the same
+              file on your device.
+            </p>
           </article>
-          <article>
-            <h3>No monetization traps</h3>
-            <p>No payments, no subscriptions, and no ad surfaces interrupting practice.</p>
+          <article class="flow-step">
+            <div class="flow-index">2</div>
+            <h3>Open the downloaded file</h3>
+            <p>
+              Use your browser, downloads list, or file manager. If the direct link stalls, open the
+              latest release page and download the attached APK there.
+            </p>
           </article>
-          <article>
-            <h3>No telemetry</h3>
-            <p>No analytics, no social feed, and no hidden cloud sync transferring your practice data elsewhere.</p>
+          <article class="flow-step">
+            <div class="flow-index">3</div>
+            <h3>Approve the trusted install</h3>
+            <p>
+              If Android blocks the first attempt, allow installation from that trusted source and
+              confirm the app name shown is MANTRINI.
+            </p>
           </article>
         </div>
       </section>
 
-      <section aria-labelledby="notes-title">
-        <div class="notes-card">
-          <h2 id="notes-title">Android install notes</h2>
-          <ul>
+      <section class="section" aria-labelledby="trust-title">
+        <div class="section-heading">
+          <div class="section-kicker">Trust boundary</div>
+          <h2 id="trust-title">Private by default, narrow by intent.</h2>
+          <p>
+            The app avoids common growth layers that would expand the trust surface and distract from
+            devotional use.
+          </p>
+        </div>
+
+        <div class="trust-grid">
+          <article>
+            <h3>No account system</h3>
+            <p>No login, no passwords, no cloud profile, and no backend identity layer to maintain.</p>
+          </article>
+          <article>
+            <h3>No monetization surfaces</h3>
+            <p>No subscriptions, no ad slots, and no payment interruptions around practice.</p>
+          </article>
+          <article>
+            <h3>No telemetry layer</h3>
+            <p>No analytics, no hidden sync channel, and no social feed attached to your history.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="notes-title">
+        <div class="section-panel">
+          <div class="section-kicker">Install notes</div>
+          <h2 id="notes-title">A few practical details before you install.</h2>
+          <ul class="install-notes">
             <li>MANTRINI is currently distributed through GitHub Releases, not the Google Play Store.</li>
-            <li>If the direct APK link does not start immediately, open the latest release page and download the attached APK there.</li>
-            <li>On some phones, the first sideload install requires enabling installs from the browser or file manager that opened the APK.</li>
-            <li>For safety, use only APKs downloaded from this repository’s official GitHub release pages.</li>
+            <li>If the direct APK link does not start immediately, use the latest release page and download the attached APK there.</li>
+            <li>Some phones require enabling installs from the browser or file manager that opened the APK the first time.</li>
+            <li>Use only APKs distributed through the official GitHub release pages for this repository.</li>
           </ul>
         </div>
       </section>
     </main>
 
     <footer class="site-footer">
-      <div class="footer-card">
+      <div class="footer-panel">
         <p>MANTRINI source code is available under the MIT License.</p>
         <div class="footer-links">
-          <a href="https://09ashishkapoor.github.io/Project_Apex11/">Project website</a>
-          <a href="https://github.com/09ashishkapoor/Project_Apex11">GitHub repository</a>
+          <a href="https://09ashishkapoor.github.io/Project_Apex11/">Project Website</a>
+          <a href="https://github.com/09ashishkapoor/Project_Apex11">GitHub Repository</a>
           <a href="https://github.com/09ashishkapoor/Project_Apex11/blob/main/LICENSE">License</a>
         </div>
       </div>
