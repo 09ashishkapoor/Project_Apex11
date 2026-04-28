@@ -10,6 +10,10 @@ A respectful, offline Japa companion distributed primarily as an Android APK thr
 
 [![APK downloads](https://img.shields.io/github/downloads/09ashishkapoor/Project_Apex11/latest/total?style=for-the-badge&label=APK%20downloads&color=8B2635)](https://github.com/09ashishkapoor/Project_Apex11/releases/latest)
 
+Scan this QR code on your Android phone to open the download:
+
+<img src="docs/mantrini-download-qr.png" alt="QR code to download MANTRINI Android APK" width="220">
+
 If the direct download does not start, open the [latest GitHub Release](https://github.com/09ashishkapoor/Project_Apex11/releases/latest) and download the APK file attached there.
 
 </div>
