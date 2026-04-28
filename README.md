@@ -16,6 +16,8 @@ Scan this QR code on your Android phone to open the download:
 
 If the direct download does not start, open the [latest GitHub Release](https://github.com/09ashishkapoor/Project_Apex11/releases/latest) and download the APK file attached there.
 
+Prefer a simpler landing page first? Open the website: [09ashishkapoor.github.io/Project_Apex11](https://09ashishkapoor.github.io/Project_Apex11/).
+
 </div>
 
 ## Install on Android
