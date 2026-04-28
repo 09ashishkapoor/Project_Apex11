@@ -8,6 +8,8 @@ A respectful, offline Japa companion distributed primarily as an Android APK thr
 
 ### [CLICK HERE TO DOWNLOAD THE APP](https://github.com/09ashishkapoor/Project_Apex11/releases/latest/download/app-release.apk)
 
+[![APK downloads](https://img.shields.io/github/downloads/09ashishkapoor/Project_Apex11/latest/total?style=for-the-badge&label=APK%20downloads&color=8B2635)](https://github.com/09ashishkapoor/Project_Apex11/releases/latest)
+
 If the direct download does not start, open the [latest GitHub Release](https://github.com/09ashishkapoor/Project_Apex11/releases/latest) and download the APK file attached there.
 
 </div>
