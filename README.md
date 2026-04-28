@@ -2,12 +2,22 @@
 
 A respectful, offline Japa companion distributed primarily as an Android APK through GitHub Releases.
 
-## Download the APK
+<div align="center">
+
+## Download MANTRINI for Android
+
+### [CLICK HERE TO DOWNLOAD THE APP](https://github.com/09ashishkapoor/Project_Apex11/releases/latest/download/app-release.apk)
+
+If the direct download does not start, open the [latest GitHub Release](https://github.com/09ashishkapoor/Project_Apex11/releases/latest) and download the APK file attached there.
+
+</div>
+
+## Install on Android
 
 MANTRINI is not distributed through the Google Play Store at this time. The recommended installation path is the signed APK attached to the latest GitHub Release for this repository.
 
-1. Open the latest GitHub Release.
-2. Download the release APK attached to that release.
+1. Tap **CLICK HERE TO DOWNLOAD THE APP** above.
+2. Download the APK file.
 3. Transfer it to your Android device if needed.
 4. Open the APK on the device and allow installation from that trusted source when Android prompts.
 5. After installation, confirm the launcher name is `MANTRINI`.
