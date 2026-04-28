@@ -382,7 +382,8 @@
 
       .flow-grid,
       .feature-grid,
-      .trust-grid {
+      .trust-grid,
+      .screenshot-grid {
         display: grid;
         gap: 18px;
       }
@@ -461,6 +462,29 @@
         grid-template-columns: repeat(3, minmax(0, 1fr));
       }
 
+      .screenshot-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .screenshot-card {
+        padding: 14px;
+      }
+
+      .screenshot-card img {
+        width: 100%;
+        border-radius: 20px;
+        border: 1px solid rgba(232, 196, 104, 0.14);
+        box-shadow: 0 16px 34px rgba(0, 0, 0, 0.24);
+      }
+
+      .screenshot-label {
+        margin: 0 0 12px;
+        font-size: 0.82rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--gold);
+      }
+
       .trust-grid article {
         padding: 24px;
       }
@@ -500,6 +524,10 @@
         .trust-grid,
         .ritual-strip {
           grid-template-columns: 1fr;
+        }
+
+        .screenshot-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
         }
 
         .hero-copy h1 {
@@ -650,6 +678,68 @@
               </div>
             </div>
           </aside>
+        </div>
+      </section>
+
+      <section class="section" id="screenshots" aria-labelledby="screenshots-title">
+        <div class="section-heading">
+          <div class="section-kicker">App walkthrough</div>
+          <h2 id="screenshots-title">Screens in natural capture order.</h2>
+          <p>
+            These screenshots are arranged in ascending timestamp order so the flow reads the same
+            way the app was captured.
+          </p>
+        </div>
+
+        <div class="screenshot-grid" aria-labelledby="screenshots-title">
+          <article class="feature-card screenshot-card">
+            <p class="screenshot-label">Screen 01</p>
+            <img src="screenshots/screen-01.jpg" alt="MANTRINI app screenshot 01">
+          </article>
+          <article class="feature-card screenshot-card">
+            <p class="screenshot-label">Screen 02</p>
+            <img src="screenshots/screen-02.jpg" alt="MANTRINI app screenshot 02">
+          </article>
+          <article class="feature-card screenshot-card">
+            <p class="screenshot-label">Screen 03</p>
+            <img src="screenshots/screen-03.jpg" alt="MANTRINI app screenshot 03">
+          </article>
+          <article class="feature-card screenshot-card">
+            <p class="screenshot-label">Screen 04</p>
+            <img src="screenshots/screen-04.jpg" alt="MANTRINI app screenshot 04">
+          </article>
+          <article class="feature-card screenshot-card">
+            <p class="screenshot-label">Screen 05</p>
+            <img src="screenshots/screen-05.jpg" alt="MANTRINI app screenshot 05">
+          </article>
+          <article class="feature-card screenshot-card">
+            <p class="screenshot-label">Screen 06</p>
+            <img src="screenshots/screen-06.jpg" alt="MANTRINI app screenshot 06">
+          </article>
+          <article class="feature-card screenshot-card">
+            <p class="screenshot-label">Screen 07</p>
+            <img src="screenshots/screen-07.jpg" alt="MANTRINI app screenshot 07">
+          </article>
+          <article class="feature-card screenshot-card">
+            <p class="screenshot-label">Screen 08</p>
+            <img src="screenshots/screen-08.jpg" alt="MANTRINI app screenshot 08">
+          </article>
+          <article class="feature-card screenshot-card">
+            <p class="screenshot-label">Screen 09</p>
+            <img src="screenshots/screen-09.jpg" alt="MANTRINI app screenshot 09">
+          </article>
+          <article class="feature-card screenshot-card">
+            <p class="screenshot-label">Screen 10</p>
+            <img src="screenshots/screen-10.jpg" alt="MANTRINI app screenshot 10">
+          </article>
+          <article class="feature-card screenshot-card">
+            <p class="screenshot-label">Screen 11</p>
+            <img src="screenshots/screen-11.jpg" alt="MANTRINI app screenshot 11">
+          </article>
+          <article class="feature-card screenshot-card">
+            <p class="screenshot-label">Screen 12</p>
+            <img src="screenshots/screen-12.jpg" alt="MANTRINI app screenshot 12">
+          </article>
         </div>
       </section>
 

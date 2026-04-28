@@ -20,6 +20,16 @@ Prefer a simpler landing page first? Open the website: [09ashishkapoor.github.io
 
 </div>
 
+## App screenshots
+
+Screens are shown in ascending capture order.
+
+| 1 | 2 | 3 | 4 |
+| --- | --- | --- | --- |
+| ![MANTRINI screenshot 01](docs/screenshots/screen-01.jpg) | ![MANTRINI screenshot 02](docs/screenshots/screen-02.jpg) | ![MANTRINI screenshot 03](docs/screenshots/screen-03.jpg) | ![MANTRINI screenshot 04](docs/screenshots/screen-04.jpg) |
+| ![MANTRINI screenshot 05](docs/screenshots/screen-05.jpg) | ![MANTRINI screenshot 06](docs/screenshots/screen-06.jpg) | ![MANTRINI screenshot 07](docs/screenshots/screen-07.jpg) | ![MANTRINI screenshot 08](docs/screenshots/screen-08.jpg) |
+| ![MANTRINI screenshot 09](docs/screenshots/screen-09.jpg) | ![MANTRINI screenshot 10](docs/screenshots/screen-10.jpg) | ![MANTRINI screenshot 11](docs/screenshots/screen-11.jpg) | ![MANTRINI screenshot 12](docs/screenshots/screen-12.jpg) |
+
 ## Install on Android
 
 MANTRINI is not distributed through the Google Play Store at this time. The recommended installation path is the signed APK attached to the latest GitHub Release for this repository.
