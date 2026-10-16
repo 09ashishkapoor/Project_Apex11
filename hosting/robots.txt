@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://mantrini.jaikhyapaparampara.com/sitemap.xml

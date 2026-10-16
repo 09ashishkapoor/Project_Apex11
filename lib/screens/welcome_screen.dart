@@ -69,7 +69,7 @@ class WelcomeScreen extends StatelessWidget {
                           const SizedBox(height: 20),
                           AltarPanel(
                             child: Text(
-                              'Your data remains on the device unless you export it yourself.\n\nMay every japa bring you closer to Ma Adya Mahakali.',
+                              'Your data remains on the device unless you export it yourself.\n\nYou can install MANTRINI to your phone: use Install app or Add to Home Screen from your browser menu.\n\nMay every japa bring you closer to Ma Adya Mahakali.',
                               textAlign: TextAlign.center,
                               style: textTheme.bodyMedium?.copyWith(
                                 height: 1.45,

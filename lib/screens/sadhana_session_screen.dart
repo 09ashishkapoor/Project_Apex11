@@ -1,11 +1,11 @@
 import 'dart:async';
 
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../models/deity.dart';
 import '../models/sadhana_session.dart';
+import '../services/chant_audio_player.dart';
 import '../services/sadhana_repository.dart';
 import '../theme/app_theme.dart';
 import '../widgets/altar_widgets.dart';
@@ -26,13 +26,16 @@ class SadhanaSessionScreen extends StatefulWidget {
 
 class _SadhanaSessionScreenState extends State<SadhanaSessionScreen> {
   static const int _defaultTimedMinutes = 5;
+  static const int _chantsPerMala = 108;
 
-  late final AudioPlayer _audioPlayer;
+  late final ChantAudioPlayer _audioPlayer;
   late final TextEditingController _targetController;
   late final TextEditingController _durationController;
+  late final TextEditingController _roundsController;
 
-  StreamSubscription<PlayerState>? _playerStateSubscription;
+  StreamSubscription<ChantAudioState>? _playerStateSubscription;
   StreamSubscription<void>? _playerCompleteSubscription;
+  StreamSubscription<Duration>? _durationSubscription;
   Timer? _countdownTimer;
   Stopwatch _sessionStopwatch = Stopwatch();
 
@@ -41,16 +44,21 @@ class _SadhanaSessionScreenState extends State<SadhanaSessionScreen> {
   int? _sessionId;
 
   late int _targetCount;
+  int _targetRounds = 1;
   int _completedCount = 0;
   Duration _timedDuration = const Duration(minutes: _defaultTimedMinutes);
   Duration _remainingDuration = const Duration(minutes: _defaultTimedMinutes);
 
   bool _isPlaying = false;
-  DateTime? _currentTimedChantStartedAt;
+  int _autoLoopBaseCount = 0;
+  Duration? _chantDuration;
+  DateTime? _currentAutoChantStartedAt;
 
   bool get _isActive => _status == SadhanaSessionStatus.active;
   bool get _isPaused => _status == SadhanaSessionStatus.paused;
   bool get _isTimed => _mode == SadhanaSessionMode.timed;
+  bool get _isCountAuto => _mode == SadhanaSessionMode.count;
+  bool get _isAutoLoop => _isTimed || _isCountAuto;
 
   Duration get _elapsed =>
       Duration(seconds: _sessionStopwatch.elapsed.inSeconds);
@@ -64,64 +72,68 @@ class _SadhanaSessionScreenState extends State<SadhanaSessionScreen> {
     _targetCount = _deity.defaultTargetCount;
     _targetController = TextEditingController(text: _targetCount.toString());
     _durationController = TextEditingController(text: '$_defaultTimedMinutes');
+    _roundsController = TextEditingController(text: '$_targetRounds');
     _timedDuration = const Duration(minutes: _defaultTimedMinutes);
     _remainingDuration = _timedDuration;
 
-    _audioPlayer = AudioPlayer();
+    _audioPlayer = createChantAudioPlayer();
     _listenAudioPlayer();
   }
 
   void _listenAudioPlayer() {
-    _playerStateSubscription =
-        _audioPlayer.onPlayerStateChanged.listen((state) {
+    _playerStateSubscription = _audioPlayer.onStateChanged.listen((state) {
       if (!mounted) return;
       setState(() {
-        _isPlaying = state == PlayerState.playing;
+        _isPlaying = state == ChantAudioState.playing;
       });
     });
 
-    _playerCompleteSubscription =
-        _audioPlayer.onPlayerComplete.listen((_) async {
+    _durationSubscription = _audioPlayer.onDurationChanged.listen((duration) {
+      _chantDuration = duration;
+    });
+
+    _playerCompleteSubscription = _audioPlayer.onComplete.listen((_) async {
       if (!mounted) return;
 
-      if (_mode == SadhanaSessionMode.timed) {
-        final startedAt = _currentTimedChantStartedAt;
-        final stillWithinWindow =
-            startedAt != null && _remainingDuration.inSeconds > 0 && _isActive;
-        if (!stillWithinWindow) {
-          return;
-        }
+      if (_isAutoLoop) {
+        // Auto modes use native media looping so mobile browsers do not block
+        // a fresh programmatic play() after the first chant finishes.
+        await _syncAutoLoopProgress();
+        return;
+      }
+
+      if (_mode == SadhanaSessionMode.audio && mounted) {
+        setState(() {
+          _isPlaying = false;
+        });
       }
 
       await _incrementProgress();
-
-      if (_mode == SadhanaSessionMode.timed && _isActive) {
-        await _startSingleChant();
-      }
     });
   }
 
-  String _audioRelativePath(String assetPath) {
-    if (assetPath.startsWith('assets/')) {
-      return assetPath.substring('assets/'.length);
-    }
-    return assetPath;
-  }
-
-  Future<void> _startSingleChant() async {
-    if (!_isActive || _isPlaying) return;
-    if (_mode == SadhanaSessionMode.timed &&
-        _remainingDuration.inSeconds <= 0) {
+  Future<void> _startSingleChant({bool forceRestart = false}) async {
+    if (!_isActive || (!forceRestart && _isPlaying)) return;
+    if (_isTimed && _remainingDuration.inSeconds <= 0) {
       return;
     }
 
     try {
-      _currentTimedChantStartedAt =
-          _mode == SadhanaSessionMode.timed ? DateTime.now() : null;
-      await _audioPlayer.stop();
-      await _audioPlayer
-          .play(AssetSource(_audioRelativePath(_deity.audioAsset)));
-    } catch (_) {
+      _currentAutoChantStartedAt = _isAutoLoop ? DateTime.now() : null;
+      if (_isAutoLoop) {
+        _autoLoopBaseCount = _completedCount;
+      }
+      if (mounted && forceRestart) {
+        setState(() {
+          _isPlaying = false;
+        });
+      }
+      await _audioPlayer.playAsset(
+        _deity.audioAsset,
+        loop: _isAutoLoop,
+      );
+    } catch (error) {
+      debugPrint('Unable to play ${_deity.displayName} chant audio: $error');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -153,22 +165,35 @@ class _SadhanaSessionScreenState extends State<SadhanaSessionScreen> {
   Future<void> _startSession() async {
     if (_isActive || _isPaused) return;
 
-    final target = _parsePositiveInt(
-      _targetController,
-      _deity.defaultTargetCount,
-      'Target count',
-    );
-    final durationMinutes = _parsePositiveInt(
-      _durationController,
-      _defaultTimedMinutes,
-      'Timed duration',
-    );
+    final target = switch (_mode) {
+      SadhanaSessionMode.count =>
+        _parsePositiveInt(_roundsController, _targetRounds, 'Rounds') *
+            _chantsPerMala,
+      SadhanaSessionMode.timed => 0,
+      _ => _parsePositiveInt(
+          _targetController,
+          _deity.defaultTargetCount,
+          'Target count',
+        ),
+    };
+    final rounds = _mode == SadhanaSessionMode.count
+        ? (target ~/ _chantsPerMala)
+        : _targetRounds;
+    final durationMinutes = _mode == SadhanaSessionMode.timed
+        ? _parsePositiveInt(
+            _durationController,
+            _defaultTimedMinutes,
+            'Timed duration',
+          )
+        : _defaultTimedMinutes;
     final duration = Duration(minutes: durationMinutes);
 
     _targetCount = target;
+    _targetRounds = rounds;
     _timedDuration = duration;
     _remainingDuration = duration;
     _completedCount = 0;
+    _autoLoopBaseCount = 0;
     _sessionStopwatch = Stopwatch()..start();
 
     final id = await _repository.startSession(
@@ -186,8 +211,11 @@ class _SadhanaSessionScreenState extends State<SadhanaSessionScreen> {
 
     await WakelockPlus.enable();
 
-    if (_mode == SadhanaSessionMode.timed) {
+    if (_isTimed) {
       _startCountdownTimer();
+      await _startSingleChant();
+    } else if (_isCountAuto) {
+      _startCountAutoTimer();
       await _startSingleChant();
     }
   }
@@ -201,6 +229,7 @@ class _SadhanaSessionScreenState extends State<SadhanaSessionScreen> {
       }
 
       if (_remainingDuration.inSeconds <= 1) {
+        await _syncAutoLoopProgress(finalSync: true);
         setState(() {
           _remainingDuration = Duration.zero;
         });
@@ -210,9 +239,66 @@ class _SadhanaSessionScreenState extends State<SadhanaSessionScreen> {
         return;
       }
 
+      await _syncAutoLoopProgress();
+
+      if (!mounted) return;
       setState(() {
         _remainingDuration -= const Duration(seconds: 1);
       });
+    });
+  }
+
+  void _startCountAutoTimer() {
+    _countdownTimer?.cancel();
+    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
+      if (!_isActive || !_isCountAuto) {
+        timer.cancel();
+        return;
+      }
+
+      await _syncAutoLoopProgress();
+
+      if (!mounted) return;
+      if (_completedCount >= _targetCount) {
+        timer.cancel();
+        await _audioPlayer.stop();
+        await _completeSession();
+      }
+    });
+  }
+
+  Future<void> _syncAutoLoopProgress({bool finalSync = false}) async {
+    if (!_isActive ||
+        _sessionId == null ||
+        !_isAutoLoop ||
+        _currentAutoChantStartedAt == null) {
+      return;
+    }
+
+    final chantDuration = _chantDuration;
+    if (chantDuration == null || chantDuration.inMilliseconds <= 0) {
+      return;
+    }
+
+    final elapsed = DateTime.now().difference(_currentAutoChantStartedAt!);
+    final estimatedCount = _autoLoopBaseCount +
+        (elapsed.inMilliseconds ~/ chantDuration.inMilliseconds);
+    final upperBound = _isCountAuto ? _targetCount : 1 << 31;
+    final nextCount = finalSync || _isCountAuto
+        ? estimatedCount.clamp(_completedCount, upperBound).toInt()
+        : estimatedCount;
+
+    if (nextCount <= _completedCount) return;
+
+    await _repository.updateProgress(
+      sessionId: _sessionId!,
+      completedCount: nextCount,
+      durationSeconds: _elapsed.inSeconds,
+    );
+
+    if (!mounted) return;
+    setState(() {
+      _completedCount = nextCount;
     });
   }
 
@@ -233,7 +319,8 @@ class _SadhanaSessionScreenState extends State<SadhanaSessionScreen> {
     });
 
     if ((_mode == SadhanaSessionMode.manual ||
-            _mode == SadhanaSessionMode.audio) &&
+            _mode == SadhanaSessionMode.audio ||
+            _mode == SadhanaSessionMode.count) &&
         _completedCount >= _targetCount) {
       await _completeSession();
     }
@@ -249,6 +336,7 @@ class _SadhanaSessionScreenState extends State<SadhanaSessionScreen> {
 
     _countdownTimer?.cancel();
     _sessionStopwatch.stop();
+    await _syncAutoLoopProgress(finalSync: true);
     await _audioPlayer.stop();
     await _repository.pauseSession(
       sessionId: _sessionId!,
@@ -282,8 +370,11 @@ class _SadhanaSessionScreenState extends State<SadhanaSessionScreen> {
 
     await WakelockPlus.enable();
 
-    if (_mode == SadhanaSessionMode.timed) {
+    if (_isTimed) {
       _startCountdownTimer();
+      await _startSingleChant();
+    } else if (_isCountAuto) {
+      _startCountAutoTimer();
       await _startSingleChant();
     }
   }
@@ -297,6 +388,7 @@ class _SadhanaSessionScreenState extends State<SadhanaSessionScreen> {
 
     _countdownTimer?.cancel();
     _sessionStopwatch.stop();
+    await _syncAutoLoopProgress(finalSync: true);
     await _audioPlayer.stop();
     await _repository.completeSession(
       sessionId: _sessionId!,
@@ -307,6 +399,7 @@ class _SadhanaSessionScreenState extends State<SadhanaSessionScreen> {
     final finalCount = _completedCount;
     final mode = _mode;
     final timedMinutes = _timedDuration.inMinutes;
+    final completedRounds = finalCount ~/ _chantsPerMala;
 
     if (!mounted) return;
     setState(() {
@@ -333,7 +426,10 @@ class _SadhanaSessionScreenState extends State<SadhanaSessionScreen> {
             Text('Completed chants: $finalCount'),
             if (mode == SadhanaSessionMode.timed)
               Text('Configured duration: $timedMinutes minutes')
-            else
+            else if (mode == SadhanaSessionMode.count) ...[
+              Text('Rounds completed: $completedRounds / $_targetRounds'),
+              Text('Target chants: $_targetCount'),
+            ] else
               Text('Target: $_targetCount'),
           ],
         ),
@@ -366,8 +462,13 @@ class _SadhanaSessionScreenState extends State<SadhanaSessionScreen> {
       _sessionId = null;
       _status = null;
       _completedCount = 0;
+      _autoLoopBaseCount = 0;
+      _chantDuration = null;
+      _currentAutoChantStartedAt = null;
       _targetCount = _deity.defaultTargetCount;
+      _targetRounds = 1;
       _targetController.text = _targetCount.toString();
+      _roundsController.text = '$_targetRounds';
       _timedDuration = const Duration(minutes: _defaultTimedMinutes);
       _durationController.text = '$_defaultTimedMinutes';
       _remainingDuration = _timedDuration;
@@ -379,23 +480,26 @@ class _SadhanaSessionScreenState extends State<SadhanaSessionScreen> {
   }
 
   Widget _buildModeSelector() {
-    return SegmentedButton<SadhanaSessionMode>(
-      segments: SadhanaSessionMode.values
-          .map(
-            (mode) => ButtonSegment<SadhanaSessionMode>(
-              value: mode,
-              label: Text(mode.label),
-            ),
-          )
-          .toList(growable: false),
-      selected: {_mode},
-      onSelectionChanged: _isActive || _isPaused
-          ? null
-          : (selection) {
-              setState(() {
-                _mode = selection.first;
-              });
-            },
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: SegmentedButton<SadhanaSessionMode>(
+        segments: SadhanaSessionMode.values
+            .map(
+              (mode) => ButtonSegment<SadhanaSessionMode>(
+                value: mode,
+                label: Text(mode.label),
+              ),
+            )
+            .toList(growable: false),
+        selected: {_mode},
+        onSelectionChanged: _isActive || _isPaused
+            ? null
+            : (selection) {
+                setState(() {
+                  _mode = selection.first;
+                });
+              },
+      ),
     );
   }
 
@@ -408,6 +512,8 @@ class _SadhanaSessionScreenState extends State<SadhanaSessionScreen> {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final completedRounds =
+        (_completedCount ~/ _chantsPerMala).clamp(0, _targetRounds).toInt();
     final progressDenominator = _mode == SadhanaSessionMode.timed
         ? (_timedDuration.inSeconds == 0 ? 1 : _timedDuration.inSeconds)
         : (_targetCount == 0 ? 1 : _targetCount);
@@ -424,12 +530,17 @@ class _SadhanaSessionScreenState extends State<SadhanaSessionScreen> {
             final imageWidth = constraints.maxWidth < 380 ? 126.0 : 160.0;
             final hasStarted = _status != null;
             final isIdle = !_isActive && !_isPaused;
-            final primaryValue = _mode == SadhanaSessionMode.timed
-                ? _formatDuration(_remainingDuration)
-                : '$_completedCount';
-            final primaryLabel = _mode == SadhanaSessionMode.timed
-                ? 'Remaining'
-                : 'Completed chants';
+            final primaryValue = switch (_mode) {
+              SadhanaSessionMode.timed => _formatDuration(_remainingDuration),
+              SadhanaSessionMode.count => '$completedRounds / $_targetRounds',
+              _ => '$_completedCount',
+            };
+            final primaryLabel = switch (_mode) {
+              SadhanaSessionMode.timed => 'Remaining',
+              SadhanaSessionMode.count =>
+                'Malas completed - $_completedCount / $_targetCount chants',
+              _ => 'Completed chants',
+            };
 
             return SingleChildScrollView(
               padding: const EdgeInsets.all(16),
@@ -501,22 +612,32 @@ class _SadhanaSessionScreenState extends State<SadhanaSessionScreen> {
                             const SizedBox(height: 12),
                             _buildModeSelector(),
                             const SizedBox(height: 14),
-                            if (_mode != SadhanaSessionMode.timed)
-                              TextField(
-                                controller: _targetController,
-                                keyboardType: TextInputType.number,
-                                decoration: const InputDecoration(
-                                  labelText: 'Target count',
-                                  helperText: 'Manual and audio sessions',
-                                ),
-                              )
-                            else
+                            if (_mode == SadhanaSessionMode.timed)
                               TextField(
                                 controller: _durationController,
                                 keyboardType: TextInputType.number,
                                 decoration: const InputDecoration(
                                   labelText: 'Timed duration (minutes)',
                                   helperText: 'Automatic audio loop',
+                                ),
+                              )
+                            else if (_mode == SadhanaSessionMode.count)
+                              TextField(
+                                controller: _roundsController,
+                                keyboardType: TextInputType.number,
+                                decoration: const InputDecoration(
+                                  labelText: 'Rounds of 108',
+                                  helperText:
+                                      'Automatic loop until malas are complete',
+                                ),
+                              )
+                            else
+                              TextField(
+                                controller: _targetController,
+                                keyboardType: TextInputType.number,
+                                decoration: const InputDecoration(
+                                  labelText: 'Target count',
+                                  helperText: 'Manual and audio sessions',
                                 ),
                               ),
                           ],
@@ -535,10 +656,14 @@ class _SadhanaSessionScreenState extends State<SadhanaSessionScreen> {
                             child: SessionMetric(
                               label: _mode == SadhanaSessionMode.timed
                                   ? 'Duration'
-                                  : 'Target',
+                                  : _mode == SadhanaSessionMode.count
+                                      ? 'Malas'
+                                      : 'Target',
                               value: _mode == SadhanaSessionMode.timed
                                   ? '${_timedDuration.inMinutes}m'
-                                  : '$_targetCount',
+                                  : _mode == SadhanaSessionMode.count
+                                      ? '$_targetRounds x 108'
+                                      : '$_targetCount',
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -555,7 +680,9 @@ class _SadhanaSessionScreenState extends State<SadhanaSessionScreen> {
                         _CountButton(onPressed: _manualTap)
                       else if (_isActive && _mode == SadhanaSessionMode.audio)
                         FilledButton.icon(
-                          onPressed: _isPlaying ? null : _startSingleChant,
+                          onPressed: _isPlaying
+                              ? null
+                              : () => _startSingleChant(forceRestart: true),
                           icon: Icon(_isPlaying
                               ? Icons.graphic_eq_rounded
                               : Icons.volume_up_rounded),
@@ -563,6 +690,13 @@ class _SadhanaSessionScreenState extends State<SadhanaSessionScreen> {
                               Text(_isPlaying ? 'Chanting...' : 'Play Chant'),
                         )
                       else if (_isActive && _mode == SadhanaSessionMode.timed)
+                        FilledButton.icon(
+                          onPressed: null,
+                          icon: const Icon(Icons.graphic_eq_rounded),
+                          label: Text(
+                              _isPlaying ? 'Auto Chanting...' : 'Listening'),
+                        )
+                      else if (_isActive && _mode == SadhanaSessionMode.count)
                         FilledButton.icon(
                           onPressed: null,
                           icon: const Icon(Icons.graphic_eq_rounded),
@@ -640,6 +774,7 @@ class _SadhanaSessionScreenState extends State<SadhanaSessionScreen> {
     _countdownTimer?.cancel();
     _playerStateSubscription?.cancel();
     _playerCompleteSubscription?.cancel();
+    _durationSubscription?.cancel();
     _sessionStopwatch.stop();
     if (_sessionId != null &&
         (_status == SadhanaSessionStatus.active ||
@@ -657,6 +792,7 @@ class _SadhanaSessionScreenState extends State<SadhanaSessionScreen> {
     unawaited(_audioPlayer.dispose());
     _targetController.dispose();
     _durationController.dispose();
+    _roundsController.dispose();
     super.dispose();
   }
 }

@@ -1,7 +1,8 @@
 enum SadhanaSessionMode {
   manual,
   audio,
-  timed;
+  timed,
+  count;
 
   String get storageValue => name;
 
@@ -9,6 +10,7 @@ enum SadhanaSessionMode {
         SadhanaSessionMode.manual => 'Manual',
         SadhanaSessionMode.audio => 'Audio-guided',
         SadhanaSessionMode.timed => 'Timed auto',
+        SadhanaSessionMode.count => 'Count auto',
       };
 
   static SadhanaSessionMode fromStorage(String value) {
