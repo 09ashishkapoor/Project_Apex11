@@ -70,7 +70,12 @@ export async function packageSite({ appBuild = join(root, 'build/web'), output =
 if (window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true) {
   window.location.replace('/app/' + window.location.search + window.location.hash);
 } else if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('/pwa_service_worker.js?v=${version}'));
+  window.addEventListener('load', async () => {
+    // Upgrade existing app installations without downloading Flutter for new landing visitors.
+    if (await navigator.serviceWorker.getRegistration('/')) {
+      await navigator.serviceWorker.register('/pwa_service_worker.js?v=${version}');
+    }
+  });
 }
 </script>`;
   await writeFile(join(output, 'index.html'), landing.replace('</body>', registration + '\n</body>'));

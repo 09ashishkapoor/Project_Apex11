@@ -62,6 +62,33 @@ test('rejects overlapping output and a changed Flutter base path before packagin
   await assert.rejects(() => packageSite(options), /base href/);
 });
 
+test('landing skips app downloads for fresh visitors and upgrades existing installations', async t => {
+  const options = await fixture(t);
+  await packageSite(options);
+  const landing = await readFile(join(options.output, 'index.html'), 'utf8');
+  const script = [...landing.matchAll(/<script>([\s\S]*?)<\/script>/g)].at(-1)[1];
+  for (const existing of [false, true]) {
+    const registered = [];
+    let onLoad;
+    runInNewContext(script, {
+      window: { matchMedia: () => ({ matches: false }), addEventListener: (event, handler) => { assert.equal(event, 'load'); onLoad = handler; } },
+      navigator: { serviceWorker: {
+        getRegistration: async scope => { assert.equal(scope, '/'); return existing ? {} : undefined; },
+        register: async url => registered.push(url),
+      } },
+    });
+    await onLoad();
+    assert.equal(registered.length, existing ? 1 : 0);
+    if (existing) assert.match(registered[0], /^\/pwa_service_worker\.js\?v=[a-f0-9]+$/);
+  }
+  let redirected;
+  runInNewContext(script, {
+    window: { matchMedia: () => ({ matches: true }), location: { search: '?installed=true', hash: '#history', replace: url => redirected = url } },
+    navigator: {},
+  });
+  assert.equal(redirected, '/app/?installed=true#history');
+});
+
 async function workerHarness(t) {
   const options = await fixture(t);
   await packageSite(options);
