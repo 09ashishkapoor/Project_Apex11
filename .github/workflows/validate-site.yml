@@ -1,0 +1,22 @@
+name: Validate web hosting
+on:
+  push:
+    branches: [main]
+  pull_request:
+    paths:
+      - 'docs/**'
+      - 'hosting/**'
+      - 'tool/package_site.mjs'
+      - 'test/site/**'
+      - '.github/workflows/validate-site.yml'
+permissions:
+  contents: read
+jobs:
+  hosting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test test/site/hosting.test.mjs

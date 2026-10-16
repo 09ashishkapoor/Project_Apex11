@@ -20,6 +20,8 @@ If the direct download does not start, open the [latest GitHub Release](https://
 
 Prefer a simpler landing page first? Open the website: [09ashishkapoor.github.io/Project_Apex11](https://09ashishkapoor.github.io/Project_Apex11/).
 
+The shared landing page also links to the browser version. See [web hosting](docs/web-hosting.md) for packaging the existing web build with the landing at `/` and the app at `/app/`.
+
 </div>
 
 ## App screenshots
