@@ -1,4 +1,4 @@
-// Proves the app works offline: install the service worker, cut the network,
+﻿// Proves the app works offline: install the service worker, cut the network,
 // reload, then walk every screen, run a session, play the chant, and confirm the
 // ledger survived. Also confirms the offline emulation is real by checking that
 // an external URL fails.
@@ -110,6 +110,9 @@ if (booted) {
   await page.screenshot({ path: path.join(OUT, 'offline-altar.png') });
 
   // Run a session end to end with no network.
+  // Tap mode: the default is Audio, where a count only lands when the chant
+  // finishes, which would make this offline count non-deterministic.
+  await page.locator('.mode-tile').nth(0).click();
   await page.locator('button.pill', { hasText: 'Begin japa' }).click();
   await page.waitForSelector('.session.on', { timeout: 8000 });
   await page.waitForTimeout(400);

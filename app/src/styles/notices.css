@@ -1,4 +1,4 @@
-/* ============================================================
+﻿/* ============================================================
    Storage + platform notices.
    ============================================================ */
 
@@ -31,7 +31,7 @@
 }
 
 .install-hint__go {
-  min-height: 36px;
+  min-height: 44px;
   padding: 0 16px;
   border-radius: 10px;
   font-size: 12.5px;
@@ -48,7 +48,7 @@
 
 .install-hint__close {
   flex: 0 0 auto;
-  min-height: 36px;
+  min-height: 44px;
   padding: 0 10px;
   font-size: 12px;
   font-weight: 600;

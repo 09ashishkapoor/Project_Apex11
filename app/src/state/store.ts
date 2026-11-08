@@ -1,4 +1,4 @@
-import {
+﻿import {
   allSessions,
   getSession,
   reapOrphanedSessions,
@@ -17,11 +17,11 @@ import { CHANTS_PER_MALA, type SessionMode, type Stats } from '../data/types';
 import type { ChantAudio } from '../lib/audio';
 import { hapticComplete, hapticCount, hapticMala } from '../lib/haptics';
 import { requestPersistentStorage, type PersistenceState } from '../lib/storage';
+import { loadConfig, saveConfig } from '../lib/prefs';
 import { acquireWakeLock, releaseWakeLock } from '../lib/wakelock';
 import {
   cadenceMs,
   completedCountFor,
-  defaultConfig,
   isLoopMode,
   crossedMala,
   isSessionComplete,
@@ -36,8 +36,8 @@ export type View = 'today' | 'altar' | 'session' | 'blessing' | 'ledger';
 /**
  * Fail a promise that never settles.
  *
- * IndexedDB is the one thing the app cannot run without, and a blocked origin —
- * Brave Shields, private mode, a storage policy — can leave `openDB` pending
+ * IndexedDB is the one thing the app cannot run without, and a blocked origin â€”
+ * Brave Shields, private mode, a storage policy â€” can leave `openDB` pending
  * forever with no error event. Without this the tap simply does nothing and the
  * app looks frozen.
  */
@@ -108,7 +108,7 @@ export interface AppState {
   error: string | null;
   /** Whether the browser has agreed to keep this origin's storage. */
   persisted: PersistenceState;
-  /** The offering animation is playing; covers the Blessing → Today swap. */
+  /** The offering animation is playing; covers the Blessing â†’ Today swap. */
   offering: boolean;
 }
 
@@ -134,7 +134,7 @@ export class AppStore {
     ready: false,
     view: 'today',
     deityId: DEITIES[0]!.id,
-    config: defaultConfig('audio'),
+    config: loadConfig(),
     live: null,
     blessing: null,
     stats: EMPTY_STATS,
@@ -250,6 +250,7 @@ export class AppStore {
 
   setMode(mode: SessionMode): void {
     const config = { ...this.state.config, mode };
+    saveConfig(config);
     this.patch({ config });
   }
 
@@ -258,11 +259,15 @@ export class AppStore {
     const config = this.state.config;
     if (config.mode === 'timed') {
       const minutes = Math.min(60, Math.max(5, config.timedMinutes + delta * 5));
-      this.patch({ config: { ...config, timedMinutes: minutes } });
+      const next = { ...config, timedMinutes: minutes };
+      saveConfig(next);
+      this.patch({ config: next });
       return;
     }
     const malas = Math.min(9, Math.max(1, config.malas + delta));
-    this.patch({ config: { ...config, malas } });
+    const next = { ...config, malas };
+    saveConfig(next);
+    this.patch({ config: next });
   }
 
   // ----------------------------------------------------------- session live
@@ -550,7 +555,7 @@ export class AppStore {
    *
    * The Beads animation runs in CSS on the Blessing screen; this only has to
    * hold the veil across the view swap and clear it afterwards. The timings
-   * match `styles/offering.css` — change them together.
+   * match `styles/offering.css` â€” change them together.
    */
   beginOffer(): void {
     if (this.state.offering) return;
