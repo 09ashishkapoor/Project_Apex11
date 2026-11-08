@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>MANTRINI — how to install, 4:5</title>
+<style>
+@font-face{font-family:'Philosopher';font-weight:400;font-display:block;
+  src:url('../docs/assets/fonts/philosopher-latin-normal-400.woff2') format('woff2')}
+@font-face{font-family:'Philosopher';font-weight:700;font-display:block;
+  src:url('../docs/assets/fonts/philosopher-latin-normal-700.woff2') format('woff2')}
+@font-face{font-family:'Crimson Text';font-weight:400;font-display:block;
+  src:url('../docs/assets/fonts/crimson-text-latin-normal-400.woff2') format('woff2')}
+@font-face{font-family:'Crimson Text';font-weight:600;font-display:block;
+  src:url('../docs/assets/fonts/crimson-text-latin-normal-600.woff2') format('woff2')}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1080px;height:1350px;overflow:hidden}
+body{
+  font-family:'Crimson Text',Georgia,serif;color:#F0DCC8;
+  background:
+    radial-gradient(120% 58% at 50% -2%, rgba(232,196,104,.13), transparent 58%),
+    radial-gradient(90% 44% at 50% 106%, rgba(74,14,23,.6), transparent 72%),
+    radial-gradient(ellipse at top, #2D0F18 0%, #1F0B11 46%, #0D0506 100%);
+  display:flex;flex-direction:column;padding:86px 80px 64px;position:relative;
+}
+body::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.05;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode:overlay}
+
+.eyebrow{font-size:22px;font-weight:600;letter-spacing:.34em;text-transform:uppercase;
+  color:#C9A962;text-indent:.34em}
+h1{font-family:'Philosopher';font-weight:400;font-size:80px;line-height:1.06;
+  color:#FFF8F0;margin-top:22px}
+h1 em{font-style:normal;color:#E8C468;font-weight:700}
+
+.blocks{margin-top:44px;display:flex;flex-direction:column;gap:36px}
+.block{}
+.block h2{
+  font-family:'Philosopher';font-weight:700;font-size:34px;color:#F4E4C1;
+  display:flex;align-items:baseline;gap:16px;padding-bottom:16px;
+  border-bottom:1px solid rgba(232,196,104,.18);margin-bottom:22px;
+}
+.block h2 span{
+  font-family:'Crimson Text';font-size:20px;font-weight:600;letter-spacing:.2em;
+  text-transform:uppercase;color:#C9A962;
+}
+.steps{counter-reset:s;list-style:none;margin:0;padding:0}
+.steps li{
+  counter-increment:s;position:relative;padding-left:58px;margin-bottom:20px;
+  font-size:27px;line-height:1.42;color:rgba(240,220,200,.9);
+}
+.steps li::before{
+  content:counter(s);position:absolute;left:0;top:-2px;
+  width:40px;height:40px;border-radius:50%;
+  display:grid;place-items:center;
+  font-family:'Philosopher';font-size:20px;color:#E8C468;
+  border:1px solid rgba(232,196,104,.45);
+}
+.steps b{font-weight:600;color:#FFF8F0}
+
+.note{
+  margin-top:36px;padding:24px 28px;border-radius:16px;
+  border:1px solid rgba(232,196,104,.24);background:rgba(232,196,104,.06);
+  font-size:23px;line-height:1.5;color:rgba(240,220,200,.88);
+}
+.note b{color:#F4E4C1}
+
+.foot{margin-top:auto;padding-top:36px;text-align:center}
+.foot .site{font-size:21px;letter-spacing:.18em;text-transform:uppercase;color:#C9A962}
+</style>
+</head>
+<body>
+  <p class="eyebrow">Install</p>
+  <h1>Two taps, <em>then it is yours</em>.</h1>
+
+  <div class="blocks">
+    <div class="block">
+      <h2><span>Android</span> Chrome, Edge, Brave</h2>
+      <ol class="steps">
+        <li>Open <b>mantrini.jaikhyapaparampara.com</b></li>
+        <li>Tap <b>Install</b>, or menu <b>⋮</b> then <b>Add to Home screen</b></li>
+        <li>It opens full screen, with the trikoṇa icon</li>
+      </ol>
+    </div>
+
+    <div class="block">
+      <h2><span>iPhone &amp; iPad</span> Safari</h2>
+      <ol class="steps">
+        <li>Open the same address in <b>Safari</b></li>
+        <li>Tap <b>Share</b>, then <b>Add to Home Screen</b></li>
+        <li>Open it from the Home Screen, not a bookmark</li>
+      </ol>
+    </div>
+  </div>
+
+  <p class="note">
+    <b>On iPhone, install rather than bookmark.</b> Safari may clear a website's
+    stored data after seven days unused; an app on the Home Screen is kept.
+  </p>
+
+  <div class="foot">
+    <p class="site">mantrini.jaikhyapaparampara.com</p>
+  </div>
+</body>
+</html>

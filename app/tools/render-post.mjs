@@ -10,9 +10,11 @@ const REPO = path.resolve('..');
 const OUT = path.join(REPO, 'reel');
 
 const POSTS = [
+  { template: 'post-tall.html', name: 'post-1-introducing.jpg', width: 1080, height: 1350 },
+  { template: 'post-modes.html', name: 'post-2-modes.jpg', width: 1080, height: 1350 },
+  { template: 'post-mantras.html', name: 'post-3-mantras.jpg', width: 1080, height: 1350 },
+  { template: 'post-install.html', name: 'post-4-install.jpg', width: 1080, height: 1350 },
   { template: 'post-square.html', name: 'post-introducing-square.jpg', width: 1080, height: 1080 },
-  { template: 'post-tall.html', name: 'post-introducing.jpg', width: 1080, height: 1350 },
-  { template: 'post-mantras.html', name: 'post-mantras.jpg', width: 1080, height: 1350 },
 ];
 
 const browser = await chromium.launch({ executablePath: resolveChrome() });
