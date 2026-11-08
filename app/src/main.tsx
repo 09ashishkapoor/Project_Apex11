@@ -9,6 +9,7 @@ import './styles/offering.css';
 import { App } from './app';
 import { store } from './state/store';
 import { ChantAudio } from './lib/audio';
+import { watchInstallability } from './lib/install';
 
 /** True inside the Capacitor Android shell (assets are already local there). */
 function isNativeShell(): boolean {
@@ -18,6 +19,10 @@ function isNativeShell(): boolean {
 
 const audio = new ChantAudio();
 store.attachAudio(audio);
+
+// Before the first render: the browser can fire beforeinstallprompt as soon as
+// the app qualifies, which may be earlier than any component mounting.
+watchInstallability();
 
 const root = document.getElementById('app');
 if (!root) throw new Error('Missing #app root element');

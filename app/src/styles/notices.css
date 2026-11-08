@@ -3,9 +3,7 @@
    ============================================================ */
 
 .install-hint {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
+  display: block;
   margin: 16px var(--gutter) 12px;
   padding: 12px 14px;
   border-radius: 14px;
@@ -14,7 +12,6 @@
 }
 
 .install-hint p {
-  flex: 1;
   font-size: 12.5px;
   line-height: 1.5;
   color: var(--cream-2);
@@ -25,10 +22,34 @@
   color: #fdf5e8;
 }
 
+.install-hint__actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.install-hint__go {
+  min-height: 36px;
+  padding: 0 16px;
+  border-radius: 10px;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: #2a1708;
+  background: linear-gradient(180deg, #f4e4c1 0%, #e8c468 55%, #c9a962 100%);
+  box-shadow: 0 4px 12px rgba(201, 169, 98, 0.22);
+}
+
+.install-hint__go:active {
+  transform: scale(0.98);
+}
+
 .install-hint__close {
   flex: 0 0 auto;
-  min-height: 32px;
-  padding: 0 8px;
+  min-height: 36px;
+  padding: 0 10px;
   font-size: 12px;
   font-weight: 600;
   color: var(--accent-2);

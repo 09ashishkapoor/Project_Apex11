@@ -247,6 +247,30 @@ for persistent storage on boot and shows a one-line Add to Home Screen hint when
 it detects iOS in a browser tab. Haptics remain unavailable on iOS in any
 browser.
 
+## Installing
+
+The app is installable, and the ask is deliberately **not** shown on arrival. It
+appears on Today only once the devotee has actually completed a sitting — someone
+who just landed has no reason to install; someone who just finished a mala does.
+
+| Browser | What is offered |
+|---|---|
+| Chrome, Edge, Android | An **Install** button wired to the browser's own `beforeinstallprompt` dialog |
+| iOS (any browser) | Share → Add to Home Screen instructions; there is no install API to call |
+| Firefox, desktop Safari | Nothing — no prompt exists and no instructions would help |
+| Already installed | Nothing, ever |
+
+It sits in the normal page flow rather than floating over the content, so it can
+never cover the altar or swallow a tap. "Not now" is stored and respected for
+**30 days**, not forever, so a change of mind is not punished.
+
+`beforeinstallprompt` is captured in `main.tsx` before the first render, because
+the browser can fire it before any component mounts, and the event is single-use.
+
+The decision rules are a pure function (`shouldOfferInstall`) with unit tests;
+`tools/check-install.mjs` synthesises the browser event and checks the whole
+behaviour in a real browser, including that a fresh visitor is never asked.
+
 ## Verification
 
 The repo ships three scripts that run against a **real browser** and are the
@@ -263,6 +287,7 @@ APP_URL=http://127.0.0.1:5200/ node tools/check-audio-playback.mjs # clips decod
 APP_URL=http://127.0.0.1:5200/ node tools/check-audio-fallback.mjs # counting survives no audio
 APP_URL=http://127.0.0.1:5200/ node tools/check-audio-gesture.mjs  # sound starts inside the tap
 APP_URL=http://127.0.0.1:5200/ node tools/check-offline.mjs        # network cut, app still works
+APP_URL=http://127.0.0.1:5200/ node tools/check-install.mjs        # install ask, and when it stays away
 npm test                                                          # domain logic
 ```
 

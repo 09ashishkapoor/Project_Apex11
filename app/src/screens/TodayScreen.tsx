@@ -57,7 +57,7 @@ export function TodayScreen({ state, onGo }: { state: AppState; onGo: (view: Vie
       </button>
 
       <div class="today__body">
-        <InstallHint />
+        <InstallHint lifetimeChants={lifetime} />
         <div class="today__count">
           <div class="today__big">{groupDigits(today)}</div>
           <div class="today__words">
