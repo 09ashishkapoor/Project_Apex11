@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>MANTRINI — the four mantras, 4:5</title>
+<style>
+@font-face{font-family:'Philosopher';font-weight:400;font-display:block;
+  src:url('../docs/assets/fonts/philosopher-latin-normal-400.woff2') format('woff2')}
+@font-face{font-family:'Philosopher';font-weight:700;font-display:block;
+  src:url('../docs/assets/fonts/philosopher-latin-normal-700.woff2') format('woff2')}
+@font-face{font-family:'Crimson Text';font-weight:400;font-display:block;
+  src:url('../docs/assets/fonts/crimson-text-latin-normal-400.woff2') format('woff2')}
+@font-face{font-family:'Crimson Text';font-weight:600;font-display:block;
+  src:url('../docs/assets/fonts/crimson-text-latin-normal-600.woff2') format('woff2')}
+@font-face{font-family:'Noto Sans Devanagari';font-weight:400 600;font-display:block;
+  src:url('../docs/assets/fonts/noto-sans-devanagari-devanagari-normal-400600.woff2') format('woff2')}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1080px;height:1350px;overflow:hidden}
+body{
+  font-family:'Crimson Text',Georgia,serif;color:#F0DCC8;
+  background:
+    radial-gradient(120% 58% at 50% -2%, rgba(232,196,104,.12), transparent 58%),
+    radial-gradient(90% 44% at 50% 106%, rgba(74,14,23,.58), transparent 72%),
+    radial-gradient(ellipse at top, #2D0F18 0%, #1F0B11 46%, #0D0506 100%);
+  display:flex;flex-direction:column;padding:86px 80px 64px;position:relative;
+}
+body::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.05;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode:overlay}
+
+.eyebrow{font-size:22px;font-weight:600;letter-spacing:.34em;text-transform:uppercase;
+  color:#C9A962;text-indent:.34em}
+h1{font-family:'Philosopher';font-weight:400;font-size:88px;line-height:1.02;
+  letter-spacing:.01em;color:#FFF8F0;margin-top:22px}
+h1 em{font-style:normal;color:#E8C468;font-weight:700}
+.rule{height:1px;margin:38px 0 8px;background:rgba(232,196,104,.22)}
+
+.row{display:flex;align-items:center;gap:30px;padding:30px 0;
+  border-bottom:1px solid rgba(232,196,104,.14)}
+.plate{width:112px;height:112px;border-radius:50%;overflow:hidden;flex:0 0 auto;
+  border:1px solid rgba(232,196,104,.45);box-shadow:0 0 0 5px rgba(232,196,104,.05)}
+.plate img{width:100%;height:100%;object-fit:cover;object-position:50% 20%}
+.text{flex:1}
+.name{font-family:'Philosopher';font-weight:700;font-size:38px;line-height:1.15;color:#FFF8F0}
+.mantra{font-family:'Noto Sans Devanagari';font-size:33px;line-height:1.45;
+  color:#F4E4C1;margin-top:8px}
+
+.foot{margin-top:auto;padding-top:44px;text-align:center}
+.foot p{font-size:25px;color:rgba(240,220,200,.78)}
+.foot .site{margin-top:14px;font-size:21px;letter-spacing:.18em;text-transform:uppercase;color:#C9A962}
+</style>
+</head>
+<body>
+  <p class="eyebrow">The four altars</p>
+  <h1>Four names, <em>four mantras</em>.</h1>
+  <div class="rule"></div>
+
+  <div class="row">
+    <div class="plate"><img src="../docs/assets/altars/adya-mahakali.jpg" alt=""></div>
+    <div class="text">
+      <p class="name">Adya Mahakali</p>
+      <p class="mantra">ॐ आद्यायै नमः</p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="plate"><img src="../docs/assets/altars/batuk-bhairav.jpg" alt=""></div>
+    <div class="text">
+      <p class="name">Batuk Bhairav</p>
+      <p class="mantra">ॐ बटुक भैरवाय नमः</p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="plate"><img src="../docs/assets/altars/swarnaakarshana-bhairav.jpg" alt=""></div>
+    <div class="text">
+      <p class="name">Swarnaakarshana Bhairav</p>
+      <p class="mantra">ॐ श्री स्वर्णाकर्षण भैरवाय नमः</p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="plate"><img src="../docs/assets/altars/skanda-bhairav.jpg" alt=""></div>
+    <div class="text">
+      <p class="name">Skanda Bhairav</p>
+      <p class="mantra">ॐ सर्वान्भवाय नमः</p>
+    </div>
+  </div>
+
+  <div class="foot">
+    <p>Japa, kept on your own device.</p>
+    <p class="site">mantrini.jaikhyapaparampara.com</p>
+  </div>
+</body>
+</html>
