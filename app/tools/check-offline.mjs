@@ -1,4 +1,4 @@
-﻿// Proves the app works offline: install the service worker, cut the network,
+// Proves the app works offline: install the service worker, cut the network,
 // reload, then walk every screen, run a session, play the chant, and confirm the
 // ledger survived. Also confirms the offline emulation is real by checking that
 // an external URL fails.

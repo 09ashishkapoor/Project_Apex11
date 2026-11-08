@@ -1,7 +1,7 @@
-﻿// Checks the install prompt in a real browser, since the browser is the only
+// Checks the install prompt in a real browser, since the browser is the only
 // place beforeinstallprompt exists. Chromium fires it only when the app
 // genuinely qualifies and with real engagement history, which a fresh profile
-// never has â€” so the event is synthesised here and the app's behaviour is
+// never has — so the event is synthesised here and the app's behaviour is
 // checked from there.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -96,7 +96,7 @@ async function open({ completeSession }) {
       // iOS path: instructions, and no dead button.
       const text = await card.innerText();
       const letters = /Add to Home Screen/i.test(text);
-      results.push({ name: 'explains Share â†’ Add to Home Screen on iOS', pass: letters, detail: letters ? 'instructions shown' : 'missing' });
+      results.push({ name: 'explains Share → Add to Home Screen on iOS', pass: letters, detail: letters ? 'instructions shown' : 'missing' });
     }
   }
   results.push({ name: 'no runtime errors (after sitting)', pass: errors.length === 0, detail: errors.join(' | ') || 'none' });

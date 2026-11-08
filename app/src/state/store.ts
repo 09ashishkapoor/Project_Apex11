@@ -1,4 +1,4 @@
-﻿import {
+import {
   allSessions,
   getSession,
   reapOrphanedSessions,
@@ -36,8 +36,8 @@ export type View = 'today' | 'altar' | 'session' | 'blessing' | 'ledger';
 /**
  * Fail a promise that never settles.
  *
- * IndexedDB is the one thing the app cannot run without, and a blocked origin â€”
- * Brave Shields, private mode, a storage policy â€” can leave `openDB` pending
+ * IndexedDB is the one thing the app cannot run without, and a blocked origin —
+ * Brave Shields, private mode, a storage policy — can leave `openDB` pending
  * forever with no error event. Without this the tap simply does nothing and the
  * app looks frozen.
  */
@@ -108,7 +108,7 @@ export interface AppState {
   error: string | null;
   /** Whether the browser has agreed to keep this origin's storage. */
   persisted: PersistenceState;
-  /** The offering animation is playing; covers the Blessing â†’ Today swap. */
+  /** The offering animation is playing; covers the Blessing → Today swap. */
   offering: boolean;
 }
 
@@ -555,7 +555,7 @@ export class AppStore {
    *
    * The Beads animation runs in CSS on the Blessing screen; this only has to
    * hold the veil across the view swap and clear it afterwards. The timings
-   * match `styles/offering.css` â€” change them together.
+   * match `styles/offering.css` — change them together.
    */
   beginOffer(): void {
     if (this.state.offering) return;
