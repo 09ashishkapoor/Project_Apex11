@@ -488,8 +488,17 @@
 
 .session__photo-wrap {
   position: relative;
-  flex: 0 0 auto;
-  height: clamp(320px, 60vh, 545px);
+  /* Not a fixed height: on iOS Safari `vh` is the LARGE viewport, so 60vh is
+     taller than what is visible while the toolbars are showing. The fixed height
+     pushed the countdown controls below the fold, and because .session is
+     overflow:hidden they were clipped rather than scrollable — the devotee saw a
+     running clock and no button at all. Letting the darshan absorb the remaining
+     space guarantees the controls are always on screen. */
+  flex: 1 1 auto;
+  min-height: 0;
+  height: auto;
+  max-height: clamp(320px, 60vh, 545px);
+  max-height: clamp(320px, 60dvh, 545px);
   overflow: hidden;
 }
 
@@ -729,6 +738,8 @@
   align-items: center;
   justify-content: center;
   margin-top: 4px;
+  /* Clear the iOS home indicator when Safari's toolbars are hidden. */
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
 }
 
 .ctl {
