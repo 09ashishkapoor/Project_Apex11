@@ -19,3 +19,6 @@ Thumbs.db
 *.iml
 *.log
 *.swp
+
+# Rendered promo video (regenerate with app/tools/record-reel.mjs)
+reel/*.mp4
