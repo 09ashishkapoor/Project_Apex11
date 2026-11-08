@@ -68,6 +68,13 @@ export async function promptInstall(): Promise<'accepted' | 'dismissed' | 'unava
   try {
     await event.prompt();
     const choice = await event.userChoice;
+    if (choice.outcome === 'accepted') {
+      // Do not wait for `appinstalled`: it can arrive much later, and until it
+      // does the card would fall back to the "use the browser menu" variant and
+      // look like the install had failed.
+      installedThisVisit = true;
+      notify();
+    }
     return choice.outcome;
   } catch {
     return 'unavailable';
@@ -79,22 +86,44 @@ export function isInstalledNow(): boolean {
 }
 
 /**
+ * Whether this is a Chromium browser, where the menu carries its own install
+ * entry even when `beforeinstallprompt` has not fired yet.
+ *
+ * Chrome only fires that event once it has engagement history with the site.
+ * A first-time visitor therefore gets no prompt and no install button — but the
+ * browser's own menu entry is usually there, so telling them where to look is
+ * the difference between "cannot install" and "installed".
+ */
+export function isChromium(): boolean {
+  if (typeof navigator === 'undefined') return false;
+  const ua = navigator.userAgent;
+  // Exclude iOS outright: every browser there is WebKit and none can install.
+  if (/iPad|iPhone|iPod/.test(ua)) return false;
+  return /Chrome\/|CriOS|Chromium|Edg\/|OPR\//.test(ua);
+}
+
+/**
  * Whether to show the install card. Pure, so the rules are testable without a
  * browser and without a clock.
+ *
+ * `requireSitting` is false where the card is somewhere the devotee went
+ * looking for it (the Ledger), so a first-time visitor can still install
+ * before completing anything.
  */
 export function shouldOfferInstall(input: {
   installed: boolean;
   appleMobile: boolean;
+  chromium: boolean;
   canPrompt: boolean;
   lifetimeChants: number;
   dismissedAt: number | null;
   now: number;
+  requireSitting?: boolean;
 }): boolean {
   if (input.installed) return false;
-  // Never on arrival: only after the devotee has actually finished a sitting.
-  if (input.lifetimeChants <= 0) return false;
+  if (input.requireSitting !== false && input.lifetimeChants <= 0) return false;
   // If there is nothing to offer and nothing to explain, say nothing.
-  if (!input.canPrompt && !input.appleMobile) return false;
+  if (!input.canPrompt && !input.appleMobile && !input.chromium) return false;
   if (input.dismissedAt !== null) {
     const elapsed = input.now - input.dismissedAt;
     // A clock that moved backwards should still suppress, not loop forever.

@@ -13,6 +13,7 @@ import {
 import type { AppState, View } from '../state/store';
 import { store } from '../state/store';
 import { NavPill, Sheet } from '../components/ui';
+import { InstallHint } from '../components/InstallHint';
 
 type Dialog = 'export' | 'import' | 'reset' | null;
 
@@ -197,6 +198,9 @@ export function LedgerScreen({ state, onGo }: { state: AppState; onGo: (view: Vi
               part of the site it is linked from. */}
           <p class="ledger__blessing">Om Shri Gurubhyo Namaha | Jai Khyapa Parampara</p>
           <p class="ledger__message">May every Japa bring you closer to Ma Adya Mahakali.</p>
+          {/* The Ledger is where someone goes looking for install, so this card
+              is offered regardless of whether a sitting has been completed. */}
+          <InstallHint lifetimeChants={state.stats.lifetimeTotal} requireSitting={false} />
           {state.persisted !== 'granted' ? (
             <p class="storage-note">
               This browser has not promised to keep the ledger. <b>Take a backup now and then</b> —

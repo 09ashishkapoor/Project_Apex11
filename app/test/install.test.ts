@@ -10,6 +10,7 @@ function base(overrides: Partial<Parameters<typeof shouldOfferInstall>[0]> = {})
   return {
     installed: false,
     appleMobile: false,
+    chromium: true,
     canPrompt: true,
     lifetimeChants: 108,
     dismissedAt: null,
@@ -32,8 +33,25 @@ describe('shouldOfferInstall', () => {
   });
 
   it('says nothing on a platform with nothing to offer and nothing to explain', () => {
-    // Firefox and desktop Safari: no prompt, not an iPhone.
-    expect(shouldOfferInstall(base({ canPrompt: false, appleMobile: false }))).toBe(false);
+    // Firefox and desktop Safari: no prompt, not an iPhone, not Chromium.
+    expect(shouldOfferInstall(base({ canPrompt: false, chromium: false }))).toBe(false);
+  });
+
+  it('still points Chromium at its menu entry before the prompt has fired', () => {
+    // Chrome only fires beforeinstallprompt after engagement history. Without
+    // this the visitor sees no install control at all.
+    expect(shouldOfferInstall(base({ canPrompt: false, chromium: true }))).toBe(true);
+  });
+
+  it('ignores the sitting requirement where the devotee went looking for it', () => {
+    expect(shouldOfferInstall(base({ lifetimeChants: 0 }))).toBe(false);
+    expect(shouldOfferInstall(base({ lifetimeChants: 0, requireSitting: false }))).toBe(true);
+  });
+
+  it('still honours "not now" in the Ledger', () => {
+    expect(
+      shouldOfferInstall(base({ lifetimeChants: 0, requireSitting: false, dismissedAt: NOW - 1000 })),
+    ).toBe(false);
   });
 
   it('still explains the route on iOS, where no prompt exists', () => {
