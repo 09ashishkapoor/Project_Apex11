@@ -419,6 +419,41 @@ section{position:relative}
 }
 .install-note b{color:var(--candle)}
 
+/* ------------------------------------------------------- browser support */
+
+.support{list-style:none;margin:clamp(30px,4vw,44px) 0 0;padding:0;
+  border-top:1px solid var(--rule)}
+.support li{
+  display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 20px;
+  padding:20px 0;border-bottom:1px solid var(--rule-soft);
+}
+.support__name{
+  font-family:var(--display);font-weight:700;font-size:20px;color:var(--candle);
+}
+.support__name em{
+  font-family:var(--body);font-style:italic;font-weight:400;font-size:15px;
+  color:var(--cream-3);margin-left:10px;
+}
+.support__state{
+  margin-left:auto;font-size:15px;text-align:right;
+  display:flex;align-items:center;gap:9px;
+}
+.support__state::before{
+  content:"";width:7px;height:7px;border-radius:50%;flex:0 0 auto;
+}
+.support--good .support__state{color:var(--gold-soft)}
+.support--good .support__state::before{background:var(--gold-soft)}
+.support--warn .support__state{color:var(--cream-3)}
+.support--warn .support__state::before{background:rgba(240,220,200,.4)}
+@media (max-width:560px){
+  .support__state{margin-left:0;width:100%;justify-content:flex-start;text-align:left}
+}
+.support__note{
+  margin-top:26px;font-size:16px;line-height:1.65;color:var(--cream-2);max-width:62ch;
+}
+.support__note a{color:var(--gold-soft);text-decoration:none;border-bottom:1px solid rgba(232,196,104,.4);padding-bottom:1px}
+.support__note a:hover{color:var(--white);border-color:var(--gold)}
+
 /* ----------------------------------------------------------- odes */
 
 .closing{
@@ -658,6 +693,40 @@ section{position:relative}
         website's stored data after seven days of no use; an app added to the Home
         Screen is kept. Your ledger is only ever on your own device, so a backup
         from the Ledger screen is the safest habit.
+      </p>
+    </section>
+
+    <!-- ------------------------------------------ browser support -->
+    <section class="showcase" id="browsers" aria-labelledby="browsers-title">
+      <div class="divider"><b>Browser support</b><span>Tested where it counts.</span></div>
+      <h2 id="browsers-title">Where it <em>works</em>.</h2>
+      <p class="lede">MANTRINI is a website, so it runs in anything modern — but these
+        are the browsers every release is actually checked in.</p>
+
+      <ul class="support">
+        <li class="support--good">
+          <span class="support__name">Chrome<em>desktop &amp; Android</em></span>
+          <span class="support__state">Fully tested</span>
+        </li>
+        <li class="support--good">
+          <span class="support__name">Safari<em>iPhone &amp; iPad</em></span>
+          <span class="support__state">Supported</span>
+        </li>
+        <li class="support--warn">
+          <span class="support__name">Brave</span>
+          <span class="support__state">Not supported — use at your own risk</span>
+        </li>
+        <li class="support--warn">
+          <span class="support__name">Other Chromium browsers<em>Edge, Opera, Vivaldi, Arc…</em></span>
+          <span class="support__state">Use at your own risk</span>
+        </li>
+      </ul>
+
+      <p class="support__note">
+        Every release is checked automatically in Chrome before it goes out, so Chrome
+        is the one to trust. If anything misbehaves, please write to
+        <a href="mailto:kaliputraashish@gmail.com">kaliputraashish@gmail.com</a> and say
+        which phone and browser you were using — that is what gets it fixed.
       </p>
     </section>
 
