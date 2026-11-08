@@ -92,7 +92,37 @@ await record('loop', async (page, zero) => {
   return { start, end: Date.now() - zero };
 });
 
-// --- 2. auto mode, for the version with sound ------------------------------
+// --- 3. slow: four mantras, then the offering ------------------------------
+// Audio mode rather than Tap: each chant sounds for its full length and only
+// then counts, so the rhythm is the mantra's own. Rushing this was the whole
+// problem with the first cut.
+await record('slow', async (page, zero) => {
+  await page.waitForSelector('.splash', { timeout: 20000 });
+  await wait(page, 900);
+  await page.locator('.splash__continue').click();
+  await page.waitForSelector('.view.on', { timeout: 10000 });
+  await wait(page, 800);
+  await page.click('text=Altar');
+  await page.waitForSelector('.altar.on', { timeout: 10000 });
+  await page.locator('.mode-tile').nth(1).click();
+  await wait(page, 900);
+  await page.locator('button.pill', { hasText: 'Begin japa' }).click();
+  await page.waitForSelector('.session.on', { timeout: 10000 });
+  await wait(page, 1000);
+
+  const chantTimes = [];
+  for (let i = 0; i < 4; i += 1) {
+    chantTimes.push(Date.now() - zero);
+    await page.locator('.session__pill').click();
+    await wait(page, 3200); // the mantra plays out, then a breath
+  }
+
+  const offered = Date.now() - zero;
+  await page.locator('.session__finish').click();
+  await page.waitForSelector('.blessing.on', { timeout: 10000 });
+  await wait(page, 4400); // hold on the offering
+  return { chantTimes, chantLen: 2.47, offered };
+});
 await record('auto', async (page, zero) => {
   await page.waitForSelector('.splash', { timeout: 20000 });
   await wait(page, 900);

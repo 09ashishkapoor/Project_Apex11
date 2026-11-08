@@ -1,4 +1,4 @@
-"""Encode the promo clips from the raw Playwright captures.
+﻿"""Encode the promo clips from the raw Playwright captures.
 
 Playwright records video only, so the sound version is built by laying the app's
 own chant loop against the measured moment the chant starts. That keeps it the
@@ -25,7 +25,7 @@ def run(args: list[str]) -> None:
     result = subprocess.run(args, capture_output=True, text=True)
     if result.returncode != 0:
         print(result.stderr[-2000:], file=sys.stderr)
-        raise SystemExit(f"ffmpeg failed: {' '.join(args[:6])}…")
+        raise SystemExit(f"ffmpeg failed: {' '.join(args[:6])}â€¦")
 
 
 def probe(path: pathlib.Path, entries: str) -> str:
@@ -81,7 +81,7 @@ def auto_clip_with_sound() -> None:
             "-filter_complex", f"[0:v]{SCALE}[v];{audio_filter}",
             "-map", "[v]", "-map", "[a]",
             "-t", f"{total:.3f}",
-            "-r", "30", "-c:v", "libx264", "-preset", "slow", "-crf", "20",
+            "-r", "30", "-c:v", "libx264", "-preset", "medium", "-crf", "20",
             "-c:a", "aac", "-b:a", "160k", "-ar", "44100",
             "-movflags", "+faststart",
             str(target),
@@ -93,10 +93,56 @@ def auto_clip_with_sound() -> None:
     )
 
 
+def slow_clip_with_sound() -> None:
+    """Four mantras at their own pace, then the offering.
+
+    Audio mode plays one chant per count and counts when it ends, so each tap
+    starts a real clip. The track is therefore four delayed copies of the chant
+    on silence, one per tap, rather than a continuous loop.
+    """
+    meta = json.loads((RAW / "slow.json").read_text())["marks"]
+    times = [t / 1000 for t in meta["chantTimes"]]
+    chant_len = 2.44  # stop just before the tail, so taps never overlap
+    source = APP / "public" / "audio" / "adya-mahakali.mp3"
+    total = float(probe(RAW / "slow.webm", "format=duration").split("=")[1])
+
+    voices = "".join(
+        f"[c{i}]atrim=0:{chant_len},asetpts=N/SR/TB,afade=t=out:st={chant_len - 0.35:.2f}:d=0.35,"
+        f"adelay={int(t * 1000)}:all=1[a{i}];"
+        for i, t in enumerate(times)
+    )
+    mixed = "".join(f"[a{i}]" for i in range(len(times)))
+    # Bound the audio to the clip instead of padding forever: `apad` with no
+    # length makes ffmpeg encode an unbounded stream, which is why this took
+    # minutes and produced a 15 MB file for a 20-second clip.
+    mixer = f"{mixed}amix=inputs={len(times)}:normalize=0,atrim=0:{total:.3f},asetpts=N/SR/TB[a]"
+    split = f"[1:a]asplit={len(times)}" + "".join(f"[c{i}]" for i in range(len(times)))
+
+    target = OUT / "mantrini-chant-slow.mp4"
+    run(
+        [
+            FFMPEG, "-y", "-v", "error",
+            "-i", str(RAW / "slow.webm"),
+            "-i", str(source),
+            "-filter_complex", f"[0:v]{SCALE}[v];{split};{voices}{mixer}",
+            "-map", "[v]", "-map", "[a]",
+            "-t", f"{total:.3f}",
+            "-r", "30", "-c:v", "libx264", "-preset", "medium", "-crf", "20",
+            "-c:a", "aac", "-b:a", "160k", "-ar", "44100",
+            "-movflags", "+faststart",
+            str(target),
+        ]
+    )
+    print(
+        f"slow      {target.name}  {target.stat().st_size / 1024:.0f} KB  {total:.1f}s  "
+        f"{len(times)} chants at {', '.join(f'{t:.1f}' for t in times)}s"
+    )
+
+
 def main() -> None:
     loop_clip()
-    auto_clip_with_sound()
-    for name in ("mantrini-loop.mp4", "mantrini-reel-audio.mp4"):
+    slow_clip_with_sound()
+    for name in ("mantrini-loop.mp4", "mantrini-chant-slow.mp4"):
         path = OUT / name
         print(f"\n{name}")
         print("  " + probe(path, "stream=codec_name,width,height,r_frame_rate").replace("\n", "  "))
