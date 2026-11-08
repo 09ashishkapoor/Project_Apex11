@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+@font-face{font-family:'Philosopher';font-weight:400;font-display:block;
+  src:url('../docs/assets/fonts/philosopher-latin-normal-400.woff2') format('woff2')}
+@font-face{font-family:'Philosopher';font-weight:700;font-display:block;
+  src:url('../docs/assets/fonts/philosopher-latin-normal-700.woff2') format('woff2')}
+@font-face{font-family:'Crimson Text';font-weight:400;font-display:block;
+  src:url('../docs/assets/fonts/crimson-text-latin-normal-400.woff2') format('woff2')}
+@font-face{font-family:'Crimson Text';font-weight:600;font-display:block;
+  src:url('../docs/assets/fonts/crimson-text-latin-normal-600.woff2') format('woff2')}
+@font-face{font-family:'Noto Sans Devanagari';font-weight:400 600;font-display:block;
+  src:url('../docs/assets/fonts/noto-sans-devanagari-devanagari-normal-400600.woff2') format('woff2')}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1080px;height:1080px;overflow:hidden}
+body{
+  font-family:'Crimson Text',Georgia,serif;
+  color:#F0DCC8;
+  background:
+    radial-gradient(120% 62% at 50% -4%, rgba(232,196,104,.13), transparent 58%),
+    radial-gradient(90% 48% at 50% 106%, rgba(74,14,23,.6), transparent 72%),
+    radial-gradient(ellipse at top, #2D0F18 0%, #1F0B11 46%, #0D0506 100%);
+  display:flex;flex-direction:column;align-items:center;
+  padding:64px 72px 54px;
+  position:relative;
+}
+/* grain, so the large gradients do not band on a phone screen */
+body::after{
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:.05;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode:overlay;
+}
+
+/* the mark, with the darshan inside — same geometry as the app icon */
+.yantra{position:relative;width:392px;aspect-ratio:280/244;flex:0 0 auto;margin-top:6px}
+.yantra::before{
+  content:"";position:absolute;inset:-16%;
+  background:radial-gradient(circle, rgba(232,196,104,.22), transparent 66%);
+}
+.yantra svg{position:relative;display:block;width:100%;height:100%}
+
+.eyebrow{
+  margin-top:46px;font-size:21px;font-weight:600;letter-spacing:.34em;
+  text-transform:uppercase;color:#C9A962;text-indent:.34em;
+}
+h1{
+  font-family:'Philosopher';font-weight:400;font-size:132px;line-height:.94;
+  letter-spacing:.055em;text-indent:.055em;color:#FFF8F0;margin-top:16px;
+}
+.rule{width:112px;height:2px;margin:30px 0 26px;
+  background:linear-gradient(90deg,rgba(201,169,98,0),#C9A962,rgba(201,169,98,0))}
+.tagline{
+  font-size:36px;line-height:1.42;text-align:center;color:rgba(240,220,200,.92);
+  max-width:19ch;
+}
+.tagline b{font-weight:600;color:#F4E4C1}
+
+/* the four altars, as small plates */
+.altars{display:flex;gap:22px;margin-top:auto;margin-bottom:34px}
+.altar{
+  width:104px;height:104px;border-radius:50%;overflow:hidden;
+  border:1px solid rgba(232,196,104,.5);
+  box-shadow:0 0 0 5px rgba(232,196,104,.06);
+}
+.altar img{width:100%;height:100%;object-fit:cover;object-position:50% 22%}
+
+.trust{
+  display:flex;gap:16px;align-items:center;
+  font-size:23px;color:rgba(240,220,200,.76);letter-spacing:.01em;
+}
+.trust span{display:flex;align-items:center;gap:10px}
+.trust span::before{content:"";width:6px;height:6px;border-radius:50%;background:#E8C468;opacity:.85}
+.trust span:first-child::before{display:none}
+.trust span:first-child{padding-left:0}
+.site{margin-top:14px;font-size:21px;letter-spacing:.16em;text-transform:uppercase;color:#C9A962}
+</style>
+</head>
+<body>
+  <div class="yantra">
+    <svg viewBox="0 0 280 244">
+      <defs>
+        <clipPath id="tri"><polygon points="140,241 2,3 278,3"/></clipPath>
+        <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#F7E3BB"/><stop offset="42%" stop-color="#E8C468"/>
+          <stop offset="100%" stop-color="#C0803A"/>
+        </linearGradient>
+        <radialGradient id="wash" cx="50%" cy="40%" r="64%">
+          <stop offset="0%" stop-color="#0D0506" stop-opacity="0"/>
+          <stop offset="58%" stop-color="#0D0506" stop-opacity=".1"/>
+          <stop offset="100%" stop-color="#0D0506" stop-opacity=".66"/>
+        </radialGradient>
+      </defs>
+      <image href="../docs/assets/altars/adya-mahakali.jpg" clip-path="url(#tri)"
+             x="0" y="0" width="280" height="244" preserveAspectRatio="xMidYMin slice"/>
+      <g clip-path="url(#tri)"><rect width="280" height="244" fill="url(#wash)"/></g>
+      <polygon points="140,241 2,3 278,3" fill="none" stroke="url(#gold)"
+               stroke-width="2.4" stroke-linejoin="round"/>
+    </svg>
+  </div>
+
+  <p class="eyebrow">Introducing</p>
+  <h1>MANTRINI</h1>
+  <div class="rule"></div>
+  <p class="tagline">A respectful, <b>offline</b> japa companion.</p>
+
+  <div class="altars">
+    <div class="altar"><img src="../docs/assets/altars/adya-mahakali.jpg" alt=""></div>
+    <div class="altar"><img src="../docs/assets/altars/batuk-bhairav.jpg" alt=""></div>
+    <div class="altar"><img src="../docs/assets/altars/swarnaakarshana-bhairav.jpg" alt=""></div>
+    <div class="altar"><img src="../docs/assets/altars/skanda-bhairav.jpg" alt=""></div>
+  </div>
+
+  <p class="trust">
+    <span>Works offline</span>
+    <span>No account</span>
+    <span>Nothing leaves your device</span>
+  </p>
+  <p class="site">mantrini.jaikhyapaparampara.com</p>
+</body>
+</html>
