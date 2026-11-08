@@ -10,8 +10,8 @@ and leaves the duration alone, because the auto-count cadence is derived from
 the clip length: shortening or padding a clip would silently change how fast a
 mala completes.
 
-Source of truth is the Flutter originals under assets/audio/, never the already
-re-encoded copies, so repeated runs cannot degrade the audio.
+Source of truth is the licensed originals under assets-src/audio/, never the
+already re-encoded copies, so repeated runs cannot degrade the audio.
 """
 import json
 import pathlib
@@ -22,10 +22,10 @@ import tempfile
 
 APP = pathlib.Path(__file__).resolve().parent.parent
 REPO = APP.parent
-SOURCE = REPO / "assets" / "audio"
+SOURCE = APP / "assets-src" / "audio"
 TARGET = APP / "public" / "audio"
 
-# Flutter asset name -> web asset name
+# original asset name -> web asset name
 FILES = {
     "maha.mp3": "adya-mahakali.mp3",
     "batuk.mp3": "batuk-bhairav.mp3",

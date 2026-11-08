@@ -1,5 +1,9 @@
 name: Deploy GitHub Pages
 
+# Publishes the same assembled site as the Cloudflare deploy, so the GitHub
+# Pages mirror also serves the app at /app/ rather than a landing page whose
+# only button is broken.
+
 on:
   push:
     branches: [main]
@@ -15,14 +19,28 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Install app dependencies
+        working-directory: app
+        run: npm ci
+
+      - name: Build the app
+        working-directory: app
+        run: npm run build
+
+      - name: Package landing and app
+        run: node tool/package_site.mjs
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -30,8 +48,15 @@ jobs:
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: docs
+          path: build/site
 
+  deploy:
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

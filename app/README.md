@@ -1,10 +1,10 @@
 # MANTRINI · app
 
 The Direction 02 ("The Lamp") rebuild of MANTRINI, as a single offline-first web
-app that also ships as an Android APK.
+app that runs in any browser and installs to a phone's Home Screen.
 
 - **Web**: Vite + Preact + TypeScript. ~57 kB JS / ~32 kB CSS before gzip.
-- **Android**: Capacitor wraps the *same* build — no second codebase.
+- **Any browser**: the same build, installable from the browser itself.
 - **Storage**: IndexedDB on the device. No backend, no account, no telemetry.
 - **Brand**: palette and type matched to `jaikhyapaparampara.com` — see below.
 
@@ -64,7 +64,6 @@ Run it after changing any brand colour:
 
 ```bash
 python tools/make-brand-icon.py
-npm run cap:sync
 ```
 
 ### The offering
@@ -124,7 +123,7 @@ made the bundle heavy and the loudness jump between deities.
 |---|---|---|
 | audio payload | 285 KB | **111 KB** |
 
-It reads the Flutter originals in `assets/audio/`, never the already-encoded
+It reads the licensed originals in `app/assets-src/audio/`, never the already-encoded
 copies, so repeated runs cannot degrade the audio. It **aborts if a clip's
 duration drifts by more than 60 ms**, because the counting cadence is derived
 from clip length.
@@ -181,7 +180,7 @@ Then:
 | `npm test` | Unit tests (Vitest) |
 | `npm run build` | Typecheck + production build into `dist/` |
 | `npm run preview` | Serve `dist/` to check the real build |
-| `npm run cap:sync` | Build, then copy `dist/` into the Android shell |
+| `node tools/preview-site.mjs` | Assemble landing + app exactly as it deploys |
 
 ## Platform behaviour
 
@@ -204,7 +203,7 @@ What the code does about it:
   and the ledger tells the truth when the browser declines.
 - `components/InstallHint.tsx` — one dismissible line on iOS only, explaining
   Add to Home Screen. Without it, Safari may clear the ledger after a week.
-- `lib/haptics.ts` — Capacitor bridge haptics inside the APK, `navigator.vibrate`
+- `lib/haptics.ts` — `navigator.vibrate`
   in Android browsers, silent no-op elsewhere.
 
 Verified by `tools/platform-check.mjs` (all six checks pass) — it asserts that
@@ -237,9 +236,9 @@ cannot pass by accident. With no network at all, it verifies that the app
 Nothing else — including the install icons, which are fetched lazily and are
 only needed when the browser shows its install prompt.
 
-**The APK is offline by construction.** The same build is copied into the native
-shell and served from disk, so there is no cache to miss. That path is still
-unverified locally — this machine has no JDK or Android SDK.
+**Once installed, the app never needs the network again.** Adding it to the Home
+Screen keeps the cache out of the browser's normal eviction path, which is the
+real reason the install ask exists.
 
 **On iPhone**, Safari may evict a site's storage — cache included — after seven
 days of no use *unless* the app has been added to the Home Screen. The app asks
@@ -357,88 +356,56 @@ screen height. If you change the curve, change both — the path is
 
 Sessions live in IndexedDB (`mantrini` database, `sessions` store).
 
-The backup envelope is **byte-compatible with the old Flutter app**:
+The backup envelope is **byte-compatible with the previous app**:
 
 ```json
 { "format": "sadhana_for_a_khyapa_backup", "version": 1,
   "exportedAt": "…", "sessions": [ { "deityId": "…", "mode": "manual", … } ] }
 ```
 
-That means a devotee moving from the APK can open the old app → Ledger → Backup,
+That means a devotee moving across can open the old app → Ledger → Backup,
 copy the JSON, and paste it into Ledger → Restore here. `test/backup.test.ts`
-pins this contract with a payload copied from the Flutter repository.
+pins this contract with a payload copied from the original repository.
 
 On boot the app also **reaps orphaned sessions**: anything left `active` or
 `paused` by a crash or a closed tab is folded into `cancelled`, so a killed
 session can never sit in the database forever (audit defect B3).
 
-## Android APK
+## Deployment
 
-The wrapper is Capacitor. The APK contains the web build on disk, so it runs
-fully offline with no server.
+`dist/` is a static site, built with `base: './'`, so it works from a domain root
+or a subpath. `tool/package_site.mjs` assembles the deployable artifact:
 
-```bash
-npm run cap:sync                    # rebuild + copy into android/
-cd android && ./gradlew assembleDebug
-# app/build/outputs/apk/debug/app-debug.apk
+```
+build/site/        the landing page, copied from docs/
+build/site/app/    this app, copied from dist/
 ```
 
-You need JDK 21 and the Android SDK. **Neither is installed in this checkout's
-development environment**, so the APK is built in CI (`.github/workflows/app-pwa.yml`),
-which uploads `mantrini-apk-debug`. Nothing here was validated with a real
-Gradle run locally — treat the first CI run as the proof.
+Two workflows publish exactly that artifact:
 
-### Release signing
+| Workflow | Destination |
+|---|---|
+| `cloudflare-pages.yml` | Cloudflare Pages (the `mantrini` project) |
+| `pages.yml` | GitHub Pages mirror |
 
-Exactly like the Flutter app: `android/key.properties`, never committed.
+The Cloudflare job needs the `CLOUDFLARE_API_TOKEN` repository secret. A separate
+`credentials` job fails fast with a clear message if it is missing, before
+anything is built or deployed.
 
-```properties
-storeFile=release.keystore
-storePassword=…
-keyAlias=…
-keyPassword=…
-```
+`hosting/_headers` is the part that matters for updates: `/app/sw.js` is
+`no-store`, the app shell revalidates, and only the content-hashed bundles are
+immutable. A cached service worker is the one thing that can silently pin an old
+build for existing users.
 
-Debug builds ignore it. `assembleRelease` **fails fast** if it is missing, rather
-than quietly producing a debug-signed APK. For CI, set these repository secrets:
+## Relationship to the previous app
 
-- `ANDROID_KEYSTORE_BASE64` — the keystore, base64 encoded
-- `ANDROID_KEYSTORE_PASSWORD`
-- `ANDROID_KEY_ALIAS`
-- `ANDROID_KEY_PASSWORD`
+This repository used to be a Flutter app (v1). It has been removed: the PWA
+replaces it, and the APK channel is gone with it. The old tree is still in git
+history if it is ever needed.
 
-Then run the *Build MANTRINI app* workflow with `deploy` checked to get a signed
-`mantrini-apk-release` artifact.
+What carried over deliberately:
 
-### App identity
-
-- Package: `org.mantrini.japa`
-- Version: 2.0.0 (versionCode 2)
-- Portrait only, dark theme, no white flash on launch
-- `VIBRATE` permission for the counting haptics
-
-> **Note on the package name.** The Flutter app's applicationId is different, so
-> this APK installs *alongside* the old one rather than upgrading it. That is
-> deliberate for the migration window: if the new build misbehaves, the devotee
-> still has the old app and its data. Once you are happy, keep this package and
-> retire the old one — do not rename it afterwards, or every install will look
-> like a new app and lose its local history.
-
-## Deployment (web)
-
-`dist/` is a static site. It is built with `base: './'`, so it works from a
-domain root **or** a subpath.
-
-For the existing Cloudflare Pages project, the shape that matches
-`docs/web-hosting.md` is landing at `/` and this app at `/app/`. Vite's relative
-base already handles that; just upload `dist/` into `/app/`.
-
-## Relationship to the Flutter app
-
-`lib/`, `android/`, `ios/`, `web/`, `test/` and `pubspec.yaml` at the repository
-root are the **original Flutter app and are untouched by this work.** It still
-builds and its three tests still pass. Nothing here removes it.
-
-The intended path is: ship the PWA and the new APK, let them prove themselves,
-then retire the Flutter tree in a separate commit. Keeping both until then means
-no devotee is ever left without a working app.
+- The four deities, mantras and invocations, verbatim.
+- The licensed images and audio, kept under `assets-src/` as originals.
+- The backup envelope, still byte-compatible with the old app's export, so a
+  devotee moving across keeps their history.

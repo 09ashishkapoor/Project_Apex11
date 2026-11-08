@@ -1,1 +1,6 @@
-/app /app/ 301
+# No redirect rules.
+#
+# The app is a single page with no client-side routes: every URL under /app/ is
+# either a real file (hashed bundles, audio, images, the manifest) or the app
+# shell itself. A catch-all would risk serving index.html in place of a bundle,
+# so there is nothing to add here.

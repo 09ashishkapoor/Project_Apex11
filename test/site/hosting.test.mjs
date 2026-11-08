@@ -1,138 +1,145 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, mkdir, writeFile, readFile, rm } from 'node:fs/promises';
+import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { runInNewContext } from 'node:vm';
 import { packageSite } from '../../tool/package_site.mjs';
+
+const LANDING = `<!doctype html>
+<html lang="en"><head><title>MANTRINI — Offline Japa Counter</title>
+<link rel="canonical" href="https://mantrini.jaikhyapaparampara.com/"></head>
+<body><h1>MANTRINI</h1><a href="app/">Open MANTRINI</a></body></html>`;
+
+const APP_HTML = `<!doctype html><html lang="en"><head><title>MANTRINI</title>
+<link rel="manifest" href="./manifest.webmanifest"></head>
+<body><div id="app"></div><script type="module" src="./assets/index-abc123.js"></script></body></html>`;
+
+const MANIFEST = JSON.stringify({
+  name: 'MANTRINI',
+  start_url: './',
+  scope: './',
+  display: 'standalone',
+  icons: [{ src: 'icons/icon-192.png', sizes: '192x192', type: 'image/png' }],
+});
 
 async function fixture(t) {
   const temporary = await mkdtemp(join(tmpdir(), 'mantrini-hosting-'));
   t.after(() => rm(temporary, { recursive: true, force: true }));
-  const appBuild = join(temporary, 'web');
+
+  const appBuild = join(temporary, 'dist');
+  const docs = join(temporary, 'docs');
+  const hosting = join(temporary, 'hosting');
   const output = join(temporary, 'site');
-  await mkdir(appBuild);
-  const files = {
-    'index.html': '<html><head><base href="/"><title>MANTRINI</title><link rel="manifest" href="manifest.json"></head><body><script>navigator.serviceWorker.register("pwa_service_worker.js?v=old");</script><script src="flutter_bootstrap.js"></script></body></html>',
-    'flutter_bootstrap.js': '_flutter.loader.load({serviceWorkerSettings: {serviceWorkerVersion: "old"},});',
-    'main.dart.js': '// Existing compiled app: database name sadhana_for_a_khyapa',
-    'sqlite3.wasm': 'existing wasm',
-    'drift_worker.js': 'existing worker',
-    'manifest.json': JSON.stringify({ name: 'MANTRINI', start_url: '.', scope: '/', icons: [{ src: 'icons/Icon-192.png' }] }),
-    '_redirects': '/* /index.html 200',
-  };
-  for (const [name, content] of Object.entries(files)) await writeFile(join(appBuild, name), content);
-  return { appBuild, output };
+
+  await mkdir(join(appBuild, 'assets'), { recursive: true });
+  await mkdir(join(appBuild, 'icons'), { recursive: true });
+  await mkdir(join(docs, 'assets'), { recursive: true });
+  await mkdir(hosting, { recursive: true });
+
+  await writeFile(join(appBuild, 'index.html'), APP_HTML);
+  await writeFile(join(appBuild, 'manifest.webmanifest'), MANIFEST);
+  await writeFile(join(appBuild, 'sw.js'), '// workbox service worker');
+  await writeFile(join(appBuild, 'assets/index-abc123.js'), 'console.log(1)');
+  await writeFile(join(appBuild, 'icons/icon-192.png'), 'png');
+
+  await writeFile(join(docs, 'index.html'), LANDING);
+  await writeFile(join(docs, 'assets/og.jpg'), 'jpg');
+
+  await writeFile(join(hosting, '_headers'), '/*\n  Cache-Control: no-cache\n');
+  await writeFile(join(hosting, '_redirects'), '# none\n');
+  await writeFile(join(hosting, 'robots.txt'), 'User-agent: *\n');
+  await writeFile(join(hosting, 'sitemap.xml'), '<urlset></urlset>');
+  await writeFile(join(hosting, '404.html'), '<meta name="robots" content="noindex, follow">');
+
+  return { appBuild, docs, hosting, output };
 }
 
-test('packages readable landing, unchanged app/runtime, PWA identity and actual discovery files', async t => {
+const read = (options, name) => readFile(join(options.output, name), 'utf8');
+
+test('assembles the landing at / and the app at /app/ from two independent builds', async (t) => {
   const options = await fixture(t);
-  await packageSite(options);
-  const read = name => readFile(join(options.output, name), 'utf8');
-  const landing = await read('index.html');
-  assert.match(landing, /<h1[^>]*>A quieter way to keep daily japa/);
-  assert.match(landing, /Open Web App/);
-  assert.match(landing, /Download Android APK/);
-  assert.match(landing, /rel="canonical" href="https:\/\/mantrini.jaikhyapaparampara.com\/"/);
-  assert.doesNotMatch(landing, /flutter_bootstrap|noindex/);
-  const app = await read('app/index.html');
-  assert.match(app, /<base href="\/">/);
-  assert.match(app, /register\("\/pwa_service_worker.js\?v=[a-f0-9]+"\)/);
-  assert.match(app, /rel="canonical" href="https:\/\/mantrini.jaikhyapaparampara.com\/app\/"/);
-  for (const name of ['main.dart.js', 'sqlite3.wasm', 'drift_worker.js']) {
-    assert.equal(await read(name), await readFile(join(options.appBuild, name), 'utf8'));
+  const result = await packageSite(options);
+
+  assert.match(result.version, /^[a-f0-9]{16}$/);
+  assert.equal(result.appFiles, 5);
+  assert.ok(result.landingFiles >= 3);
+
+  const landing = await read(options, 'index.html');
+  assert.match(landing, /<h1>MANTRINI<\/h1>/);
+  assert.match(landing, /href="app\/"/);
+  assert.doesNotMatch(landing, /flutter_bootstrap|main\.dart\.js/);
+
+  // The app is copied verbatim: relative base means no rewriting is needed.
+  assert.equal(await read(options, 'app/index.html'), APP_HTML);
+  assert.equal(await read(options, 'app/manifest.webmanifest'), MANIFEST);
+  assert.equal(await read(options, 'app/sw.js'), '// workbox service worker');
+  assert.equal(await read(options, 'app/assets/index-abc123.js'), 'console.log(1)');
+
+  // No root-level service worker: the landing does not need one, and the app
+  // brings its own scoped to /app/.
+  await assert.rejects(() => read(options, 'sw.js'));
+  await assert.rejects(() => read(options, 'pwa_service_worker.js'));
+
+  // Hosting files land at the root.
+  assert.match(await read(options, '_headers'), /Cache-Control: no-cache/);
+  assert.match(await read(options, 'robots.txt'), /^User-agent: \*/);
+  assert.match(await read(options, 'sitemap.xml'), /<urlset>/);
+  assert.match(await read(options, '404.html'), /noindex, follow/);
+});
+
+test('publishes a build record with no local paths or machine names', async (t) => {
+  const options = await fixture(t);
+  const result = await packageSite(options);
+  const build = await read(options, 'site-build.json');
+  assert.doesNotMatch(build, /appBuild|"output"|temporary|[A-Z]:\\/);
+  const parsed = JSON.parse(build);
+  assert.deepEqual(Object.keys(parsed).sort(), ['appFiles', 'landingFiles', 'version']);
+  assert.equal(parsed.version, result.version);
+  assert.equal(parsed.appFiles, 5);
+});
+
+test('refuses to package a Flutter build, an unscoped manifest, or a stale landing', async (t) => {
+  {
+    const options = await fixture(t);
+    await writeFile(join(options.appBuild, 'flutter_bootstrap.js'), '// old');
+    await assert.rejects(() => packageSite(options), /Flutter web build/);
   }
-  assert.doesNotMatch(await read('flutter_bootstrap.js'), /serviceWorkerSettings/);
-  const manifest = JSON.parse(await read('manifest.json'));
-  assert.equal(manifest.id, '/');
-  assert.equal(manifest.start_url, '/app/');
-  assert.equal(manifest.icons[0].src, 'icons/Icon-192.png');
-  assert.match(await read('robots.txt'), /^User-agent: \*/);
-  assert.match(await read('sitemap.xml'), /<loc>https:\/\/mantrini.jaikhyapaparampara.com\/<\/loc>/);
-  assert.doesNotMatch(await read('_redirects'), /\/\*/);
-  assert.match(await read('404.html'), /noindex, follow/);
-  assert.doesNotMatch(await read('site-build.json'), /appBuild|temporary|[A-Z]:/);
-  await assert.rejects(() => packageSite(options), /Output must be empty/);
-});
-
-test('rejects overlapping output and a changed Flutter base path before packaging', async t => {
-  const options = await fixture(t);
-  await assert.rejects(() => packageSite({ ...options, output: join(options.appBuild, 'site') }), /separate directories/);
-  await writeFile(join(options.appBuild, 'index.html'), '<base href="/app/">');
-  await assert.rejects(() => packageSite(options), /base href/);
-});
-
-test('landing skips app downloads for fresh visitors and upgrades existing installations', async t => {
-  const options = await fixture(t);
-  await packageSite(options);
-  const landing = await readFile(join(options.output, 'index.html'), 'utf8');
-  const script = [...landing.matchAll(/<script>([\s\S]*?)<\/script>/g)].at(-1)[1];
-  for (const existing of [false, true]) {
-    const registered = [];
-    let onLoad;
-    runInNewContext(script, {
-      window: { matchMedia: () => ({ matches: false }), addEventListener: (event, handler) => { assert.equal(event, 'load'); onLoad = handler; } },
-      navigator: { serviceWorker: {
-        getRegistration: async scope => { assert.equal(scope, '/'); return existing ? {} : undefined; },
-        register: async url => registered.push(url),
-      } },
-    });
-    await onLoad();
-    assert.equal(registered.length, existing ? 1 : 0);
-    if (existing) assert.match(registered[0], /^\/pwa_service_worker\.js\?v=[a-f0-9]+$/);
+  {
+    const options = await fixture(t);
+    await writeFile(join(options.appBuild, 'manifest.webmanifest'), JSON.stringify({ start_url: '/app/', scope: '/' }));
+    await assert.rejects(() => packageSite(options), /scoped to \/app\//);
   }
-  let redirected;
-  runInNewContext(script, {
-    window: { matchMedia: () => ({ matches: true }), location: { search: '?installed=true', hash: '#history', replace: url => redirected = url } },
-    navigator: {},
-  });
-  assert.equal(redirected, '/app/?installed=true#history');
+  {
+    const options = await fixture(t);
+    await writeFile(join(options.docs, 'index.html'), '<script src="flutter_bootstrap.js"></script>');
+    await assert.rejects(() => packageSite(options), /still references the Flutter build/);
+  }
+  {
+    const options = await fixture(t);
+    await rm(join(options.appBuild, 'sw.js'));
+    await assert.rejects(() => packageSite(options), /Missing app file: sw\.js/);
+  }
 });
 
-async function workerHarness(t) {
+test('refuses to overwrite a non-empty output or overlap with its inputs', async (t) => {
+  {
+    const options = await fixture(t);
+    await mkdir(options.output, { recursive: true });
+    await writeFile(join(options.output, 'stale.txt'), 'x');
+    await assert.rejects(() => packageSite(options), /Output must be empty/);
+  }
+  {
+    const options = await fixture(t);
+    await assert.rejects(() => packageSite({ ...options, output: join(options.appBuild, 'site') }), /separate directories/);
+    await assert.rejects(() => packageSite({ ...options, output: join(options.docs, 'site') }), /separate directories/);
+  }
+});
+
+test('cache headers keep the worker and shell fresh and the bundles immutable', async (t) => {
   const options = await fixture(t);
   await packageSite(options);
-  const listeners = {};
-  const entries = new Map();
-  const cache = {
-    addAll: async urls => urls.forEach(url => entries.set(url, new Response('cached:' + url))),
-    match: async url => entries.get(url)?.clone(),
-    put: async (url, response) => entries.set(url, response),
-  };
-  let offline = false;
-  let networkStatus = 200;
-  let claimed = false;
-  const scope = {
-    URL, Response,
-    self: { location: { origin: 'https://mantrini.example' }, addEventListener: (name, listener) => listeners[name] = listener, skipWaiting: async () => {}, clients: { claim: async () => { claimed = true; } } },
-    caches: { open: async () => cache }, // No delete/global match APIs: accessing them fails the test.
-    fetch: async request => { if (offline) throw new Error('offline'); return new Response('network:' + request.url, { status: networkStatus }); },
-  };
-  runInNewContext(await readFile(join(options.output, 'pwa_service_worker.js'), 'utf8'), scope);
-  let completion;
-  listeners.install({ waitUntil: promise => completion = promise }); await completion;
-  listeners.activate({ waitUntil: promise => completion = promise }); await completion;
-  assert.equal(claimed, true);
-  return {
-    offline: value => offline = value,
-    status: value => networkStatus = value,
-    fetch: (path, mode = 'navigate', origin = 'https://mantrini.example') => {
-      let response;
-      listeners.fetch({ request: { url: origin + path, method: 'GET', mode }, respondWith: promise => response = promise });
-      return response;
-    },
-  };
-}
-
-test('offline worker separates landing/app fallbacks and never turns unknown routes into the app', async t => {
-  const worker = await workerHarness(t);
-  worker.offline(true);
-  assert.equal(await (await worker.fetch('/')).text(), 'cached:/index.html');
-  assert.equal(await (await worker.fetch('/app/?installed=true')).text(), 'cached:/app/index.html');
-  assert.equal(worker.fetch('/missing-page'), undefined);
-  assert.equal(worker.fetch('/robots.txt', 'cors'), undefined);
-  assert.equal(worker.fetch('/', 'navigate', 'https://other.example'), undefined);
-  assert.equal(await (await worker.fetch('/main.dart.js?v=current', 'cors')).text(), 'cached:/main.dart.js');
-  worker.offline(false); worker.status(404);
-  assert.equal((await worker.fetch('/app/')).status, 404);
+  const headers = await readFile(join(process.cwd(), 'hosting/_headers'), 'utf8');
+  assert.match(headers, /\/app\/sw\.js\n {2}Cache-Control: no-store/);
+  assert.match(headers, /\/app\/index\.html\n {2}Cache-Control: no-cache/);
+  assert.match(headers, /\/app\/assets\/\*\n {2}Cache-Control: public, max-age=31536000, immutable/);
 });

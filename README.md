@@ -1,161 +1,93 @@
 # MANTRINI
 
-![MANTRINI app introduction](docs/app-intro.jpg)
+A respectful, offline japa counter for the Khyapa Parampara. Four altars, 108
+beads, and nothing that leaves the device.
 
-A respectful, offline Japa companion distributed primarily as an Android APK through GitHub Releases.
+**Live:** [mantrini.jaikhyapaparampara.com](https://mantrini.jaikhyapaparampara.com/)
 
-<div align="center">
+It is a progressive web app: one codebase, installable from the browser on
+Android and iPhone, and it runs with the network completely cut after the first
+visit.
 
-## Download MANTRINI for Android
+| | |
+|---|---|
+| Four altars | Adya Mahakali, Batuk Bhairav, Swarnaakarshana Bhairav, Skanda Bhairav |
+| Four modes | Tap · Audio · Timer · Auto |
+| Storage | IndexedDB on your device. No account, no sync, no analytics |
+| Offline | Verified: cold reload, every screen, a full sitting, with the network off |
 
-### [CLICK HERE TO DOWNLOAD THE APP](https://github.com/09ashishkapoor/Project_Apex11/releases/latest/download/app-release.apk)
+## Repository layout
 
-[![APK downloads](https://img.shields.io/github/downloads/09ashishkapoor/Project_Apex11/latest/total?style=for-the-badge&label=APK%20downloads&color=8B2635)](https://github.com/09ashishkapoor/Project_Apex11/releases/latest)
-
-Scan this QR code on your Android phone to open the download:
-
-<img src="docs/mantrini-download-qr.png" alt="QR code to download MANTRINI Android APK" width="220">
-
-If the direct download does not start, open the [latest GitHub Release](https://github.com/09ashishkapoor/Project_Apex11/releases/latest) and download the APK file attached there.
-
-Prefer a simpler landing page first? Open the website: [09ashishkapoor.github.io/Project_Apex11](https://09ashishkapoor.github.io/Project_Apex11/).
-
-The shared landing page also links to the browser version. See [web hosting](docs/web-hosting.md) for packaging the existing web build with the landing at `/` and the app at `/app/`.
-
-</div>
-
-## App screenshots
-
-Screens are shown in ascending capture order.
-
-| 1 | 2 | 3 | 4 |
-| --- | --- | --- | --- |
-| ![MANTRINI screenshot 01](docs/screenshots/screen-01.jpg) | ![MANTRINI screenshot 02](docs/screenshots/screen-02.jpg) | ![MANTRINI screenshot 03](docs/screenshots/screen-03.jpg) | ![MANTRINI screenshot 04](docs/screenshots/screen-04.jpg) |
-| ![MANTRINI screenshot 05](docs/screenshots/screen-05.jpg) | ![MANTRINI screenshot 06](docs/screenshots/screen-06.jpg) | ![MANTRINI screenshot 07](docs/screenshots/screen-07.jpg) | ![MANTRINI screenshot 08](docs/screenshots/screen-08.jpg) |
-| ![MANTRINI screenshot 09](docs/screenshots/screen-09.jpg) | ![MANTRINI screenshot 10](docs/screenshots/screen-10.jpg) | ![MANTRINI screenshot 11](docs/screenshots/screen-11.jpg) | ![MANTRINI screenshot 12](docs/screenshots/screen-12.jpg) |
-
-## Install on Android
-
-MANTRINI is not distributed through the Google Play Store at this time. The recommended installation path is the signed APK attached to the latest GitHub Release for this repository.
-
-1. Tap **CLICK HERE TO DOWNLOAD THE APP** above.
-2. Download the APK file.
-3. Transfer it to your Android device if needed.
-4. Open the APK on the device and allow installation from that trusted source when Android prompts.
-5. After installation, confirm the launcher name is `MANTRINI`.
-
-Only install APKs downloaded from GitHub release pages controlled by this project. Do not install copies from mirrors, reposts, or messaging forwards.
-
-## What it does
-
-- Presents the current four bundled deity/mantra paths.
-- Supports manual counting, audio-guided counting, and timed automatic chanting.
-- Stores session history locally in Drift/SQLite.
-- Computes today totals, lifetime totals, malas of 108, per-deity totals, and recent session history from local data.
-- Exports and imports session backups as JSON text.
-
-## Two builds in this repository
-
-This repository currently contains **two** implementations, on purpose, while the
-redesign is proven:
-
-| | Where | State |
-|---|---|---|
-| **Flutter app** (original) | `lib/`, `android/`, `web/`, `test/` | Unchanged, still builds, still ships the current APK |
-| **Rebuilt app** (Direction 02 · "The Lamp") | `app/` | New. Web app + Capacitor APK from one codebase |
-
-The rebuild is documented in [`app/README.md`](app/README.md), the design
-direction is in [`design-demos/design-brief.md`](design-demos/design-brief.md),
-and the defects it was written to fix are in [`docs/ux-audit.md`](docs/ux-audit.md).
-
-The two apps keep their history **separately**. To move practice history from the
-Flutter app to the rebuilt one: open the old app → Sadhana Tracker → Export
-backup, then in the new app → Ledger → Restore → paste. The backup format is
-identical by design.
-
-Nothing in `app/` changes or removes the Flutter implementation. The Flutter
-tree can be retired in a separate commit once the rebuild has been validated.
-
-## What it does not do
-
-- No backend
-- No login or accounts
-- No payments or subscriptions
-- No ads
-- No analytics or telemetry
-- No cloud sync
-- No social features
-
-## Licensing and assets
-
-- App source code is licensed under the MIT License. See `LICENSE`.
-- Bundled font files are licensed under the SIL Open Font License. See `assets/fonts/OFL.txt`.
-- Bundled devotional images and audio are project assets for MANTRINI distribution only. They are not licensed for reuse outside this app unless you have separate permission from the rights holder.
-- If you fork or redistribute this project, replace any image or audio asset whose rights you cannot verify.
-
-## Development
-
-Open the repository root in Android Studio or VS Code:
-
-- [E:\projects\Project_Apex11](E:/projects/Project_Apex11)
-
-Do not open only the `android/` subfolder for Flutter development.
-
-### Required validation commands
-
-```bash
-flutter pub get
-dart run build_runner build --delete-conflicting-outputs
-dart format lib test
-flutter analyze
-flutter test
-flutter build apk --debug
+```
+app/            the PWA (Vite + Preact + TypeScript) and its tools
+docs/           the landing page — static HTML, published at /
+hosting/        cache headers, robots, sitemap, 404
+tool/           site packaging and asset preparation
+test/site/      packaging tests
 ```
 
-### Running on an Android emulator or device
+The Flutter application that this replaced has been removed; it remains in git
+history. See [`app/README.md`](app/README.md) for the design system, the audio
+pipeline, the offline strategy and the platform caveats.
 
-After starting an emulator or connecting a device:
-
-```bash
-flutter run
-```
-
-If Drift tables or database models change, rerun code generation before `flutter run`:
+## Quick start
 
 ```bash
-dart run build_runner build --delete-conflicting-outputs
+cd app
+npm install
+npm run dev            # http://localhost:5173
 ```
 
-### Web and desktop targets
-
-- The app is maintained as Android-first.
-- Chrome/web may not reflect Android behavior because the app relies on mobile/local database plugins.
-- Windows desktop requires its own toolchain and is not the primary validation target for this project.
-
-### Current asset setup
-
-- Android launcher icon uses adaptive icon resources derived from `assets/images/1111.png`.
-- Android launcher images currently include:
-  - `assets/images/batuk1.jpg`
-  - `assets/images/maha1.jpg`
-
-## Android release build
-
-Release signing is loaded from `android/key.properties`.
-
-Expected keys:
-
-- `storeFile`
-- `storePassword`
-- `keyAlias`
-- `keyPassword`
-
-If `key.properties` is missing, debug builds still work, but a release build fails fast instead of falling back to the debug keystore.
-
-After configuring signing:
+To see the real deployed shape — landing at `/`, app at `/app/`:
 
 ```bash
-flutter build apk --release
+cd app && npm run build
+node tools/preview-site.mjs
+npx vite preview --outDir ../.preview-site --port 5300
 ```
 
-Publish the generated release APK as a GitHub Release asset. See `RELEASE.md` for sideload guidance, keystore setup, and trusted distribution notes.
+## Verify
+
+The checks are browser-based wherever the risk is in the browser, because that
+is where the interesting failures live.
+
+```bash
+cd app
+npm run check && npm test        # types, 41 unit tests
+npm run build
+
+npx vite preview --port 5200 &
+APP_URL=http://127.0.0.1:5200/ node tools/check-offline.mjs
+APP_URL=http://127.0.0.1:5200/ node tools/check-audio-gesture.mjs
+APP_URL=http://127.0.0.1:5200/ node tools/check-audio-playback.mjs
+APP_URL=http://127.0.0.1:5200/ node tools/check-audio-fallback.mjs
+APP_URL=http://127.0.0.1:5200/ node tools/check-install.mjs
+APP_URL=http://127.0.0.1:5200/ node tools/a11y.mjs
+APP_URL=http://127.0.0.1:5200/ node tools/check-responsive.mjs
+
+node --test test/site/hosting.test.mjs   # packaging, from the repo root
+```
+
+## Deploy
+
+Push to `main`. Two workflows build the same artifact and publish it:
+
+- `.github/workflows/cloudflare-pages.yml` → Cloudflare Pages (`mantrini` project)
+- `.github/workflows/pages.yml` → GitHub Pages mirror
+
+Cloudflare needs the `CLOUDFLARE_API_TOKEN` repository secret; the deploy job
+checks for it first and fails with a clear message rather than half-deploying.
+
+`tool/package_site.mjs` assembles `build/site/` from `docs/` and `app/dist/`.
+Nothing is bundled that is not part of the site.
+
+## Privacy
+
+There is no account, no server-side storage and no third-party script. The
+bundled fonts are self-hosted. Sessions are written to IndexedDB on the device
+and exported, when asked, as a JSON file.
+
+## Licence
+
+Source code is MIT (see [`LICENSE`](LICENSE)). Bundled devotional images and
+audio are project assets for MANTRINI distribution only — see [`NOTICE`](NOTICE).
