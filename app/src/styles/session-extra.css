@@ -1,4 +1,4 @@
-/* ============================================================
+﻿/* ============================================================
    Odds and ends: boot state, the auto-mode status strip, and the
    small corrections that keep the flow layout faithful to the mockup.
    ============================================================ */
@@ -128,4 +128,15 @@
   .today__photo {
     height: 30vh;
   }
+}
+
+/* iOS silences web audio with the Ring/Silent switch, and nothing in the web
+   platform can see or override it. This is the only actionable thing to say. */
+.session__sound-hint {
+  margin: 14px auto 0;
+  max-width: 300px;
+  text-align: center;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: rgba(240, 220, 200, 0.66);
 }

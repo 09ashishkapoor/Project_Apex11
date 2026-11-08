@@ -1,14 +1,15 @@
-import { useEffect, useRef, useState } from 'preact/hooks';
+﻿import { useEffect, useRef, useState } from 'preact/hooks';
 import { deityById } from '../data/deities';
 import { CHANTS_PER_MALA, MODE_LABEL } from '../data/types';
 import { clock } from '../lib/format';
 import type { AppState } from '../state/store';
 import { store } from '../state/store';
 import { targetCountFor } from '../state/session';
+import { isAppleMobile } from '../lib/storage';
 import { MalaSeam } from '../components/MalaSeam';
 
 /**
- * SESSION — the counting surface.
+ * SESSION â€” the counting surface.
  *
  * The product. A full-bleed darshan, the mala seam riding the edge of the
  * photograph, the mantra, the count, and one thumb-sized action.
@@ -41,8 +42,8 @@ export function SessionScreen({ state }: { state: AppState }) {
 
   const meta =
     mode === 'timed'
-      ? `${clock(elapsed)} elapsed · ${clock(Math.ceil(remaining / 1000))} left`
-      : `${clock(elapsed)} elapsed · ${MODE_LABEL[mode]}`;
+      ? `${clock(elapsed)} elapsed Â· ${clock(Math.ceil(remaining / 1000))} left`
+      : `${clock(elapsed)} elapsed Â· ${MODE_LABEL[mode]}`;
 
   const target = live
     ? live.config.mode === 'timed'
@@ -104,7 +105,7 @@ export function SessionScreen({ state }: { state: AppState }) {
             class={`pill session__pill${state.audioPlaying ? ' is-muted' : ''}`}
             onClick={() => void store.playSingle()}
           >
-            {state.audioPlaying ? 'Chanting…' : 'Play chant'}
+            {state.audioPlaying ? 'Chantingâ€¦' : 'Play chant'}
           </button>
         ) : (
           <div class="session__status" role="status">
@@ -112,6 +113,16 @@ export function SessionScreen({ state }: { state: AppState }) {
             {state.audioPlaying ? 'The chant is playing' : 'The chant is paused'}
           </div>
         )}
+
+        {/*
+          iOS mutes <audio> with the Ring/Silent switch, and no web API can see
+          that switch or unmute around it. A devotee with the phone on silent
+          gets silence and no explanation, which reads as a broken app. Say the
+          one thing that can actually fix it.
+        */}
+        {mode !== 'manual' && isAppleMobile() ? (
+          <p class="session__sound-hint">No sound? Check the Ring/Silent switch on the side of the phone.</p>
+        ) : null}
       </div>
     </section>
   );
