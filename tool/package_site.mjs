@@ -98,7 +98,16 @@ export async function packageSite({
   // landing first, so the app can never shadow a root file
   await cp(docs, output, { recursive: true });
   await cp(appBuild, join(output, 'app'), { recursive: true });
-  for (const file of ['_headers', '_redirects', '404.html', 'robots.txt', 'sitemap.xml']) {
+  for (const file of [
+    '_headers',
+    '_redirects',
+    '404.html',
+    'robots.txt',
+    'sitemap.xml',
+    // Takes over the URL the retired Flutter site registered its root-scope
+    // worker at, so returning visitors are not served a cached old landing.
+    'pwa_service_worker.js',
+  ]) {
     if (await isFile(join(hosting, file))) await cp(join(hosting, file), join(output, file));
   }
 

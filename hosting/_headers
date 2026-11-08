@@ -15,6 +15,11 @@
 /app/sw.js
   Cache-Control: no-store
 
+# The retired worker's stub must be fetched fresh, or a legacy registration could
+# pin a stale copy of the very script that removes it.
+/pwa_service_worker.js
+  Cache-Control: no-store
+
 # The app shell must revalidate so a new build is picked up.
 /app/index.html
   Cache-Control: no-cache
