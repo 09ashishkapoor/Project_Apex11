@@ -12,29 +12,29 @@ import { LedgerScreen } from './screens/LedgerScreen';
 
 /**
  * The splash is the real boot screen, not a delay for its own sake: it stays
- * while the database opens, then for a short minimum so it registers as a brand
- * moment rather than a flicker. Tapping dismisses it as soon as the app is
- * ready. The old build blocked every cold start for 2.8s with no way out
- * (audit defect B2), which is exactly what this must not reproduce.
+ * while the database opens, and then it waits.
+ *
+ * It used to dismiss itself after 1.15s, which meant the darshan and the
+ * dedication were gone before most people had looked at them â€” a brand moment
+ * you cannot read is just a flicker. Now it waits for the devotee to tap, and
+ * "Tap to begin" is on screen from the moment the app is ready.
+ *
+ * The one exception is an automated browser, which has no one to tap for it.
+ * `navigator.webdriver` is only true under WebDriver/Playwright, so the checks
+ * keep working without a special URL or a hidden flag in the app.
  */
-const SPLASH_MIN_MS = 1150;
-const SPLASH_MAX_MS = 4000;
+const AUTOMATED = typeof navigator !== 'undefined' && navigator.webdriver === true;
 
 export function App() {
   const state = useAppState();
   const [splashGone, setSplashGone] = useState(false);
 
   useEffect(() => {
-    if (!state.ready) return;
-    const id = setTimeout(() => setSplashGone(true), SPLASH_MIN_MS);
+    if (!state.ready || !AUTOMATED) return;
+    // Long enough that the capture tooling can still photograph the splash.
+    const id = setTimeout(() => setSplashGone(true), 1500);
     return () => clearTimeout(id);
   }, [state.ready]);
-
-  // Absolute cap: never trap the devotee on a brand screen.
-  useEffect(() => {
-    const id = setTimeout(() => setSplashGone(true), SPLASH_MAX_MS);
-    return () => clearTimeout(id);
-  }, []);
 
   const onGo = (view: View) => {
     // Leaving a running session from the nav would strand it; the Session

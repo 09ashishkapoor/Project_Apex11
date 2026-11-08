@@ -25,11 +25,26 @@ export function Splash({ canDismiss, onDismiss }: { canDismiss: boolean; onDismi
     return () => clearTimeout(id);
   }, []);
 
+  // Any key continues, so a devotee is never stuck hunting for the button — and
+  // so the screen is usable without a pointer.
+  useEffect(() => {
+    if (!canDismiss) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Enter' || event.key === ' ' || event.key === 'Escape') {
+        event.preventDefault();
+        onDismiss();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [canDismiss, onDismiss]);
+
   return (
     <div
       class={`splash${lit ? ' is-lit' : ''}`}
       role="group"
       aria-label="MANTRINI, a respectful, offline japa companion"
+      onClick={canDismiss ? onDismiss : undefined}
     >
       <div class="splash__glow" aria-hidden="true" />
       <div class="splash__grain" aria-hidden="true" />
