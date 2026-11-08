@@ -1,0 +1,227 @@
+/* ============================================================
+   THE OFFERING
+
+   Tapping "Offer to Ma Adya" is the closing beat of the whole loop, so it gets
+   a real gesture: the 108 beads of the mala lift off the ring, funnel together,
+   and rise into her image — the offering goes to the receiver, and then the
+   screen is empty.
+
+   Everything here is driven by one class on the Blessing screen plus per-bead
+   custom properties, so the whole sequence is CSS and costs no runtime.
+   ============================================================ */
+
+/* the point the mala is drawn toward, just above the ring */
+.blessing__bloom {
+  position: absolute;
+  left: 50%;
+  top: -240px;
+  width: 200px;
+  height: 200px;
+  margin-left: -100px;
+  margin-top: -100px;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    circle,
+    rgba(244, 228, 193, 0.85) 0%,
+    rgba(232, 196, 104, 0.5) 34%,
+    rgba(232, 196, 104, 0.14) 62%,
+    transparent 74%
+  );
+}
+
+.blessing__ringwrap {
+  /* the bloom needs a positioned anchor above the ring */
+  position: relative;
+}
+
+/* ---------------------------------------------------------- the beads */
+
+/* Every bead turns gold as it leaves: it is not a partially-finished ring any
+   more, it is the whole mala being given. */
+.blessing.is-offering .bdot {
+  background: #f6c379;
+  box-shadow: 0 0 7px rgba(246, 195, 121, 0.85);
+  animation: bead-offer 760ms cubic-bezier(0.32, 0, 0.28, 1) var(--od, 0ms) forwards;
+}
+
+@keyframes bead-offer {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  /* a small outward breath before they are given away */
+  16% {
+    transform: translate(calc(-50% + var(--fx, 0px) * 0.16), calc(-50% - 9px)) scale(1.15);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(calc(-50% + var(--fx, 0px)), calc(-50% + var(--fy, 0px))) scale(0.16);
+    opacity: 0;
+  }
+}
+
+/* ------------------------------------------------------- the bloom */
+
+.blessing.is-offering .blessing__bloom {
+  animation: bloom-offer 1150ms cubic-bezier(0.2, 0.8, 0.3, 1) 240ms forwards;
+}
+
+@keyframes bloom-offer {
+  0% {
+    opacity: 0;
+    transform: scale(0.24);
+  }
+  42% {
+    opacity: 1;
+    transform: scale(1.5);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(4.2);
+  }
+}
+
+/* ------------------------------------------------------- the count */
+
+.blessing.is-offering .blessing__core {
+  animation: core-offer 720ms cubic-bezier(0.4, 0, 0.3, 1) 240ms forwards;
+}
+
+@keyframes core-offer {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-46px) scale(0.82);
+  }
+}
+
+/* ------------------------------------------------- the written page */
+
+.blessing.is-offering .blessing__line,
+.blessing.is-offering .blessing__thanks,
+.blessing.is-offering .blessing__second,
+.blessing.is-offering .blessing__rest {
+  animation: page-offer 520ms ease 420ms forwards;
+  pointer-events: none;
+}
+
+@keyframes page-offer {
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+/* the darshan itself warms and recedes as the offering is received */
+.blessing.is-offering .blessing__photo img {
+  animation: darshan-offer 1500ms ease forwards;
+}
+
+@keyframes darshan-offer {
+  0% {
+    filter: brightness(1.22) saturate(1.1);
+    transform: scale(1);
+  }
+  55% {
+    filter: brightness(1.6) saturate(1.05);
+    transform: scale(1.035);
+  }
+  100% {
+    filter: brightness(1.1) saturate(0.95);
+    transform: scale(1.06);
+  }
+}
+
+/* ------------------------------------------------------ the veil
+   Covers the swap from Blessing to Today. It peaks exactly when the view
+   changes, so the transition is a warm exhale rather than a cut. */
+
+.offer-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    radial-gradient(70% 48% at 50% 26%, rgba(244, 228, 193, 0.55), transparent 72%),
+    radial-gradient(120% 70% at 50% 60%, rgba(139, 38, 53, 0.9), rgba(31, 11, 17, 0.98) 72%);
+  animation: offer-veil 1750ms cubic-bezier(0.4, 0, 0.4, 1) forwards;
+}
+
+/* The trikoṇa, faintly, at the moment the offering arrives — so the veil is a
+   received gesture rather than a blank flash. */
+.offer-veil::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  width: 148px;
+  aspect-ratio: 280 / 244;
+  transform: translate(-50%, -50%) scale(0.82);
+  opacity: 0;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 280 244'%3E%3Cpolygon points='140,241 2,3 278,3' fill='none' stroke='%23F4E4C1' stroke-width='3' stroke-linejoin='round'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+  animation: veil-mark 1750ms ease forwards;
+}
+
+@keyframes veil-mark {
+  0%,
+  40% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.82);
+  }
+  66% {
+    opacity: 0.46;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  86% {
+    opacity: 0.18;
+    transform: translate(-50%, -50%) scale(1.04);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.06);
+  }
+}
+
+@keyframes offer-veil {
+  /* Hold clear while the mala is being given away — the beads are the point,
+     the veil only exists to hide the view swap, which happens at 71 %. */
+  0%,
+  46% {
+    opacity: 0;
+  }
+  62% {
+    opacity: 1;
+  }
+  74% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blessing.is-offering .bdot,
+  .blessing.is-offering .blessing__bloom,
+  .blessing.is-offering .blessing__core,
+  .blessing.is-offering .blessing__line,
+  .blessing.is-offering .blessing__thanks,
+    .blessing.is-offering .blessing__second,
+  .blessing.is-offering .blessing__rest,
+  .blessing.is-offering .blessing__photo img {
+    animation: none;
+  }
+
+  /* Reduced motion: no flight, no veil — the store swaps the view almost
+     immediately, and a half-played veil would just show the cut it hides. */
+  .offer-veil {
+    display: none;
+  }
+}

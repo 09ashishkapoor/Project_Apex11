@@ -1,0 +1,55 @@
+/* ============================================================
+   Storage + platform notices.
+   ============================================================ */
+
+.install-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 16px var(--gutter) 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(232, 196, 104, 0.09);
+  border: 1px solid rgba(232, 196, 104, 0.26);
+}
+
+.install-hint p {
+  flex: 1;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--cream-2);
+}
+
+.install-hint p b {
+  font-weight: 600;
+  color: #fdf5e8;
+}
+
+.install-hint__close {
+  flex: 0 0 auto;
+  min-height: 32px;
+  padding: 0 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-2);
+  border-radius: 8px;
+  white-space: nowrap;
+}
+
+.install-hint__close:hover {
+  background: rgba(232, 196, 104, 0.14);
+}
+
+/* Shown in the ledger colophon when the browser has not promised to keep data. */
+.storage-note {
+  margin-top: 10px;
+  font-size: 12px;
+  line-height: 1.55;
+  color: rgba(240, 220, 200, 0.66);
+  max-width: 330px;
+}
+
+.storage-note b {
+  font-weight: 600;
+  color: var(--cream-2);
+}

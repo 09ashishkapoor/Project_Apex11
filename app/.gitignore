@@ -1,0 +1,26 @@
+# Build output
+dist/
+.shots/
+
+# Dependencies
+node_modules/
+
+# Python tool caches
+__pycache__/
+*.pyc
+
+# Capacitor / Android
+android/app/build/
+android/build/
+android/.gradle/
+android/local.properties
+android/app/src/main/assets/public/
+android/app/src/main/assets/capacitor.config.json
+android/app/src/main/assets/capacitor.plugins.json
+android/.idea/
+*.iml
+
+# Signing — never commit
+android/key.properties
+*.jks
+*.keystore

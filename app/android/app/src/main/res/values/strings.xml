@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MANTRINI</string>
+    <string name="title_activity_main">MANTRINI</string>
+    <string name="package_name">org.mantrini.japa</string>
+    <string name="custom_url_scheme">org.mantrini.japa</string>
+</resources>

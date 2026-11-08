@@ -1,0 +1,1068 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>MANTRINI · Direction 03 · The Ledger</title>
+<meta name="viewport" content="width=1600">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,200..500;1,6..72,200..500&family=Noto+Sans+Devanagari:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   MANTRINI · DIRECTION 03 · THE LEDGER
+   light paper · one reading column · hairlines · display serif
+   ============================================================ */
+:root{
+  --paper:#F0EADB;
+  --desk:#C9BCA2;
+  --ink:#191510;
+  --ink-2:#3D362C;
+  --ink-3:#5F574A;
+  --rule:rgba(25,21,16,.18);
+  --rule-2:rgba(25,21,16,.42);
+  --rule-strong:rgba(25,21,16,.78);
+  --oxide:#8C3A24;
+  --serif:'Newsreader',Georgia,'Times New Roman',serif;
+  --mono:'IBM Plex Mono','Courier New',monospace;
+  --deva:'Noto Sans Devanagari','Nirmala UI',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--desk)}
+body{
+  background:var(--desk);
+  color:var(--ink);
+  font-family:var(--serif);
+  padding:20px;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;text-align:left}
+button:focus-visible{outline:1px solid var(--ink);outline-offset:3px}
+ol,ul{list-style:none}
+img{display:block}
+.deva{font-family:var(--deva);font-weight:400}
+
+/* ------------------------------------------------ the sheet */
+.sheet{
+  position:relative;
+  width:1540px;
+  margin:0 auto;
+  padding:38px 30px 30px;
+  background:var(--paper);
+  border:1px solid rgba(25,21,16,.22);
+  box-shadow:0 0 0 1px rgba(255,255,255,.35) inset, 0 26px 70px rgba(70,55,28,.16);
+}
+.sheet::after{
+  content:"";
+  position:absolute;inset:0;
+  pointer-events:none;z-index:9;
+  opacity:.9;
+  mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.085'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.crop{position:absolute;width:22px;height:22px;z-index:8;pointer-events:none;border:0 solid rgba(25,21,16,.55)}
+.crop.tl{top:9px;left:9px;border-top-width:1px;border-left-width:1px}
+.crop.tr{top:9px;right:9px;border-top-width:1px;border-right-width:1px}
+.crop.bl{bottom:9px;left:9px;border-bottom-width:1px;border-left-width:1px}
+.crop.br{bottom:9px;right:9px;border-bottom-width:1px;border-right-width:1px}
+
+/* ------------------------------------------------ type ramps (board) */
+.lbl{
+  font-family:var(--mono);
+  font-size:12px;
+  font-weight:400;
+  letter-spacing:.13em;
+  text-transform:uppercase;
+  color:var(--ink-3);
+  line-height:1.4;
+}
+.hair{height:1px;background:var(--rule)}
+.hair-strong{height:1px;background:var(--rule-strong)}
+
+/* ------------------------------------------------ masthead */
+.mast{display:flex;justify-content:space-between;align-items:baseline;gap:30px;padding-bottom:11px}
+.mast-brand{font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:.32em;color:var(--ink)}
+.mast-mid{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-3);margin-left:auto}
+.mast-no{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3)}
+
+/* ------------------------------------------------ deck */
+.deck{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 452px;
+  gap:64px;
+  padding:34px 0 30px;
+  border-bottom:1px solid var(--rule-strong);
+}
+.eyebrow{display:flex;align-items:center;gap:14px}
+.eyebrow .sep{width:26px;height:1px;background:var(--rule-2)}
+.deck h1{
+  font-family:var(--serif);
+  font-weight:200;
+  font-size:88px;
+  line-height:.9;
+  letter-spacing:-.038em;
+  margin-top:14px;
+}
+.deck-line{
+  font-family:var(--serif);
+  font-style:italic;
+  font-weight:300;
+  font-size:26px;
+  line-height:1.25;
+  letter-spacing:-.012em;
+  color:var(--ink-2);
+  margin-top:18px;
+}
+.deck-body{
+  font-size:16px;
+  line-height:1.55;
+  color:var(--ink-2);
+  max-width:636px;
+  margin-top:18px;
+}
+.spec{
+  display:grid;
+  grid-template-columns:120px minmax(0,1fr);
+  gap:7px 20px;
+  margin-top:24px;
+  padding-top:14px;
+  border-top:1px solid var(--rule);
+  max-width:760px;
+}
+.spec dt{
+  font-family:var(--mono);font-size:11px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink-3);padding-top:2px;
+}
+.spec dd{font-size:15px;line-height:1.45;color:var(--ink-2)}
+.deck-aside{display:flex;flex-direction:column;justify-content:flex-end}
+.idx-head{
+  font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--ink-3);padding-bottom:9px;border-bottom:1px solid var(--rule-strong);
+}
+.idx li{
+  display:grid;grid-template-columns:30px minmax(0,1fr);column-gap:12px;
+  padding:9px 0 8px;border-bottom:1px solid var(--rule);
+}
+.idx .rn{font-family:var(--serif);font-style:italic;font-size:15px;color:var(--ink-3);line-height:1.1}
+.idx .nm{font-size:19px;font-weight:400;letter-spacing:-.012em;line-height:1.15}
+.idx .nt{grid-column:2;font-family:var(--mono);font-size:11px;letter-spacing:.03em;color:var(--ink-3);margin-top:3px;line-height:1.3}
+
+/* ------------------------------------------------ flow head */
+.flowhead{
+  display:flex;justify-content:space-between;align-items:flex-end;gap:60px;
+  margin-top:26px;padding-bottom:13px;border-bottom:1px solid var(--rule-strong);
+}
+.flow-note{font-size:16px;line-height:1.55;color:var(--ink-2);max-width:800px;margin-top:9px}
+.flow-key{
+  font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-3);text-align:right;line-height:2;white-space:nowrap;
+}
+
+/* ------------------------------------------------ flow field */
+.flow{position:relative;margin-top:0;height:2322px}.flowsvg{position:absolute;inset:0;width:100%;height:100%;z-index:1;overflow:visible;pointer-events:none}
+.ph{position:absolute;z-index:2;width:432px}
+
+.phcap{position:absolute;z-index:3;width:330px;border-top:1px solid var(--rule-strong);padding-top:6px}
+.phcap-row{display:flex;align-items:baseline;gap:11px}
+.phcap-no{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--ink-3);line-height:1}
+.phcap-name{font-size:19px;font-weight:400;letter-spacing:-.01em;line-height:1.1}
+.phcap-note{font-family:var(--mono);font-size:11px;letter-spacing:.02em;color:var(--ink-3);margin-top:4px;line-height:1.3}
+
+.flab{
+  position:absolute;z-index:4;
+  font-family:var(--serif);font-style:italic;font-size:15px;
+  color:var(--ink-2);white-space:nowrap;letter-spacing:.01em;
+}
+.flab.brk{background:var(--paper);padding:0 9px;transform:translate(-50%,-50%)}
+.flab .n{font-family:var(--mono);font-style:normal;font-size:10px;letter-spacing:.1em;color:var(--ink-3);margin-right:7px;vertical-align:1px}
+
+.margin-ded{position:absolute;left:0;top:1690px;width:300px;z-index:2}
+.margin-ded .lbl{display:block;padding-bottom:9px;border-bottom:1px solid var(--rule)}
+.margin-ded .ded{
+  font-family:var(--serif);font-weight:300;font-size:21px;line-height:1.35;
+  letter-spacing:-.012em;color:var(--ink-2);margin-top:13px;
+}
+.margin-ded .ded i{font-style:italic;color:var(--ink-3)}
+.margin-note{
+  position:absolute;left:0;top:1962px;width:258px;z-index:2;
+  font-family:var(--serif);font-style:italic;font-size:15px;line-height:1.55;color:var(--ink-3);
+}
+
+/* ------------------------------------------------ colophon */
+.colo{
+  margin-top:34px;padding-top:16px;border-top:1px solid var(--rule-strong);
+  display:grid;grid-template-columns:minmax(0,1fr) 460px 60px;gap:44px;align-items:start;
+}
+.colo p{font-size:14px;line-height:1.55;color:var(--ink-2);margin-top:7px;max-width:540px}
+.colo .lbl{display:block}
+.colo-folio{font-size:22px;font-weight:300;text-align:right;letter-spacing:-.01em;color:var(--ink-2)}
+
+/* ============================================================
+   THE ANDROID FRAME (android_frame.jsx, reproduced once)
+   ============================================================ */
+.af-wrap{
+  display:inline-block;padding:10px;background:#1a1a1a;border-radius:44px;
+  box-shadow:0 0 0 2px #2a2a2a, 0 20px 60px rgba(0,0,0,.3);
+  position:relative;
+}
+.af-screen{
+  --paper:#F5F0E7;
+  --ink:#191510;
+  --ink-2:#3D362C;
+  --ink-3:#5F574A;
+  --rule:rgba(25,21,16,.18);
+  --rule-2:rgba(25,21,16,.42);
+  --oxide:#8C3A24;
+  position:relative;border-radius:36px;overflow:hidden;background:var(--paper);
+  width:412px;height:892px;color:var(--ink);font-family:var(--serif);font-size:15px;line-height:1.4;
+}
+.af-status{
+  position:absolute;top:0;left:0;right:0;height:32px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;font-size:14px;font-weight:500;
+  font-family:Roboto,-apple-system,'Segoe UI',sans-serif;
+  color:#1a1a1a;z-index:20;pointer-events:none;
+}
+.af-status .si{display:flex;align-items:center;gap:6px}
+.af-status .batt{width:22px;height:10px;border:1.5px solid currentColor;border-radius:2px;padding:1px;position:relative}
+.af-status .batt i{display:block;width:100%;height:100%;background:currentColor;border-radius:1px}
+.af-status .batt-t{font-size:11px;font-weight:600;margin-left:2px}
+.af-punch{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:14px;height:14px;background:#000;border-radius:50%;z-index:30}
+.af-content{position:absolute;top:32px;left:0;right:0;bottom:24px;overflow:auto}
+.af-content::-webkit-scrollbar{display:none}
+.af-nav{position:absolute;bottom:0;left:0;right:0;height:24px;display:flex;align-items:center;justify-content:center;z-index:10}
+.af-nav i{width:100px;height:4px;background:rgba(0,0,0,.4);border-radius:999px}
+
+/* ============================================================
+   PHONE SCREENS
+   ============================================================ */
+.scr{display:none;flex-direction:column;min-height:100%}
+.scr.on{display:flex}
+
+/* running nav — every phone */
+.pnav{
+  flex:0 0 auto;height:48px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 26px;border-bottom:1px solid var(--rule);
+}
+.pbrand{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.2em;color:var(--ink)}
+.plinks{display:flex;margin-right:-9px}
+.plinks button{
+  position:relative;min-height:48px;padding:0 9px;
+  font-family:var(--mono);font-size:12px;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--ink-3);
+}
+.plinks button.on{color:var(--ink)}
+.plinks button.on::after{content:"";position:absolute;left:9px;right:9px;bottom:14px;height:1px;background:var(--ink)}
+
+.pbody{flex:1 1 auto;min-height:0;padding:14px 26px 0;display:flex;flex-direction:column}
+.folio{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:12px}
+.folio .lbl{font-size:12px}
+.void{flex:1 1 auto;min-height:24px}
+.hr-m{margin:14px 0 0}
+
+.p-title{font-family:var(--serif);font-weight:300;font-size:31px;line-height:1.05;letter-spacing:-.025em;margin:0 0 13px}
+
+/* ---- bar actions (rule-bounded, full width) ---- */
+.bar{
+  flex:0 0 auto;width:100%;height:88px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 26px;
+}
+.bar-solid{background:var(--ink);color:var(--paper)}
+.bar-l{font-family:var(--serif);font-size:27px;font-weight:300;letter-spacing:-.012em;line-height:1.05}
+.bar-r{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;opacity:.72;white-space:nowrap}
+.bar-quiet{color:var(--ink);border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);background:transparent}
+.bar-quiet .bar-r{opacity:1;color:var(--ink-3)}
+
+.footlink{
+  flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  min-height:56px;padding:0 26px;border-top:1px solid var(--rule);color:var(--ink-2);
+}
+.footlink .fl-l{font-family:var(--serif);font-size:16px;line-height:1.2}
+.footlink .fl-r{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--ink-3);text-align:right}
+
+/* ---------------------------------------------------------- TODAY */
+.tm-row{display:flex;align-items:flex-end;padding:2px 0 6px}
+.tm{display:flex;flex-direction:column;align-items:flex-start;gap:9px}
+.tm-num{font-weight:200;font-size:132px;line-height:.76;letter-spacing:-.048em}
+.tm-sm .tm-num{font-size:56px;letter-spacing:-.035em;line-height:.8}
+.tm .lbl{font-size:12px}
+.tm-sep{width:1px;height:74px;background:var(--rule-2);margin:0 24px 3px}
+.sect{margin-top:2px}
+.sect-label{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin:16px 0 7px}
+.resume{
+  display:flex;align-items:center;gap:14px;width:100%;
+  padding:10px 0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);
+}
+.resume .plate{width:60px;height:60px;object-fit:cover;border:1px solid var(--rule-2);flex:0 0 auto}
+.resume-txt{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}
+.rname{font-size:20px;line-height:1.1;letter-spacing:-.012em}
+.rmantra{font-size:16px;line-height:1.55}
+.rsub{font-family:var(--mono);font-size:12px;letter-spacing:.05em;color:var(--ink-3);line-height:1.4}
+.rgo{font-family:var(--mono);font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink);white-space:nowrap}
+.epigraph{margin:auto 0;padding:10px 0 0}
+.epi-mantra{font-size:42px;line-height:1.38;letter-spacing:.004em}
+.epi-inv{font-style:italic;font-size:19px;line-height:1.35;color:var(--ink-3);margin-top:12px;max-width:298px;text-wrap:balance}
+.ded-inline{padding:12px 0 14px;border-top:1px solid var(--rule)}
+.ded-inline p{font-family:var(--mono);font-size:12px;line-height:1.55;letter-spacing:.02em;color:var(--ink-3)}
+
+/* ---------------------------------------------------------- ALTAR */
+.scr[data-scr="altar"] .pbody{padding-top:12px}
+.scr[data-scr="altar"] .sect-label{margin:12px 0 5px}
+.p-title{font-family:var(--serif);font-weight:300;font-size:27px;line-height:1.05;letter-spacing:-.022em;margin:0 0 11px}
+.deity-list{display:flex;flex-direction:column}
+.deity-row{
+  position:relative;display:flex;gap:14px;align-items:flex-start;width:100%;
+  padding:6px 0;border-top:1px solid var(--rule);color:var(--ink);
+}
+.deity-row:last-child{border-bottom:1px solid var(--rule)}
+.deity-plate{width:56px;height:66px;object-fit:cover;border:1px solid var(--rule-2);flex:0 0 auto;background:#E6DCCC}
+.deity-txt{display:flex;flex-direction:column;gap:0;min-width:0;padding-top:1px}
+.deity-name{font-size:18px;line-height:1.15;letter-spacing:-.012em}
+.deity-mantra{font-size:15px;line-height:1.45}
+.deity-inv{font-style:italic;font-size:14px;line-height:1.26;color:var(--ink-3);margin-top:2px}
+.deity-row.sel::before{content:"";position:absolute;left:-18px;top:12px;width:2px;height:24px;background:var(--oxide)}
+.deity-row.sel .deity-name{font-weight:500}
+.mode-list{display:flex;flex-direction:column}
+.mode-row{
+  position:relative;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  width:100%;min-height:48px;padding:2px 0;border-top:1px solid var(--rule);
+  color:var(--ink-2);
+}
+.mode-row:last-child{border-bottom:1px solid var(--rule)}
+.mode-name{font-size:16px;line-height:1.25}
+.mode-note{font-family:var(--mono);font-size:12px;letter-spacing:.02em;color:var(--ink-3);text-align:right;line-height:1.3}
+.mode-row.sel{color:var(--ink)}
+.mode-row.sel .mode-name{font-weight:500}
+.mode-row.sel::before{content:"";position:absolute;left:-18px;top:15px;width:2px;height:18px;background:var(--oxide)}
+.target-row{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding:8px 0 0;
+}
+.target-rail{display:flex;align-items:center;border-top:1px solid var(--rule-2);border-bottom:1px solid var(--rule-2)}
+.tbtn{
+  width:48px;height:48px;display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-size:25px;font-weight:300;color:var(--ink);line-height:1;
+}
+.tbtn:first-child{border-right:1px solid var(--rule)}
+.tbtn:last-child{border-left:1px solid var(--rule)}
+.tnum{min-width:56px;text-align:center;font-size:26px;font-weight:300;line-height:1}
+
+/* ---------------------------------------------------------- SESSION */
+.sess-head{display:flex;flex-direction:column}
+.sess-mantra{font-size:41px;line-height:1.42;letter-spacing:.004em;margin:0 0 13px;margin-top:-2px}
+.sess-seal{position:relative;width:320px;height:320px;margin:14px auto 0;flex:0 0 auto}
+.sess-seal svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.seal-centre{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.sess-num{font-weight:200;font-size:168px;line-height:.74;letter-spacing:-.055em;transition:font-size .28s ease}
+.sess-of{font-family:var(--mono);font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-3);line-height:1.4;margin-top:10px}
+.sess-meta{display:flex;align-items:flex-start;gap:38px;padding-top:13px;margin-top:16px;border-top:1px solid var(--rule)}
+.sess-meta .mk{font-family:var(--mono);font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3);line-height:1.4}
+.sess-meta .mv{font-size:17px;line-height:1.45;margin-top:3px}
+.sess-ded{margin-top:auto;padding:12px 0 13px;border-top:1px solid var(--rule);font-family:var(--mono);font-size:12px;line-height:1.55;letter-spacing:.02em;color:var(--ink-3)}
+.subnav{flex:0 0 auto;display:flex;height:58px;border-top:1px solid var(--rule)}
+.subnav button{
+  flex:1;min-height:58px;display:flex;align-items:center;justify-content:center;text-align:center;
+  padding:6px 5px;border-left:1px solid var(--rule);
+  font-family:var(--mono);font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-2);line-height:1.3;
+}
+.subnav button:first-child{border-left:0}
+.count-bar.is-paused{background:transparent;color:var(--ink);border-top:1px solid var(--ink);border-bottom:1px solid var(--ink)}
+.count-bar.is-paused .bar-r{opacity:1;color:var(--ink-3)}
+
+/* ---------------------------------------------------------- BLESSING */
+.bless-top{display:flex;justify-content:space-between}
+.bless-void-top{flex:0 0 auto;height:34px}
+.bless-over{display:flex;justify-content:space-between;gap:12px}
+.bless-num{font-weight:200;font-size:158px;line-height:.72;letter-spacing:-.052em;margin:42px 0 16px;margin-left:-4px}
+.bless-cap{font-style:italic;font-size:18px;line-height:1.35;color:var(--ink-2);max-width:305px}
+.bless-mantra{font-size:30px;line-height:1.55;padding:18px 0 16px}
+.bless-grat{font-style:italic;font-weight:300;font-size:24px;line-height:1.28;letter-spacing:-.012em;padding:20px 0 0;color:var(--ink)}
+.bless-ded{
+  flex:0 0 auto;padding:9px 26px 11px;border-top:1px solid var(--rule);
+  font-family:var(--mono);font-size:12px;line-height:1.5;letter-spacing:.02em;color:var(--ink-3);
+}
+
+/* ---------------------------------------------------------- LEDGER */
+.lg-body{padding-top:12px}
+.lgr-top{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;padding:9px 0 3px}
+.lgr-num{font-weight:200;font-size:108px;line-height:.74;letter-spacing:-.05em;margin-left:-3px}
+.lgr-side{display:flex;flex-direction:column;align-items:flex-end;gap:5px;padding-bottom:9px}
+.lgr-side .lbl{font-size:12px}
+.lgr-malas{font-style:italic;font-size:18px;color:var(--ink-2);line-height:1.2}
+.lgr-life{display:flex;align-items:flex-start;padding:12px 0 13px;border-top:1px solid var(--rule)}
+.lgr-cell{display:flex;flex-direction:column;gap:4px;padding-right:34px}
+.lgr-v{font-size:29px;font-weight:300;letter-spacing:-.02em;line-height:1}
+.lgr-vr{width:1px;align-self:stretch;background:var(--rule);margin-right:34px}
+.lbl-row{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.lbl-row .lbl{font-size:12px}
+.week{display:grid;grid-template-columns:repeat(7,1fr);padding:8px 0 5px}
+.wd{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;border-left:1px solid var(--rule);padding:2px 0}
+.wd:first-child{border-left:0}
+.wd .k{font-family:var(--mono);font-size:12px;letter-spacing:.1em;color:var(--ink-3);line-height:1.2}
+.wd .v{font-size:23px;font-weight:300;letter-spacing:-.02em;line-height:1.15;color:var(--ink-2)}
+.wd.today .k{color:var(--ink)}
+.wd.today .v{color:var(--ink);font-weight:400}
+.wd.today::after{content:"";position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);width:13px;height:2px;background:var(--oxide)}
+.dreg{padding:8px 0 8px;border-top:1px solid var(--rule)}
+.dreg:last-child{border-bottom:1px solid var(--rule)}
+.dreg-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.dreg-name{font-size:16px;line-height:1.2;letter-spacing:-.008em}
+.dreg-total{font-size:20px;font-weight:300;letter-spacing:-.012em;line-height:1.1}
+.dreg-sub{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-top:3px}
+.dreg-sub span{font-family:var(--mono);font-size:12px;letter-spacing:.02em;color:var(--ink-3);line-height:1.3}
+.dreg-measure{height:2px;background:rgba(25,21,16,.13);margin-top:6px;position:relative}
+.dreg-measure i{position:absolute;left:0;top:0;bottom:0;background:var(--ink)}
+.rec{display:grid;grid-template-columns:78px 40px minmax(0,1fr) 54px;align-items:baseline;gap:8px;padding:5px 0 4px;border-top:1px solid var(--rule)}
+.rec:last-child{border-bottom:1px solid var(--rule)}
+.rec .d{font-family:var(--mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);line-height:1.3}
+.rec .c{font-size:21px;font-weight:300;text-align:right;line-height:1.1}
+.rec .m{font-family:var(--mono);font-size:12px;letter-spacing:.03em;color:var(--ink-3);line-height:1.3}
+.rec .t{font-size:15px;text-align:right;color:var(--ink-2);line-height:1.2}
+.lgr-foot{
+  flex:0 0 auto;height:48px;display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:0 26px;border-top:1px solid var(--rule);
+}
+.lgr-foot button{
+  min-height:48px;padding:0 8px;margin-left:-8px;
+  font-family:var(--mono);font-size:12px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);
+}
+.lgr-foot .note{font-family:var(--mono);font-size:12px;letter-spacing:.02em;color:var(--ink-3);text-align:right}
+</style>
+</head>
+<body>
+<div class="sheet">
+  <span class="crop tl"></span><span class="crop tr"></span><span class="crop bl"></span><span class="crop br"></span>
+
+  <header class="mast">
+    <span class="mast-brand">MANTRINI</span>
+    <span class="mast-mid">design directions &nbsp;/&nbsp; full build</span>
+    <span class="mast-no">direction 03 &nbsp;/&nbsp; the ledger</span>
+  </header>
+  <div class="hair-strong"></div>
+
+  <section class="deck">
+    <div class="deck-main">
+      <div class="eyebrow">
+        <span class="lbl">Direction 03</span><span class="sep"></span><span class="lbl">The record</span>
+      </div>
+      <h1>The Ledger</h1>
+      <p class="deck-line">A printed sadhana register, not a stack of cards.</p>
+      <p class="deck-body">Japa is a counted thing kept daily, so this direction makes the app one printed page: a single reading column hanging off the left margin, hairline rules where the other directions would put cards, and a display serif that lets the count be the ornament. Warm paper, ink, one oxide mark. The margin is left unclaimed on purpose — the air is part of the composition.</p>
+      <dl class="spec">
+        <dt>Logic</dt><dd>秒数轮盘 — Editorial Reader × japan-magazine-dense × Kenya Hara&rsquo;s 空</dd>
+        <dt>App style</dt><dd>#12 Editorial Reader</dd>
+        <dt>East style</dt><dd>#12 japan-magazine-dense</dd>
+        <dt>Material</dt><dd>Newsreader / Noto Sans Devanagari / IBM Plex Mono</dd>
+        <dt>Rules</dt><dd>hairlines, not cards &nbsp;/&nbsp; one reading column, one left margin &nbsp;/&nbsp; no icons, shadows, gradients</dd>
+      </dl>
+    </div>
+    <aside class="deck-aside">
+      <div class="idx-head">The five screens</div>
+      <ol class="idx">
+        <li><span class="rn">I</span><span class="nm">Today</span><span class="nt">nothing on open, answered</span></li>
+        <li><span class="rn">II</span><span class="nm">Altar</span><span class="nt">four names, four ways to count</span></li>
+        <li><span class="rn">III</span><span class="nm">Session</span><span class="nt">47 of 108, one hand</span></li>
+        <li><span class="rn">IV</span><span class="nm">Blessing</span><span class="nt">the mala closes, quietly</span></li>
+        <li><span class="rn">V</span><span class="nm">Ledger</span><span class="nt">the register the direction exists for</span></li>
+      </ol>
+    </aside>
+  </section>
+
+  <div class="flowhead">
+    <div>
+      <span class="lbl">The task, in order</span>
+      <p class="flow-note">Open on Today. Choose a name and a way at the Altar. Count with the thumb in the Session; the mala closes at the Blessing. The Ledger branches from the opening page, not from a menu.</p>
+    </div>
+    <div class="flow-key">read left to right<br>hairlines follow the tapped control<br>every phone is live</div>
+  </div>
+
+  <div class="flow" id="flow">
+    <svg class="flowsvg" id="flowSvg" aria-hidden="true"></svg>
+    <div class="margin-ded">
+      <span class="lbl">The dedication</span>
+      <p class="ded">GuruShreshta Maa Adya Mahakali<br><i>·</i>&nbsp; My Guru Shri Praveen RadhaKrishnan</p>
+    </div>
+    <p class="margin-note">The margin is not empty. It is the room the mantra needs.</p>
+  </div>
+
+  <footer class="colo">
+    <div>
+      <span class="lbl">Colophon</span>
+      <p>Set in Newsreader, Noto Sans Devanagari and IBM Plex Mono. Five screens; every control is live — count, choose a mode, finish a mala, undo, pause.</p>
+    </div>
+    <div>
+      <span class="lbl">State</span>
+      <p>Adya Mahakali, 47 of 108, 9:12 elapsed, manual.<br>Ledger: today 47, lifetime 4,212, 39 malas.<br>Week: 21 / 108 / 0 / 54 / 108 / 47 / 0.</p>
+    </div>
+    <div class="colo-folio">003</div>
+  </footer>
+</div>
+
+<script>
+/* ============================================================
+   MANTRINI · DIRECTION 03 · prototype state machine
+   ============================================================ */
+(function(){
+  'use strict';
+
+  var DEITIES = [
+    {name:'Adya Mahakali',        deva:'ॐ आद्यायै नमः',                  inv:'At the lotus feet of the primordial Mother.',        img:'assets/maha1.jpg',  total:2180},
+    {name:'Batuk Bhairav',        deva:'ॐ बटुक भैरवाय नमः',              inv:'Guardian of swift grace and fearless protection.',   img:'assets/batuk1.jpg', total:1296},
+    {name:'Swarnaakarshana Bhairav', deva:'ॐ श्री स्वर्णाकर्षण भैरवाय नमः', inv:'For radiance, dignified prosperity, and clear intent.', img:'assets/swarna.jpg', total:528},
+    {name:'Skanda Bhairav',       deva:'ॐ सर्वान्भवाय नमः',              inv:'For disciplined courage and focused tapas.',         img:'assets/skanda.jpg', total:208}
+  ];
+  var MODES = [
+    {name:'Tap each mantra',  note:'thumb counting',      tag:'Manual'},
+    {name:'Chant with audio', note:'one chant per play',  tag:'Audio'},
+    {name:'Sit for a set time', note:'a timer holds the room', tag:'Timed'},
+    {name:'Auto-count malas', note:'the chant loops',     tag:'Auto'}
+  ];
+  var WEEK = [['M',21],['T',108],['W',0],['T',54],['F',108],['S',47],['S',0]];
+  var TODAY_INDEX = 5;
+  var RECENT = [
+    ['Today',108,'Manual','9m41s'],
+    ['Yesterday',54,'Timed','5m00s'],
+    ['Nov 5',108,'Audio','11m12s'],
+    ['Nov 4',27,'Manual','3m08s']
+  ];
+  var BASE_TOTAL = 2180, BASE_TODAY = 47, BASE_LIFE = 4212, BASE_MALAS = 39;
+
+  var STATUS_ICONS =
+    '<svg width="14" height="10" viewBox="0 0 14 10" fill="currentColor" aria-hidden="true">' +
+      '<rect x="0" y="6" width="2" height="4" rx="0.5"/><rect x="4" y="4" width="2" height="6" rx="0.5"/>' +
+      '<rect x="8" y="2" width="2" height="8" rx="0.5"/><rect x="12" y="0" width="2" height="10" rx="0.5"/>' +
+    '</svg>' +
+    '<svg width="14" height="10" viewBox="0 0 14 10" fill="none" aria-hidden="true">' +
+      '<path d="M7 9a1 1 0 100-2 1 1 0 000 2z" fill="currentColor"/>' +
+      '<path d="M3 6a5 5 0 018 0" stroke="currentColor" stroke-width="1.2"/>' +
+      '<path d="M0.5 3.5a11 11 0 0113 0" stroke="currentColor" stroke-width="1.2" opacity="0.6"/>' +
+    '</svg>' +
+    '<span class="batt"><i></i></span><span class="batt-t">100%</span>';
+
+  function navHTML(){
+    return '<nav class="pnav"><span class="pbrand">MANTRINI</span><span class="plinks">' +
+      '<button type="button" data-nav="today">Today</button>' +
+      '<button type="button" data-nav="altar">Altar</button>' +
+      '<button type="button" data-nav="ledger">Ledger</button>' +
+    '</span></nav>';
+  }
+
+  function deityRowsHTML(){
+    return DEITIES.map(function(d,i){
+      return '<button type="button" class="deity-row' + (i===0?' sel':'') + '" data-act="deity" data-i="' + i + '">' +
+        '<img class="deity-plate" src="' + d.img + '" alt="' + d.name + '">' +
+        '<span class="deity-txt">' +
+          '<span class="deity-name">' + d.name + '</span>' +
+          '<span class="deity-mantra deva">' + d.deva + '</span>' +
+          '<span class="deity-inv">' + d.inv + '</span>' +
+        '</span>' +
+      '</button>';
+    }).join('');
+  }
+
+  function modeRowsHTML(){
+    return MODES.map(function(m,i){
+      return '<button type="button" class="mode-row' + (i===0?' sel':'') + '" data-act="mode" data-i="' + i + '">' +
+        '<span class="mode-name">' + m.name + '</span><span class="mode-note">' + m.note + '</span>' +
+      '</button>';
+    }).join('');
+  }
+
+  function weekHTML(){
+    return WEEK.map(function(w,i){
+      return '<div class="wd' + (i===TODAY_INDEX?' today':'') + '"><span class="k">' + w[0] + '</span><span class="v">' + w[1] + '</span></div>';
+    }).join('');
+  }
+
+  function recentHTML(){
+    return RECENT.map(function(r){
+      return '<div class="rec"><span class="d">' + r[0] + '</span><span class="c">' + r[1] + '</span><span class="m">' + r[2] + '</span><span class="t">' + r[3] + '</span></div>';
+    }).join('');
+  }
+
+  function screensHTML(s){
+    var d = DEITIES[s.deity];
+    return '' +
+    /* ---------------------------------------------------- TODAY */
+    '<section class="scr" data-scr="today">' + navHTML() +
+      '<div class="pbody">' +
+        '<div class="folio"><span class="lbl">Saturday · 7 November</span><span class="lbl">2026</span></div>' +
+        '<div class="tm-row">' +
+          '<div class="tm"><div class="tm-num" data-bind="todayCount">47</div><div class="lbl">chants today</div></div>' +
+          '<div class="tm-sep"></div>' +
+          '<div class="tm tm-sm"><div class="tm-num" data-bind="todayMalas">0</div><div class="lbl">malas today</div></div>' +
+        '</div>' +
+        '<div class="hair" style="margin-top:12px"></div>' +
+        '<div class="sect-label"><span class="lbl">Last at the altar</span><span class="lbl" data-bind="lastTag">manual</span></div>' +
+        '<button type="button" class="resume" data-act="resume">' +
+          '<img class="plate" data-bind="lastImg" src="assets/maha1.jpg" alt="Adya Mahakali">' +
+          '<span class="resume-txt">' +
+            '<span class="rname" data-bind="lastName">Adya Mahakali</span>' +
+            '<span class="rsub" data-bind="resumeSub">47 of 108</span>' +
+          '</span>' +
+          '<span class="rgo">Resume</span>' +
+        '</button>' +
+        '<div class="hair"></div>' +
+        '<div class="epigraph">' +
+          '<div class="deva epi-mantra" data-bind="lastMantra">ॐ आद्यायै नमः</div>' +
+          '<div class="epi-inv" data-bind="lastInv">At the lotus feet of the primordial Mother.</div>' +
+        '</div>' +
+        '<div class="ded-inline"><p>GuruShreshta Maa Adya Mahakali<br>· My Guru Shri Praveen RadhaKrishnan</p></div>' +
+      '</div>' +
+      '<button type="button" class="bar bar-solid" data-act="begin"><span class="bar-l">Begin japa</span><span class="bar-r">open the altar</span></button>' +
+      '<button type="button" class="footlink" data-act="gotoledger"><span class="fl-l">The ledger</span><span class="fl-r" data-bind="todayFootStats">4,212 chants &nbsp;/&nbsp; 39 malas</span></button>' +
+    '</section>' +
+
+    /* ---------------------------------------------------- ALTAR */
+    '<section class="scr" data-scr="altar">' + navHTML() +
+      '<div class="pbody">' +
+        '<div class="folio"><span class="lbl">The altar</span><span class="lbl">four names</span></div>' +
+        '<h2 class="p-title">Choose the deity</h2>' +
+        '<div class="deity-list">' + deityRowsHTML() + '</div>' +
+        '<div class="sect-label"><span class="lbl">How will you chant</span><span class="lbl">one of four</span></div>' +
+        '<div class="mode-list">' + modeRowsHTML() + '</div>' +
+        '<div class="target-row">' +
+          '<span class="lbl">Malas to offer</span>' +
+          '<span class="target-rail">' +
+            '<button type="button" class="tbtn" data-act="minus" aria-label="One fewer mala">−</button>' +
+            '<span class="tnum" data-bind="target">1</span>' +
+            '<button type="button" class="tbtn" data-act="plus" aria-label="One more mala">+</button>' +
+          '</span>' +
+        '</div>' +
+      '</div>' +
+      '<button type="button" class="bar bar-solid" data-act="start"><span class="bar-l">Start japa</span><span class="bar-r" data-bind="startTag">manual</span></button>' +
+    '</section>' +
+
+    /* ---------------------------------------------------- SESSION */
+    '<section class="scr" data-scr="session">' + navHTML() +
+      '<div class="pbody">' +
+        '<div class="folio"><span class="lbl" data-bind="sessDeity">Adya Mahakali</span><span class="lbl" data-bind="sessMode">manual</span></div>' +
+        '<div class="sess-head">' +
+          '<div class="sess-mantra deva" data-bind="sessMantra">ॐ आद्यायै नमः</div>' +
+        '</div>' +
+        '<div class="hair"></div>' +
+        '<div class="sess-seal">' +
+          '<svg class="mring" viewBox="0 0 320 320" aria-hidden="true"></svg>' +
+          '<div class="seal-centre">' +
+            '<div class="sess-num" data-bind="sessionCount">47</div>' +
+            '<div class="sess-of"><span data-bind="sessOf">of 108</span></div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="sess-meta">' +
+          '<div><div class="mk">Elapsed</div><div class="mv">9:12</div></div>' +
+          '<div><div class="mk">Remaining</div><div class="mv"><span data-bind="remaining">61</span> <span data-bind="remainingWord">chants</span></div></div>' +
+          '<div><div class="mk">Mala</div><div class="mv"><span data-bind="malaLabel">01 of 01</span></div></div>' +
+        '</div>' +
+        '<div class="sess-ded">GuruShreshta Maa Adya Mahakali<br>· My Guru Shri Praveen RadhaKrishnan</div>' +
+      '</div>' +
+      '<button type="button" class="bar bar-solid count-bar" data-act="count"><span class="bar-l" data-bind="countLabel">Count</span><span class="bar-r" data-bind="countHint">tap</span></button>' +
+      '<div class="subnav">' +
+        '<button type="button" data-act="pause" data-bind="pauseLabel">Pause</button>' +
+        '<button type="button" data-act="undo">Undo last count</button>' +
+        '<button type="button" data-act="finish">Finish</button>' +
+      '</div>' +
+    '</section>' +
+
+    /* ---------------------------------------------------- BLESSING */
+    '<section class="scr" data-scr="blessing">' + navHTML() +
+      '<div class="pbody">' +
+        '<div class="folio"><span class="lbl">After the mala</span><span class="lbl">colophon</span></div>' +
+        '<div class="bless-void-top"></div>' +
+        '<div class="bless-over"><span class="lbl" data-bind="blessDeity">Adya Mahakali</span><span class="lbl" data-bind="blessTag">manual</span></div>' +
+        '<div class="bless-num" data-bind="blessCount">108</div>' +
+        '<div class="bless-cap"><span data-bind="blessWord">chants offered</span><br><span data-bind="blessMalas">one mala complete</span></div>' +
+        '<div class="hair" style="margin-top:20px"></div>' +
+        '<div class="bless-mantra deva" data-bind="blessMantra">ॐ आद्यायै नमः</div>' +
+        '<div class="hair"></div>' +
+        '<p class="bless-grat">For the breath and the hour,<br>gratitude.</p>' +
+        '<div class="void"></div>' +
+      '</div>' +
+      '<button type="button" class="bar bar-solid" data-act="rest"><span class="bar-l">Rest at the altar</span><span class="bar-r">close</span></button>' +
+      '<button type="button" class="footlink" data-act="again"><span class="fl-l">Begin another mala</span><span class="fl-r">108 beads</span></button>' +
+      '<div class="bless-ded">GuruShreshta Maa Adya Mahakali · My Guru Shri Praveen RadhaKrishnan</div>' +
+    '</section>' +
+
+    /* ---------------------------------------------------- LEDGER */
+    '<section class="scr" data-scr="ledger">' + navHTML() +
+      '<div class="pbody lg-body">' +
+        '<div class="folio"><span class="lbl">The ledger</span><span class="lbl">folio 01</span></div>' +
+        '<div class="lgr-top">' +
+          '<div class="lgr-num" data-bind="lgrToday">47</div>' +
+          '<div class="lgr-side"><span class="lbl">chants today</span><span class="lgr-malas"><span data-bind="lgrMalasToday">0</span> malas today</span></div>' +
+        '</div>' +
+        '<div class="lgr-life">' +
+          '<div class="lgr-cell"><span class="lbl">Lifetime</span><span class="lgr-v" data-bind="lgrLife">4,212</span></div>' +
+          '<div class="lgr-vr"></div>' +
+          '<div class="lgr-cell"><span class="lbl">Malas</span><span class="lgr-v" data-bind="lgrMalas">39</span></div>' +
+        '</div>' +
+        '<div class="lbl-row"><span class="lbl">This week</span><span class="lbl">M – S</span></div>' +
+        '<div class="week">' + weekHTML() + '</div>' +
+        '<div class="lbl-row" style="margin-top:6px"><span class="lbl">By name</span><span class="lbl">to the next mala</span></div>' +
+        '<div class="deity-reg">' + DEITIES.map(function(dd,i){
+            var t = dd.total;
+            return '<div class="dreg" data-reg="' + i + '">' +
+              '<div class="dreg-top"><span class="dreg-name">' + dd.name + '</span><span class="dreg-total" data-bind="regTotal">' + t.toLocaleString('en-US') + '</span></div>' +
+              '<div class="dreg-sub"><span data-bind="regMalas"></span><span data-bind="regNext"></span></div>' +
+              '<div class="dreg-measure"><i data-bind="regFill"></i></div>' +
+            '</div>';
+          }).join('') + '</div>' +
+        '<div class="lbl-row" style="margin-top:10px"><span class="lbl">Recent sittings</span><span class="lbl">four</span></div>' +
+        '<div class="recent">' + recentHTML() + '</div>' +
+        '<div class="void" style="min-height:14px"></div>' +
+      '</div>' +
+      '<div class="lgr-foot">' +
+        '<span><button type="button" data-act="backup">Backup</button><button type="button" data-act="backup">Restore</button></span>' +
+        '<span class="note" data-bind="backupNote">stored on this phone</span>' +
+      '</div>' +
+    '</section>';
+  }
+
+  /* ---------------------------------------------------- ring */
+  function buildRing(svg){
+    if (!svg || svg.getAttribute('data-built')) return;
+    svg.setAttribute('data-built','1');
+    var NS = 'http://www.w3.org/2000/svg';
+    var cx = 160, cy = 160, rOut = 152, rMark = 138;
+    for (var i = 0; i < 108; i++){
+      var a = (i / 108) * Math.PI * 2 - Math.PI / 2;
+      var len = (i % 9 === 0) ? 13 : 8;
+      var l = document.createElementNS(NS,'line');
+      l.setAttribute('x1', (cx + Math.cos(a) * rOut).toFixed(2));
+      l.setAttribute('y1', (cy + Math.sin(a) * rOut).toFixed(2));
+      l.setAttribute('x2', (cx + Math.cos(a) * (rOut - len)).toFixed(2));
+      l.setAttribute('y2', (cy + Math.sin(a) * (rOut - len)).toFixed(2));
+      l.setAttribute('class','bead');
+      l.setAttribute('data-i', i);
+      l.setAttribute('stroke','rgba(25,21,16,.26)');
+      l.setAttribute('stroke-width','1');
+      l.setAttribute('stroke-linecap','butt');
+      svg.appendChild(l);
+    }
+    var g = document.createElementNS(NS,'circle');
+    g.setAttribute('cx',cx); g.setAttribute('cy',cy); g.setAttribute('r',rMark);
+    g.setAttribute('fill','none'); g.setAttribute('stroke','rgba(25,21,16,.12)'); g.setAttribute('stroke-width','1');
+    svg.appendChild(g);
+  }
+
+  function updateRing(host, count){
+    var lines = host.querySelectorAll('.mring line.bead');
+    for (var i = 0; i < lines.length; i++){
+      var l = lines[i];
+      var on = i < count;
+      var cur = (i === count - 1);
+      l.setAttribute('class', 'bead' + (on ? ' done':'') + (cur ? ' cur':''));
+      l.setAttribute('stroke', cur ? '#8C3A24' : (on ? '#191510' : 'rgba(25,21,16,.26)'));
+      l.setAttribute('stroke-width', cur ? '3.2' : (on ? '2.2' : '1'));
+    }
+  }
+
+  /* ---------------------------------------------------- phone */
+  function setText(host, name, val){
+    var nodes = host.querySelectorAll('[data-bind="' + name + '"]');
+    for (var i = 0; i < nodes.length; i++) nodes[i].textContent = val;
+  }
+  function setAttr(host, name, attr, val){
+    var nodes = host.querySelectorAll('[data-bind="' + name + '"]');
+    for (var i = 0; i < nodes.length; i++) nodes[i].setAttribute(attr, val);
+  }
+  function fmt(n){ return Number(n).toLocaleString('en-US'); }
+  function pad2(n){ return (n < 10 ? '0' : '') + n; }
+
+  function makePhone(cfg){
+    var host = document.createElement('div');
+    host.className = 'ph';
+    host.style.left = cfg.x + 'px';
+    host.style.top = cfg.y + 'px';
+
+    var s = {
+      screen: cfg.screen,
+      count: cfg.count,
+      today: cfg.today,
+      malas: cfg.malas,
+      mode: 0,
+      deity: 0,
+      target: 1,
+      paused: false
+    };
+
+    host.innerHTML =
+      '<div class="af-wrap"><div class="af-screen">' +
+        '<div class="af-status"><span>' + cfg.time + '</span><span class="si">' + STATUS_ICONS + '</span></div>' +
+        '<div class="af-punch"></div>' +
+        '<div class="af-content">' + screensHTML(s) + '</div>' +
+        '<div class="af-nav"><i></i></div>' +
+      '</div></div>';
+
+    var ring = host.querySelector('.mring');
+    buildRing(ring);
+
+    function update(){
+      var d = DEITIES[s.deity];
+      var m = MODES[s.mode];
+      var i, nodes;
+
+      nodes = host.querySelectorAll('.scr');
+      for (i = 0; i < nodes.length; i++) nodes[i].classList.toggle('on', nodes[i].getAttribute('data-scr') === s.screen);
+
+      nodes = host.querySelectorAll('[data-nav]');
+      for (i = 0; i < nodes.length; i++) nodes[i].classList.toggle('on', nodes[i].getAttribute('data-nav') === s.screen);
+
+      /* today */
+      setText(host,'todayCount', s.today);
+      setText(host,'todayMalas', s.malas);
+      setText(host,'lastTag', m.tag);
+      setAttr(host,'lastImg','src', d.img);
+      setAttr(host,'lastImg','alt', d.name);
+      setText(host,'lastName', d.name);
+      setText(host,'lastMantra', d.deva);
+      setText(host,'lastInv', d.inv);
+      setText(host,'resumeSub', s.count + ' of 108');
+      setText(host,'todayFootStats', fmt(BASE_LIFE + (s.today - BASE_TODAY)) + ' chants  /  ' + (BASE_MALAS + s.malas) + ' malas');
+
+      /* altar */
+      nodes = host.querySelectorAll('.deity-row');
+      for (i = 0; i < nodes.length; i++) nodes[i].classList.toggle('sel', i === s.deity);
+      nodes = host.querySelectorAll('.mode-row');
+      for (i = 0; i < nodes.length; i++) nodes[i].classList.toggle('sel', i === s.mode);
+      setText(host,'target', s.target);
+      setText(host,'startTag', m.tag);
+
+      /* session */
+      setText(host,'sessDeity', d.name.toUpperCase());
+      setText(host,'sessMode', s.paused ? 'PAUSED' : m.tag.toUpperCase());
+      setText(host,'sessMantra', d.deva);
+      setText(host,'sessionCount', s.count);
+      var rem = Math.max(0, 108 - s.count);
+      setText(host,'remaining', rem);
+      setText(host,'remainingWord', rem === 1 ? 'chant' : 'chants');
+      setText(host,'malaLabel', pad2(1) + ' of ' + pad2(s.target));
+      var numEl = host.querySelector('.sess-num');
+      if (numEl) numEl.style.fontSize = (s.count >= 100 ? '136px' : '168px');
+      setText(host,'countLabel', s.paused ? 'Paused' : 'Count');
+      setText(host,'countHint', s.paused ? 'pause to resume' : 'tap');
+      setText(host,'pauseLabel', s.paused ? 'Resume' : 'Pause');
+      var cb = host.querySelector('.count-bar');
+      if (cb) cb.classList.toggle('is-paused', s.paused);
+      updateRing(host, s.count);
+
+      /* blessing */
+      setText(host,'blessDeity', d.name.toUpperCase());
+      setText(host,'blessTag', m.tag.toUpperCase());
+      setText(host,'blessCount', s.count);
+      setText(host,'blessMantra', d.deva);
+      setText(host,'blessWord', 'chants offered');
+      setText(host,'blessMalas', s.malas > 0 ? 'one mala complete' : 'the sitting closed');
+
+      /* ledger */
+      setText(host,'lgrToday', s.today);
+      setText(host,'lgrMalasToday', s.malas);
+      setText(host,'lgrLife', fmt(BASE_LIFE + (s.today - BASE_TODAY)));
+      setText(host,'lgrMalas', BASE_MALAS + s.malas);
+      nodes = host.querySelectorAll('.wd');
+      for (i = 0; i < nodes.length; i++){
+        var v = (i === TODAY_INDEX) ? s.today : WEEK[i][1];
+        var vn = nodes[i].querySelector('.v');
+        if (vn) vn.textContent = v;
+      }
+      var reg = host.querySelectorAll('.dreg');
+      for (i = 0; i < reg.length; i++){
+        var base = DEITIES[i].total;
+        var tot = base + (i === 0 ? (s.today - BASE_TODAY) : 0);
+        var malas = Math.floor(tot / 108);
+        var mod = tot % 108;
+        var toNext = (108 - mod) % 108;
+        if (toNext === 0) toNext = 108;
+        var row = reg[i];
+        row.querySelector('[data-bind="regTotal"]').textContent = fmt(tot);
+        row.querySelector('[data-bind="regMalas"]').textContent = malas + (malas === 1 ? ' mala' : ' malas');
+        row.querySelector('[data-bind="regNext"]').textContent = toNext + ' chants to the next';
+        row.querySelector('[data-bind="regFill"]').style.width = ((mod / 108) * 100).toFixed(2) + '%';
+      }
+    }
+
+    host.addEventListener('click', function(ev){
+      var nav = ev.target.closest('[data-nav]');
+      if (nav){ s.screen = nav.getAttribute('data-nav'); update(); return; }
+      var el = ev.target.closest('[data-act]');
+      if (!el) return;
+      var act = el.getAttribute('data-act');
+      switch(act){
+        case 'begin': s.screen = 'altar'; break;
+        case 'resume': s.screen = 'session'; break;
+        case 'gotoledger': s.screen = 'ledger'; break;
+        case 'count':
+          if (s.paused) break;
+          if (s.count >= 108){ s.screen = 'blessing'; break; }
+          s.count += 1; s.today += 1;
+          if (s.count === 108){ s.malas += 1; s.screen = 'blessing'; }
+          break;
+        case 'undo':
+          if (s.count > 0){
+            s.count -= 1;
+            if (s.today > BASE_TODAY) s.today -= 1;
+          }
+          break;
+        case 'pause': s.paused = !s.paused; break;
+        case 'finish': s.screen = 'blessing'; break;
+        case 'rest': s.screen = 'today'; break;
+        case 'again': s.count = 0; s.paused = false; s.screen = 'session'; break;
+        case 'start': s.count = 0; s.paused = false; s.screen = 'session'; break;
+        case 'deity': s.deity = Number(el.getAttribute('data-i')); break;
+        case 'mode': s.mode = Number(el.getAttribute('data-i')); break;
+        case 'minus': s.target = Math.max(1, s.target - 1); break;
+        case 'plus': s.target = Math.min(9, s.target + 1); break;
+        case 'backup':
+          var note = host.querySelector('[data-bind="backupNote"]');
+          if (note){
+            note.textContent = 'no account, no cloud';
+            window.setTimeout(function(){ note.textContent = 'stored on this phone'; }, 2600);
+          }
+          return;
+      }
+      update();
+    });
+
+    update();
+    return host;
+  }
+
+  /* ---------------------------------------------------- board build */
+  var PHONES = [
+    {key:'today',   x:0,    y:130,  time:'06:04', screen:'today',    count:47,  today:47,  malas:0},
+    {key:'altar',   x:524,  y:70,   time:'06:06', screen:'altar',    count:47,  today:47,  malas:0},
+    {key:'session', x:1048, y:140,  time:'06:12', screen:'session',  count:47,  today:47,  malas:0},
+    {key:'blessing',x:1048, y:1260, time:'06:21', screen:'blessing', count:108, today:108, malas:1},
+    {key:'ledger',  x:340,  y:1350, time:'21:40', screen:'ledger',   count:47,  today:47,  malas:0}
+  ];
+  var CAPS = [
+    {key:'today',   num:'I',   name:'Today',    note:'date, today’s count, the last altar, one action'},
+    {key:'altar',   num:'II',  name:'Altar',    note:'four names, four ways to count, a target'},
+    {key:'session', num:'III', name:'Session',  note:'adya mahakali · 47 of 108 · 9:12 · manual'},
+    {key:'blessing',num:'IV',  name:'Blessing', note:'108 chants, one mala, a closing colophon'},
+    {key:'ledger',  num:'V',   name:'Ledger',   note:'one typeset page of sadhana, kept'}
+  ];
+
+  var flow = document.getElementById('flow');
+  var phoneEls = {};
+
+  PHONES.forEach(function(cfg){
+    var host = makePhone(cfg);
+    flow.appendChild(host);
+    phoneEls[cfg.key] = host;
+  });
+
+  CAPS.forEach(function(cap){
+    var cfg = PHONES.filter(function(p){ return p.key === cap.key; })[0];
+    var el = document.createElement('div');
+    el.className = 'phcap';
+    el.style.left = cfg.x + 'px';
+    el.style.top = (cfg.y - 64) + 'px';
+    el.innerHTML = '<div class="phcap-row"><span class="phcap-no">' + cap.num + '</span><span class="phcap-name">' + cap.name + '</span></div>' +
+                   '<div class="phcap-note">' + cap.note + '</div>';
+    flow.appendChild(el);
+  });
+
+  /* ---------------------------------------------------- connectors */
+  function drawConnectors(){
+    var svg = document.getElementById('flowSvg');
+    if (!svg) return;
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    var old = flow.querySelectorAll('.flab');
+    for (var q = 0; q < old.length; q++) old[q].parentNode.removeChild(old[q]);
+
+    var fR = flow.getBoundingClientRect();
+    function relRect(el){
+      var r = el.getBoundingClientRect();
+      return {left:r.left-fR.left, top:r.top-fR.top, right:r.right-fR.left, bottom:r.bottom-fR.top, width:r.width, height:r.height};
+    }
+    var NS = 'http://www.w3.org/2000/svg';
+    function node(tag, attrs){
+      var n = document.createElementNS(NS, tag);
+      for (var k in attrs) n.setAttribute(k, attrs[k]);
+      svg.appendChild(n);
+      return n;
+    }
+    function mark(pt, filled){
+      node('rect', {x:(pt.x-3).toFixed(1), y:(pt.y-3).toFixed(1), width:'6', height:'6',
+        fill: filled ? 'rgba(25,21,16,.82)' : '#F0EADB',
+        stroke: filled ? 'none' : 'rgba(25,21,16,.82)', 'stroke-width':'1'});
+    }
+    function path(points){
+      var d = 'M' + points[0].x.toFixed(1) + ',' + points[0].y.toFixed(1);
+      for (var j = 1; j < points.length; j++) d += ' L' + points[j].x.toFixed(1) + ',' + points[j].y.toFixed(1);
+      node('path', {d:d, fill:'none', stroke:'rgba(25,21,16,.62)', 'stroke-width':'1.1',
+        'stroke-linejoin':'miter', 'stroke-linecap':'butt'});
+    }
+    function label(text, x, y, mode){
+      var el = document.createElement('div');
+      el.className = 'flab' + (mode === 'break' ? ' brk' : '');
+      el.style.left = x + 'px';
+      el.style.top = y + 'px';
+      if (mode === 'center') el.style.transform = 'translateX(-50%)';
+      el.textContent = text;
+      flow.appendChild(el);
+    }
+
+    var tP = relRect(phoneEls.today), aP = relRect(phoneEls.altar),
+        sP = relRect(phoneEls.session), bP = relRect(phoneEls.blessing),
+        lP = relRect(phoneEls.ledger);
+
+    /* 1 · Today [Begin japa] to Altar */
+    var begin = relRect(phoneEls.today.querySelector('[data-act="begin"]'));
+    var y1 = begin.top + begin.height / 2;
+    var y1b = Math.min(Math.max(y1, aP.top + 60), aP.bottom - 60);
+    var c1a = {x: tP.right + 4, y: y1};
+    var c1b = {x: aP.left - 4, y: y1b};
+    path([c1a, c1b]); mark(c1a, false); mark(c1b, true);
+    label('Begin japa', (c1a.x + c1b.x) / 2, (c1a.y + c1b.y) / 2 - 24, 'center');
+
+    /* 2 · Altar [Start] to Session */
+    var start = relRect(phoneEls.altar.querySelector('[data-act="start"]'));
+    var y2 = start.top + start.height / 2;
+    var y2b = Math.min(Math.max(y2, sP.top + 60), sP.bottom - 60);
+    var c2a = {x: aP.right + 4, y: y2};
+    var c2b = {x: sP.left - 4, y: y2b};
+    path([c2a, c2b]); mark(c2a, false); mark(c2b, true);
+    label('Start', (c2a.x + c2b.x) / 2, (c2a.y + c2b.y) / 2 - 24, 'center');
+
+    /* 3 · Session [count] to Blessing */
+    var countBar = relRect(phoneEls.session.querySelector('[data-act="count"]'));
+    var c3a = {x: sP.left - 4, y: countBar.top + countBar.height / 2};
+    var gx = sP.left - 60;
+    var hy = bP.top - 100;
+    var ex = bP.right - 62;
+    var pts3 = [c3a, {x:gx, y:c3a.y}, {x:gx, y:hy}, {x:ex, y:hy}, {x:ex, y:bP.top - 4}];
+    path(pts3); mark(c3a, false); mark({x:ex, y:bP.top - 4}, true);
+    label('mala 108 reached', (gx + ex) / 2, hy, 'break');
+
+    /* 4 · Today [the ledger] to Ledger */
+    var foot = relRect(phoneEls.today.querySelector('[data-act="gotoledger"]'));
+    var c4a = {x: foot.left + foot.width / 2, y: tP.bottom + 4};
+    var hy4 = tP.bottom + 66;
+    var ex4 = lP.left + 382;
+    var pts4 = [c4a, {x:c4a.x, y:hy4}, {x:ex4, y:hy4}, {x:ex4, y:lP.top - 4}];
+    path(pts4); mark(c4a, false); mark({x:ex4, y:lP.top - 4}, true);
+    label('the ledger', (c4a.x + ex4) / 2, hy4, 'break');
+
+    /* flow height from lowest phone */
+    var bottoms = PHONES.map(function(p){ return relRect(phoneEls[p.key]).bottom; });
+    flow.style.height = (Math.max.apply(null, bottoms) + 70) + 'px';
+  }
+
+  var ready = false;
+  function refresh(){ if (!ready) return; drawConnectors(); }
+  function boot(){
+    ready = true;
+    requestAnimationFrame(function(){ drawConnectors(); });
+  }
+  if (document.fonts && document.fonts.ready){
+    document.fonts.ready.then(boot).catch(boot);
+  } else {
+    window.addEventListener('load', boot);
+  }
+  window.addEventListener('resize', refresh);
+  window.addEventListener('load', function(){ setTimeout(refresh, 200); });
+})();
+</script>
+</body>
+</html>

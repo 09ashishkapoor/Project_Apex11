@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>MANTRINI · six direction candidates</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Figtree:wght@300;400;600;800&family=Newsreader:opsz,wght@6..72,200;6..72,300;6..72,400;6..72,600&family=Inter+Tight:wght@400;500;700&family=Noto+Sans+Devanagari:wght@400;500;600&family=Cinzel:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root { --label: #6b6257; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #d9d4cc;
+    font-family: 'Inter Tight', system-ui, sans-serif;
+    color: #2a2622;
+    padding: 46px 44px 56px;
+  }
+  header { margin-bottom: 34px; max-width: 980px; }
+  header h1 { font-family: 'Newsreader', serif; font-weight: 300; font-size: 42px; letter-spacing: -0.02em; }
+  header p { margin-top: 10px; font-size: 14px; line-height: 1.5; color: var(--label); max-width: 720px; }
+  .grid { display: grid; grid-template-columns: repeat(3, 412px); gap: 40px 34px; }
+  .cell { }
+  .cap { display: flex; gap: 10px; align-items: baseline; margin-bottom: 12px; }
+  .cap .n { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #948a7d; letter-spacing: .06em; }
+  .cap .t { font-family: 'Inter Tight'; font-weight: 700; font-size: 15px; letter-spacing: -0.01em; }
+  .cap .s { font-family: 'Inter Tight'; font-size: 12px; color: var(--label); }
+  .phone {
+    width: 412px; height: 892px; border-radius: 36px; overflow: hidden; position: relative;
+    box-shadow: 0 0 0 10px #1a1a1a, 0 24px 60px rgba(0,0,0,.26);
+  }
+  .scan { position: absolute; inset: 0; display: flex; flex-direction: column; }
+  .deva { font-family: 'Noto Sans Devanagari', sans-serif; }
+
+  /* ---------- 1 · THE MALA ---------- */
+  .mala { background: #08090a; color: #d3cec6; }
+  .mala .top { padding: 34px 26px 0; display: flex; justify-content: space-between; align-items: center; }
+  .mala .tag { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: #6f6b65; }
+  .mala .tick { width: 2px; height: 16px; background: #e8a33d; }
+  .mala .ringwrap { margin: 26px auto 0; position: relative; width: 340px; height: 340px; }
+  .mala .centre { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .mala .count { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 96px; line-height: .9; letter-spacing: -.05em; color: #f2eee7; }
+  .mala .of { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .16em; color: #7c7770; margin-top: 10px; }
+  .mala .devaline { margin: 26px 0 0; text-align: center; font-size: 22px; color: #e8dcc8; letter-spacing: .01em; }
+  .mala .strip { margin: auto 26px 0; padding: 16px 0 22px; border-top: 1px solid #23252a; display: flex; justify-content: space-between; }
+  .mala .ro { font-family: 'IBM Plex Mono', monospace; }
+  .mala .ro .k { font-size: 9px; letter-spacing: .18em; text-transform: uppercase; color: #63605a; }
+  .mala .ro .v { font-size: 17px; color: #cfcac2; margin-top: 5px; }
+  .mala .key {
+    margin: 0 26px 26px; height: 92px; border-radius: 14px; background: #e8a33d; color: #14100a;
+    display: flex; align-items: center; justify-content: space-between; padding: 0 26px;
+    box-shadow: inset 0 -4px 0 rgba(0,0,0,.22), 0 1px 0 rgba(255,255,255,.28) inset;
+  }
+  .mala .key .l { font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; font-weight: 600; }
+  .mala .key .r { font-family: 'IBM Plex Mono', monospace; font-size: 11px; opacity: .66; }
+
+  /* ---------- 2 · THE LAMP ---------- */
+  .lamp { background: #120a0a; color: #f6e6cf; }
+  .lamp .photo { position: absolute; inset: 0 0 42% 0; }
+  .lamp .photo img { width: 100%; height: 100%; object-fit: cover; }
+  .lamp .photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(18,10,10,.55) 0%, rgba(18,10,10,0) 22%, rgba(18,10,10,0) 55%, #120a0a 100%); }
+  .lamp .head { position: absolute; top: 30px; left: 26px; right: 26px; display: flex; justify-content: space-between; z-index: 2; }
+  .lamp .head .nm { font-family: 'Figtree'; font-weight: 600; font-size: 15px; color: #f8ecdb; }
+  .lamp .head .el { font-family: 'Figtree'; font-weight: 400; font-size: 13px; color: rgba(248,236,219,.7); }
+  .lamp .dots { position: absolute; left: 0; right: 0; top: calc(58% - 15px); display: flex; justify-content: center; gap: 3px; z-index: 2; }
+  .lamp .dots i { width: 3px; height: 3px; border-radius: 50%; background: rgba(246,230,207,.26); display: block; }
+  .lamp .dots i.on { background: #f0b463; }
+  .lamp .low { position: absolute; left: 0; right: 0; bottom: 0; height: 42%; display: flex; flex-direction: column; padding: 34px 30px 28px; }
+  .lamp .mantra { font-size: 25px; text-align: center; color: #fbefdb; letter-spacing: .01em; }
+  .lamp .num { margin-top: 22px; display: flex; align-items: baseline; justify-content: center; gap: 10px; }
+  .lamp .num .big { font-family: 'Figtree'; font-weight: 300; font-size: 82px; line-height: .9; letter-spacing: -.045em; color: #fff6ea; }
+  .lamp .num .sep { font-family: 'Figtree'; font-size: 20px; color: rgba(246,230,207,.4); }
+  .lamp .num .tot { font-family: 'Figtree'; font-weight: 400; font-size: 20px; color: rgba(246,230,207,.55); }
+  .lamp .hint { text-align: center; font-family: 'Figtree'; font-size: 13px; color: rgba(246,230,207,.5); margin-top: 6px; }
+  .lamp .tap { margin-top: auto; height: 84px; border-radius: 999px; background: linear-gradient(180deg,#f7d9a8,#efb96f); color: #2a1710;
+    display: flex; align-items: center; justify-content: center; font-family: 'Figtree'; font-weight: 800; font-size: 16px; letter-spacing: .01em;
+    box-shadow: 0 10px 30px rgba(239,185,111,.28); }
+
+  /* ---------- 3 · THE LEDGER ---------- */
+  .ledger { background: #f2ede3; color: #17130f; }
+  .ledger .top { padding: 30px 34px 0; display: flex; justify-content: space-between; align-items: baseline;
+    border-bottom: 1px solid rgba(23,19,15,.18); padding-bottom: 12px; }
+  .ledger .top .l { font-family: 'Newsreader'; font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: #7a6f60; }
+  .ledger .top .r { font-family: 'Newsreader'; font-size: 13px; color: #7a6f60; }
+  .ledger .mid { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0 34px; }
+  .ledger .ring { position: relative; width: 268px; height: 268px; }
+  .ledger .centre { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .ledger .big { font-family: 'Newsreader'; font-weight: 200; font-size: 108px; line-height: .82; letter-spacing: -.035em; }
+  .ledger .meta { font-family: 'Newsreader'; font-style: italic; font-size: 14px; color: #7a6f60; margin-top: 8px; }
+  .ledger .mantra { font-size: 26px; text-align: center; margin-top: 22px; letter-spacing: .005em; }
+  .ledger .foot { padding: 0 34px 30px; }
+  .ledger .rule { height: 1px; background: rgba(23,19,15,.2); margin-bottom: 16px; }
+  .ledger .row { display: flex; justify-content: space-between; font-family: 'Newsreader'; font-size: 13px; color: #5d5346; }
+  .ledger .act { margin-top: 16px; height: 62px; border: 1px solid #17130f; display: flex; align-items: center; justify-content: center;
+    font-family: 'Newsreader'; font-size: 15px; letter-spacing: .1em; text-transform: uppercase; }
+
+  /* ---------- 4 · THE STILL POINT ---------- */
+  .still { background: #faf8f3; color: #2b2723; }
+  .still .in { padding: 46px 40px; height: 100%; display: flex; flex-direction: column; }
+  .still .dot { width: 5px; height: 5px; border-radius: 50%; background: #2b2723; }
+  .still .mantra { font-size: 30px; text-align: center; margin-top: 120px; letter-spacing: .02em; }
+  .still .ring { margin: 56px auto 0; position: relative; width: 210px; height: 210px; }
+  .still .centre { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+  .still .big { font-family: 'Inter Tight'; font-weight: 300; font-size: 66px; letter-spacing: -.05em; }
+  .still .hint { margin-top: 60px; text-align: center; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: #9d968c; }
+  .still .foot { margin-top: auto; display: flex; justify-content: space-between; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: #a8a196; }
+
+  /* ---------- 5 · THE ALMANAC ---------- */
+  .alm { background: #f6f2e9; color: #14120f; }
+  .alm .in { padding: 24px 22px; height: 100%; display: flex; flex-direction: column; }
+  .alm .bar { display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: .14em; text-transform: uppercase; border-bottom: 2px solid #14120f; padding-bottom: 6px; }
+  .alm .ttl { font-family: 'Newsreader'; font-size: 34px; line-height: 1; margin-top: 14px; letter-spacing: -.02em; }
+  .alm .mantra { font-size: 17px; margin-top: 6px; padding-bottom: 10px; border-bottom: 1px solid rgba(20,18,15,.24); }
+  .alm .mat { display: grid; grid-template-columns: repeat(12, 1fr); gap: 4px; margin-top: 16px; }
+  .alm .mat i { aspect-ratio: 1; background: rgba(20,18,15,.1); display: block; }
+  .alm .mat i.on { background: #14120f; }
+  .alm .mat i.cur { background: #a8341f; }
+  .alm .lbl { display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: .12em; color: #6d655a; margin-top: 8px; text-transform: uppercase; }
+  .alm .big { font-family: 'Newsreader'; font-weight: 300; font-size: 88px; line-height: .85; letter-spacing: -.04em; margin-top: 18px; }
+  .alm .cap2 { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: #6d655a; }
+  .alm .act { margin-top: auto; border-top: 2px solid #14120f; padding-top: 12px; display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
+
+  /* ---------- 6 · THE TALISMAN ---------- */
+  .talis { background: linear-gradient(180deg,#3a2550,#241637); color: #f4ecff; }
+  .talis .in { padding: 34px 30px 30px; height: 100%; display: flex; flex-direction: column; }
+  .talis .nm { font-family: 'Figtree'; font-weight: 600; font-size: 15px; color: rgba(244,236,255,.72); }
+  .talis .ring { margin: 40px auto 0; position: relative; width: 300px; height: 300px; }
+  .talis .disc { position: absolute; inset: 18px; border-radius: 50%;
+    background: radial-gradient(circle at 34% 26%, #6d4a94, #3d2456 62%, #2a1740);
+    box-shadow: inset 0 2px 0 rgba(255,255,255,.16), inset 0 -10px 24px rgba(0,0,0,.45), 0 18px 40px rgba(0,0,0,.4); }
+  .talis .centre { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .talis .big { font-family: 'Figtree'; font-weight: 800; font-size: 92px; line-height: .9; letter-spacing: -.05em; }
+  .talis .of { font-family: 'Figtree'; font-weight: 600; font-size: 12px; letter-spacing: .14em; color: rgba(244,236,255,.5); margin-top: 8px; }
+  .talis .mantra { text-align: center; font-size: 22px; margin-top: 30px; color: #efe2ff; }
+  .talis .key { margin-top: auto; height: 104px; border-radius: 26px;
+    background: linear-gradient(180deg,#b48cf0,#8b5ecf); color: #1e1030;
+    display: flex; align-items: center; justify-content: center; font-family: 'Figtree'; font-weight: 800; font-size: 17px;
+    box-shadow: 0 8px 0 #5b3a8c, 0 20px 34px rgba(0,0,0,.42), inset 0 2px 0 rgba(255,255,255,.5); }
+</style>
+</head>
+<body>
+<header>
+  <h1>MANTRINI — six candidates, key screen = Session</h1>
+  <p>412 × 892 dp Android. Same content in all six: Adya Mahakali, 47 of 108, 9:12, manual.
+     Rows 1–2 are picked for full builds; row 3 are the alternates.</p>
+</header>
+
+<div class="grid">
+
+  <!-- 1 -->
+  <div class="cell">
+    <div class="cap"><span class="n">01</span><span class="t">The Mala</span><span class="s">TE instrument</span></div>
+    <div class="phone mala">
+      <div class="scan">
+        <div class="top"><div class="tag">Adya Mahakali / Manual</div><div class="tick"></div></div>
+        <div class="ringwrap" data-ring="108" data-done="47" data-r="148" data-tick="#2a2c31" data-on="#e8a33d" data-w="2.5"></div>
+        <div class="centre" style="position:absolute;top:0;left:0;right:0;height:392px"></div>
+        <div class="devaline deva">ॐ आद्यायै नमः</div>
+        <div class="strip">
+          <div class="ro"><div class="k">Elapsed</div><div class="v">9:12</div></div>
+          <div class="ro"><div class="k">Mala</div><div class="v">01 / 01</div></div>
+          <div class="ro"><div class="k">Rate</div><div class="v">5.1/m</div></div>
+        </div>
+        <div class="key"><div class="l">Count</div><div class="r">tap</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2 -->
+  <div class="cell">
+    <div class="cap"><span class="n">02</span><span class="t">The Lamp</span><span class="s">Headspace × Endel</span></div>
+    <div class="phone lamp">
+      <div class="scan">
+        <div class="photo"><img src="assets/maha1.jpg" alt=""></div>
+        <div class="head"><div class="nm">Adya Mahakali</div><div class="el">9:12</div></div>
+        <div class="dots" data-dots="108" data-done="47"></div>
+        <div class="low">
+          <div class="mantra deva">ॐ आद्यायै नमः</div>
+          <div class="num"><span class="big">47</span><span class="sep">/</span><span class="tot">108</span></div>
+          <div class="hint">one mala · manual</div>
+          <div class="tap">Count chant</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3 -->
+  <div class="cell">
+    <div class="cap"><span class="n">03</span><span class="t">The Ledger</span><span class="s">editorial reader</span></div>
+    <div class="phone ledger">
+      <div class="scan">
+        <div class="top"><div class="l">Adya Mahakali</div><div class="r">manual · 9:12</div></div>
+        <div class="mid">
+          <div class="ring" data-ring="108" data-done="47" data-r="132" data-tick="#cfc6b6" data-on="#17130f" data-w="2"></div>
+          <div class="mantra deva">ॐ आद्यायै नमः</div>
+        </div>
+        <div class="foot">
+          <div class="rule"></div>
+          <div class="row"><span>47 of one mala</span><span>61 remaining</span></div>
+          <div class="act">Count</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4 -->
+  <div class="cell">
+    <div class="cap"><span class="n">04</span><span class="t">The Still Point</span><span class="s">Hara · 空</span></div>
+    <div class="phone still">
+      <div class="scan in">
+        <div class="dot"></div>
+        <div class="mantra deva">ॐ आद्यायै नमः</div>
+        <div class="ring" data-ring="108" data-done="47" data-r="103" data-tick="#ded8cd" data-on="#2b2723" data-w="1.5"></div>
+        <div class="hint">tap anywhere</div>
+        <div class="foot"><span>9:12</span><span>47 / 108</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5 -->
+  <div class="cell">
+    <div class="cap"><span class="n">05</span><span class="t">The Almanac</span><span class="s">east #12 dense</span></div>
+    <div class="phone alm">
+      <div class="scan in">
+        <div class="bar"><span>Adya Mahakali</span><span>Mala 01</span></div>
+        <div class="ttl">One hundred<br>and eight</div>
+        <div class="mantra deva">ॐ आद्यायै नमः</div>
+        <div class="mat" data-matrix="108" data-done="47"></div>
+        <div class="lbl"><span>bead 048</span><span>61 to go</span></div>
+        <div class="big">47</div>
+        <div class="cap2">chants · 9:12 elapsed · manual</div>
+        <div class="act"><span>Count</span><span>tap</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6 -->
+  <div class="cell">
+    <div class="cap"><span class="n">06</span><span class="t">The Talisman</span><span class="s">Not Boring tactile</span></div>
+    <div class="phone talis">
+      <div class="scan in">
+        <div class="nm">Adya Mahakali</div>
+        <div class="ring"><div class="disc"></div>
+          <div class="centre"><div class="big">47</div><div class="of">OF 108</div></div></div>
+        <div class="mantra deva">ॐ आद्यायै नमः</div>
+        <div class="key">Count</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // Build the 108-tick mala ring inside [data-ring].
+  document.querySelectorAll('[data-ring]').forEach((el) => {
+    const total = Number(el.dataset.ring);
+    const done = Number(el.dataset.done);
+    const r = Number(el.dataset.r);
+    const w = Number(el.dataset.w);
+    const box = r * 2 + 26;
+    const c = box / 2;
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('width', box);
+    svg.setAttribute('height', box);
+    svg.setAttribute('viewBox', `0 0 ${box} ${box}`);
+    el.style.width = box + 'px';
+    el.style.height = box + 'px';
+    el.style.position = 'relative';
+    for (let i = 0; i < total; i += 1) {
+      const a = (i / total) * Math.PI * 2 - Math.PI / 2;
+      const inner = r;
+      const outer = r + (i % 9 === 0 ? 13 : 7);
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('x1', c + Math.cos(a) * inner);
+      line.setAttribute('y1', c + Math.sin(a) * inner);
+      line.setAttribute('x2', c + Math.cos(a) * outer);
+      line.setAttribute('y2', c + Math.sin(a) * outer);
+      line.setAttribute('stroke', i < done ? el.dataset.on : el.dataset.tick);
+      line.setAttribute('stroke-width', i % 9 === 0 ? w * 1.5 : w);
+      line.setAttribute('stroke-linecap', 'round');
+      svg.appendChild(line);
+      if (i === done - 1) {
+        const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        dot.setAttribute('cx', c + Math.cos(a) * (r - 9));
+        dot.setAttribute('cy', c + Math.sin(a) * (r - 9));
+        dot.setAttribute('r', 3.4);
+        dot.setAttribute('fill', el.dataset.on);
+        dot.dataset.cur = '1';
+        svg.appendChild(dot);
+      }
+    }
+    el.appendChild(svg);
+    const centre = document.createElement('div');
+    centre.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column';
+    el.appendChild(centre);
+  });
+
+  // The Mala: numerals live in the ring centre.
+  (() => {
+    const ring = document.querySelector('.mala .ringwrap');
+    if (!ring) return;
+    const centre = ring.querySelector('div');
+    centre.innerHTML = '<div class="count">47</div><div class="of">OF 108 · MALA 01</div>';
+    ring.style.display = 'grid';
+    ring.style.placeItems = 'center';
+  })();
+
+  // The Ledger / Still Point: numerals inside the ring.
+  document.querySelectorAll('.ledger .ring, .still .ring').forEach((ring) => {
+    const centre = ring.querySelector('div');
+    if (ring.closest('.ledger')) {
+      centre.innerHTML = '<div class="big">47</div><div class="meta">of 108</div>';
+    } else {
+      centre.innerHTML = '<div class="big">47</div>';
+    }
+  });
+
+  // The Lamp: 108 dots, 47 lit.
+  document.querySelectorAll('[data-dots]').forEach((el) => {
+    const total = Number(el.dataset.dots);
+    const done = Number(el.dataset.done);
+    for (let i = 0; i < total; i += 1) {
+      const dot = document.createElement('i');
+      if (i < done) dot.className = 'on';
+      el.appendChild(dot);
+    }
+  });
+
+  // The Almanac: 108 beads in a 12 × 9 matrix.
+  document.querySelectorAll('[data-matrix]').forEach((el) => {
+    const total = Number(el.dataset.matrix);
+    const done = Number(el.dataset.done);
+    for (let i = 0; i < total; i += 1) {
+      const cell = document.createElement('i');
+      if (i < done) cell.className = 'on';
+      if (i === done - 1) cell.className = 'cur';
+      el.appendChild(cell);
+    }
+  });
+</script>
+</body>
+</html>

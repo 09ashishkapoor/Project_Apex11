@@ -1,0 +1,271 @@
+/* ============================================================
+   SPLASH — darshan, brand, dedication.
+
+   The old app blocked every cold start behind a 2.8 s dedication card.
+   This is the same content, but it is the real boot screen: it lives
+   only while the database opens, plus a short minimum so it reads as a
+   brand moment rather than a flicker, and it dismisses on tap.
+   ============================================================ */
+
+.splash {
+  position: relative;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 0;
+  padding: calc(34px + var(--safe-top)) 30px calc(26px + var(--safe-bottom));
+  /* The room before the lamp is lit: the brand's temple gradient, with the
+     maroons carrying the colour rather than a warm brown wash. */
+  background:
+    radial-gradient(64% 38% at 50% 30%, rgba(139, 38, 53, 0.26), transparent 74%),
+    radial-gradient(120% 62% at 50% 106%, rgba(74, 14, 23, 0.55), transparent 76%),
+    var(--brand-temple-gradient);
+  overflow: hidden;
+  text-align: center;
+}
+
+/* The lamplight: a warm wash that rises from behind the trikoṇa. */
+.splash__glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 950ms cubic-bezier(0.4, 0, 0.2, 1);
+  background:
+    radial-gradient(52% 30% at 50% 30%, rgba(232, 196, 104, 0.1), transparent 72%),
+    radial-gradient(90% 46% at 50% 66%, rgba(139, 38, 53, 0.22), transparent 74%),
+    radial-gradient(120% 62% at 50% 108%, rgba(74, 14, 23, 0.5), transparent 76%);
+}
+
+.splash.is-lit .splash__glow {
+  opacity: 1;
+}
+
+/* A faint grain, so the ground is a surface rather than a flat fill. */
+.splash__grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: var(--noise);
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+}
+
+.splash__body {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 700ms ease,
+    transform 820ms cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+.splash.is-lit .splash__body {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ---------------------------------------------------------- trikoṇa */
+
+.splash__yantra {
+  position: relative;
+  width: min(62vw, 268px);
+  aspect-ratio: 280 / 244;
+  margin-bottom: 26px;
+}
+
+/* warm halo behind the gold edge */
+.splash__yantra::before {
+  content: '';
+  position: absolute;
+  inset: -18%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(232, 196, 104, 0.22), transparent 68%);
+  opacity: 0;
+  transition: opacity 1100ms ease 200ms;
+  pointer-events: none;
+}
+
+.splash.is-lit .splash__yantra::before {
+  opacity: 1;
+}
+
+.splash__yantra-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform: scale(0.94);
+  opacity: 0;
+  transition:
+    opacity 760ms ease 60ms,
+    transform 1000ms cubic-bezier(0.2, 0.9, 0.3, 1) 60ms;
+  filter: drop-shadow(0 12px 30px rgba(0, 0, 0, 0.55)) drop-shadow(0 0 14px rgba(232, 196, 104, 0.16));
+}
+
+.splash.is-lit .splash__yantra-svg {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ------------------------------------------------------------- brand */
+
+.splash__word {
+  margin: 0;
+  font-family: var(--fig);
+  font-size: clamp(25px, 7.2vw, 32px);
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  /* letter-spacing adds trailing space after the last glyph; pull it back */
+  text-indent: 0.3em;
+  color: #fdf5e8;
+  line-height: 1;
+}
+
+.splash__tagline {
+  margin: 13px 0 0;
+  font-size: 14.5px;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  color: var(--cream-2);
+  max-width: 17em;
+}
+
+.splash__dedication {
+  margin-top: 34px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+.splash__dedication-label {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(240, 220, 200, 0.54);
+}
+
+.splash__dedication-name {
+  margin: 11px 0 0;
+  font-size: clamp(17px, 4.5vw, 20px);
+  font-weight: 500;
+  line-height: 1.28;
+  letter-spacing: -0.01em;
+  color: var(--accent-2);
+  max-width: 15em;
+}
+
+.splash__dedication-and {
+  margin: 8px 0 0;
+  font-size: 12.5px;
+  font-style: italic;
+  color: rgba(240, 220, 200, 0.55);
+}
+
+.splash__dedication-sub {
+  margin: 8px 0 0;
+  font-size: clamp(14px, 3.8vw, 16px);
+  font-weight: 400;
+  line-height: 1.34;
+  color: var(--cream-2);
+  max-width: 17em;
+}
+
+/* -------------------------------------------------------------- foot */
+
+.splash__foot {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(26px + var(--safe-bottom));
+  display: flex;
+  justify-content: center;
+}
+
+.splash__continue {
+  min-height: 48px;
+  padding: 0 22px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--cream-2);
+  transition:
+    color 0.2s ease,
+    background 0.2s ease;
+  animation: splash-in 480ms ease 360ms both;
+}
+
+.splash__continue:hover {
+  color: #fdf5e8;
+  background: rgba(240, 220, 200, 0.07);
+}
+
+.splash__waiting {
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(240, 220, 200, 0.46);
+  animation: splash-in 400ms ease both;
+}
+
+@keyframes splash-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Short phones: shrink the darshan so the dedication never crowds the fold. */
+@media (max-height: 740px) {
+  .splash__yantra {
+    width: min(46vw, 196px);
+    margin-bottom: 18px;
+  }
+
+  .splash__dedication {
+    margin-top: 22px;
+  }
+}
+
+@media (max-height: 640px) {
+  .splash__yantra {
+    width: min(34vw, 148px);
+    margin-bottom: 12px;
+  }
+
+  .splash__dedication {
+    margin-top: 16px;
+  }
+
+  .splash__tagline {
+    font-size: 13.5px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .splash__glow,
+  .splash__body,
+  .splash__yantra::before,
+  .splash__yantra-svg {
+    transition-duration: 1ms;
+    transition-delay: 0ms;
+  }
+
+  .splash__continue,
+  .splash__waiting {
+    animation: none;
+  }
+}

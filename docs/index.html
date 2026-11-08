@@ -1,918 +1,694 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MANTRINI | Offline Japa Counter for Web and Android</title>
-    <meta
-      name="description"
-      content="Use MANTRINI in your browser or download the Android APK. A private Japa counter with local history, guided counting modes, and no accounts or telemetry."
-    >
-    <link rel="canonical" href="https://mantrini.jaikhyapaparampara.com/">
-    <meta property="og:title" content="MANTRINI | Japa Counter for Web and Android">
-    <meta property="og:description" content="A private Japa companion. Open the web app or download the official Android APK.">
-    <meta property="og:url" content="https://mantrini.jaikhyapaparampara.com/">
-    <meta property="og:type" content="website">
-    <meta property="og:image" content="https://mantrini.jaikhyapaparampara.com/app-intro.jpg">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    >
-    <style>
-      :root {
-        --bg: #090304;
-        --bg-soft: #15070b;
-        --panel: rgba(24, 10, 15, 0.82);
-        --panel-strong: rgba(18, 7, 10, 0.92);
-        --panel-glass: rgba(255, 248, 240, 0.04);
-        --line: rgba(214, 173, 86, 0.2);
-        --line-strong: rgba(232, 196, 104, 0.45);
-        --gold: #e8c468;
-        --gold-deep: #b88a32;
-        --ink: #fff9f1;
-        --text: #f0dcc8;
-        --muted: #ccb8a4;
-        --maroon: #8b2635;
-        --rose: #5c1620;
-        --shadow: 0 24px 80px rgba(0, 0, 0, 0.38);
-        --shadow-soft: 0 18px 50px rgba(0, 0, 0, 0.24);
-        --max-width: 1180px;
-      }
-
-      * {
-        box-sizing: border-box;
-      }
-
-      html {
-        scroll-behavior: smooth;
-      }
-
-      body {
-        margin: 0;
-        min-width: 320px;
-        color: var(--text);
-        font-family: "Manrope", sans-serif;
-        line-height: 1.6;
-        background:
-          radial-gradient(circle at 15% 18%, rgba(232, 196, 104, 0.14), transparent 0 22%),
-          radial-gradient(circle at 86% 12%, rgba(139, 38, 53, 0.28), transparent 0 30%),
-          radial-gradient(circle at 50% 40%, rgba(232, 196, 104, 0.05), transparent 0 34%),
-          linear-gradient(180deg, #1a0910 0%, var(--bg) 28%, #050102 100%);
-      }
-
-      body::before {
-        content: "";
-        position: fixed;
-        inset: 0;
-        pointer-events: none;
-        background-image:
-          linear-gradient(rgba(255, 248, 240, 0.02) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(255, 248, 240, 0.02) 1px, transparent 1px);
-        background-size: 80px 80px;
-        mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.34), transparent 82%);
-      }
-
-      img {
-        display: block;
-        max-width: 100%;
-      }
-
-      a {
-        color: inherit;
-      }
-
-      a:focus-visible,
-      button:focus-visible {
-        outline: 3px solid var(--gold);
-        outline-offset: 4px;
-        border-radius: 14px;
-      }
-
-      .skip-link {
-        position: absolute;
-        left: 16px;
-        top: -52px;
-        padding: 12px 16px;
-        color: #140709;
-        background: var(--gold);
-        font-weight: 800;
-        z-index: 1000;
-      }
-
-      .skip-link:focus {
-        top: 16px;
-      }
-
-      .site-header,
-      main,
-      .site-footer {
-        width: min(calc(100% - 32px), var(--max-width));
-        margin: 0 auto;
-      }
-
-      .site-header {
-        padding: 18px 0 8px;
-      }
-
-      .masthead {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 16px;
-        padding: 16px 18px;
-        border: 1px solid var(--line);
-        border-radius: 24px;
-        background: rgba(12, 4, 6, 0.68);
-        backdrop-filter: blur(14px);
-        box-shadow: var(--shadow-soft);
-      }
-
-      .brand-lockup {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-      }
-
-      .brand-kicker,
-      .section-kicker,
-      .pill {
-        text-transform: uppercase;
-        letter-spacing: 0.22em;
-        font-size: 0.75rem;
-        color: var(--gold);
-      }
-
-      .brand-name,
-      h1,
-      h2,
-      h3 {
-        margin: 0;
-        color: var(--ink);
-        font-family: "Cormorant Garamond", serif;
-        line-height: 1.05;
-      }
-
-      .brand-name {
-        font-size: clamp(1.7rem, 3vw, 2.3rem);
-        letter-spacing: 0.08em;
-      }
-
-      .top-nav {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        justify-content: flex-end;
-      }
-
-      .top-nav a {
-        text-decoration: none;
-        padding: 11px 16px;
-        border: 1px solid var(--line);
-        border-radius: 999px;
-        background: rgba(255, 248, 240, 0.03);
-        transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
-      }
-
-      .top-nav a:hover {
-        transform: translateY(-1px);
-        border-color: var(--line-strong);
-        background: rgba(255, 248, 240, 0.07);
-      }
-
-      .hero {
-        position: relative;
-        padding: 30px 0 28px;
-      }
-
-      .intro-visual {
-        margin-bottom: 26px;
-        padding: 14px;
-        border: 1px solid var(--line);
-        border-radius: 30px;
-        background:
-          linear-gradient(180deg, rgba(255, 248, 240, 0.04), transparent 28%),
-          linear-gradient(180deg, rgba(31, 11, 17, 0.96), rgba(11, 4, 6, 0.98));
-        box-shadow: var(--shadow);
-      }
-
-      .intro-visual img {
-        width: 100%;
-        border-radius: 22px;
-        border: 1px solid rgba(232, 196, 104, 0.16);
-        box-shadow: 0 20px 48px rgba(0, 0, 0, 0.24);
-      }
-
-      .hero-grid {
-        display: grid;
-        grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
-        gap: 28px;
-        align-items: stretch;
-      }
-
-      .hero-copy,
-      .download-card,
-      .section-panel,
-      .trust-grid article,
-      .feature-card,
-      .flow-step,
-      .footer-panel {
-        position: relative;
-        overflow: hidden;
-        border: 1px solid var(--line);
-        border-radius: 28px;
-        background:
-          linear-gradient(180deg, rgba(255, 248, 240, 0.04), transparent 28%),
-          linear-gradient(180deg, rgba(31, 11, 17, 0.96), rgba(11, 4, 6, 0.98));
-        box-shadow: var(--shadow-soft);
-      }
-
-      .hero-copy {
-        padding: clamp(26px, 4vw, 44px);
-      }
-
-      .hero-copy::before,
-      .download-card::before,
-      .section-panel::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        pointer-events: none;
-        background: radial-gradient(circle at top right, rgba(232, 196, 104, 0.12), transparent 0 36%);
-      }
-
-      .hero-copy h1 {
-        font-size: clamp(3.2rem, 7vw, 6rem);
-        letter-spacing: 0.03em;
-        text-transform: uppercase;
-        max-width: 9ch;
-      }
-
-      .hero-copy .lead {
-        margin: 18px 0 0;
-        max-width: 58ch;
-        font-size: 1.08rem;
-        color: var(--text);
-      }
-
-      .hero-copy .sublead {
-        margin: 14px 0 0;
-        max-width: 58ch;
-        color: var(--muted);
-      }
-
-      .hero-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 14px;
-        margin-top: 28px;
-      }
-
-      .button,
-      .button-secondary {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 54px;
-        padding: 14px 20px;
-        border-radius: 16px;
-        font-weight: 800;
-        text-decoration: none;
-        transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
-      }
-
-      .button {
-        color: #150609;
-        background: linear-gradient(180deg, #f0cf7d 0%, var(--gold-deep) 100%);
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.38), 0 16px 34px rgba(184, 138, 50, 0.24);
-      }
-
-      .button-secondary {
-        color: var(--ink);
-        border: 1px solid var(--line-strong);
-        background: rgba(255, 248, 240, 0.04);
-      }
-
-      .button:hover,
-      .button-secondary:hover {
-        transform: translateY(-2px);
-      }
-
-      .hero-stats {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 14px;
-        margin-top: 32px;
-      }
-
-      .stat-card {
-        padding: 18px;
-        border-radius: 20px;
-        border: 1px solid rgba(232, 196, 104, 0.14);
-        background:
-          linear-gradient(180deg, rgba(255, 248, 240, 0.03), transparent),
-          rgba(92, 22, 32, 0.38);
-      }
-
-      .stat-card strong {
-        display: block;
-        margin-bottom: 6px;
-        color: var(--ink);
-        font-size: 1.1rem;
-      }
-
-      .download-card {
-        padding: clamp(24px, 3vw, 34px);
-        border-color: var(--line-strong);
-        box-shadow: var(--shadow);
-      }
-
-      .download-card h2 {
-        font-size: clamp(2.2rem, 4vw, 3.4rem);
-      }
-
-      .download-copy {
-        margin: 14px 0 20px;
-        color: var(--muted);
-      }
-
-      .download-badge {
-        display: inline-flex;
-        margin-bottom: 22px;
-      }
-
-      .download-badge img {
-        height: 34px;
-      }
-
-      .download-actions {
-        display: grid;
-        gap: 12px;
-      }
-
-      .device-note {
-        margin-top: 18px;
-        padding: 16px 18px;
-        border: 1px solid rgba(232, 196, 104, 0.14);
-        border-radius: 18px;
-        background: rgba(255, 248, 240, 0.03);
-        color: var(--muted);
-      }
-
-      .qr-card {
-        display: grid;
-        grid-template-columns: 146px minmax(0, 1fr);
-        gap: 18px;
-        margin-top: 22px;
-        padding: 18px;
-        border-radius: 22px;
-        border: 1px solid rgba(232, 196, 104, 0.14);
-        background: rgba(8, 2, 4, 0.52);
-      }
-
-      .qr-card img {
-        width: 146px;
-        aspect-ratio: 1;
-        object-fit: cover;
-        border-radius: 18px;
-        padding: 10px;
-        background: #fff8f0;
-      }
-
-      .section {
-        padding: 28px 0;
-      }
-
-      .section-heading {
-        display: grid;
-        gap: 10px;
-        margin-bottom: 18px;
-      }
-
-      .section-heading h2 {
-        font-size: clamp(2.1rem, 4vw, 3.3rem);
-      }
-
-      .section-heading p {
-        margin: 0;
-        max-width: 62ch;
-        color: var(--muted);
-      }
-
-      .section-panel {
-        padding: 28px;
-      }
-
-      .flow-grid,
-      .feature-grid,
-      .trust-grid,
-      .screenshot-grid {
-        display: grid;
-        gap: 18px;
-      }
-
-      .flow-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
-
-      .feature-grid {
-        grid-template-columns: 1.1fr 0.9fr;
-      }
-
-      .feature-column {
-        display: grid;
-        gap: 18px;
-      }
-
-      .feature-card {
-        padding: 24px;
-      }
-
-      .feature-card p,
-      .trust-grid p,
-      .flow-step p,
-      .section-panel p,
-      .section-panel li,
-      .footer-panel p {
-        color: var(--muted);
-      }
-
-      .feature-list,
-      .install-notes {
-        margin: 0;
-        padding-left: 1.1rem;
-      }
-
-      .feature-list li + li,
-      .install-notes li + li {
-        margin-top: 8px;
-      }
-
-      .ritual-strip {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 12px;
-        margin-top: 22px;
-      }
-
-      .pill {
-        padding: 12px 14px;
-        border: 1px solid rgba(232, 196, 104, 0.14);
-        border-radius: 999px;
-        background: rgba(255, 248, 240, 0.03);
-        text-align: center;
-      }
-
-      .flow-step {
-        padding: 22px 20px 20px;
-      }
-
-      .flow-index {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 42px;
-        height: 42px;
-        margin-bottom: 16px;
-        border-radius: 50%;
-        border: 1px solid rgba(232, 196, 104, 0.28);
-        background: rgba(232, 196, 104, 0.1);
-        color: var(--gold);
-        font-weight: 800;
-      }
-
-      .trust-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
-
-      .screenshot-grid {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-      }
-
-      .screenshot-card {
-        padding: 14px;
-      }
-
-      .screenshot-card img {
-        width: 100%;
-        border-radius: 20px;
-        border: 1px solid rgba(232, 196, 104, 0.14);
-        box-shadow: 0 16px 34px rgba(0, 0, 0, 0.24);
-      }
-
-      .screenshot-label {
-        margin: 0 0 12px;
-        font-size: 0.82rem;
-        letter-spacing: 0.18em;
-        text-transform: uppercase;
-        color: var(--gold);
-      }
-
-      .trust-grid article {
-        padding: 24px;
-      }
-
-      .callout {
-        margin-top: 20px;
-        padding: 18px 20px;
-        border-left: 3px solid var(--gold);
-        border-radius: 16px;
-        background: rgba(255, 248, 240, 0.03);
-        color: var(--ink);
-      }
-
-      .footer-panel {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        gap: 16px;
-        padding: 22px 24px 34px;
-      }
-
-      .footer-links {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 14px;
-      }
-
-      .footer-links a {
-        text-decoration: none;
-        color: var(--gold);
-      }
-
-      @media (max-width: 1024px) {
-        .hero-grid,
-        .feature-grid,
-        .flow-grid,
-        .trust-grid,
-        .ritual-strip {
-          grid-template-columns: 1fr;
-        }
-
-        .screenshot-grid {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-
-        .hero-copy h1 {
-          max-width: none;
-        }
-      }
-
-      @media (max-width: 720px) {
-        .site-header,
-        main,
-        .site-footer {
-          width: min(calc(100% - 20px), var(--max-width));
-        }
-
-        .masthead,
-        .top-nav,
-        .footer-panel {
-          flex-direction: column;
-          align-items: stretch;
-        }
-
-        .top-nav {
-          justify-content: stretch;
-        }
-
-        .top-nav a {
-          text-align: center;
-        }
-
-        .hero {
-          padding-top: 22px;
-        }
-
-        .hero-copy,
-        .download-card,
-        .section-panel,
-        .feature-card,
-        .trust-grid article,
-        .flow-step,
-        .intro-visual,
-        .footer-panel {
-          border-radius: 22px;
-        }
-
-        .hero-stats {
-          grid-template-columns: 1fr;
-        }
-
-        .qr-card {
-          grid-template-columns: 1fr;
-          justify-items: center;
-          text-align: center;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <a class="skip-link" href="#main-content">Skip to main content</a>
-
-    <header class="site-header">
-      <div class="masthead">
-        <div class="brand-lockup">
-          <div class="brand-kicker">Private Japa Companion</div>
-          <div class="brand-name">MANTRINI</div>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MANTRINI — Offline Japa Counter | Jai Khyapa Parampara</title>
+<meta name="description" content="A respectful, offline japa counter for the Khyapa Parampara. Four altars, 108 beads, four ways to count. No account, no tracking, and nothing leaves your device.">
+<link rel="canonical" href="https://mantrini.jaikhyapaparampara.com/">
+<meta name="theme-color" content="#0D0506">
+<meta name="color-scheme" content="dark">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Jai Khyapa Parampara">
+<meta property="og:title" content="MANTRINI — Offline Japa Counter">
+<meta property="og:description" content="Four altars, 108 beads, four ways to count. Works offline, no account, nothing leaves your device.">
+<meta property="og:url" content="https://mantrini.jaikhyapaparampara.com/">
+<meta property="og:image" content="https://mantrini.jaikhyapaparampara.com/assets/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="icon" href="assets/mark.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/mark-180.png">
+
+<link rel="preload" href="assets/fonts/philosopher-latin-normal-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/crimson-text-latin-normal-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/altars/adya-mahakali.jpg" as="image">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "MANTRINI",
+  "applicationCategory": "LifestyleApplication",
+  "operatingSystem": "Any device with a modern browser",
+  "url": "https://mantrini.jaikhyapaparampara.com/app/",
+  "description": "A respectful, offline japa counter. Four altars, 108 beads, four ways to count. No account, no tracking, nothing leaves your device.",
+  "isAccessibleForFree": true,
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "INR" },
+  "publisher": { "@type": "Organization", "name": "Jai Khyapa Parampara", "url": "https://jaikhyapaparampara.com/" }
+}
+</script>
+
+<style>
+/* ============================================================
+   MANTRINI landing
+   Palette + type lifted from jaikhyapaparampara.com/styles.css so the
+   page and the app are the same room.
+   ============================================================ */
+
+@font-face{font-family:'Philosopher';font-style:normal;font-weight:400;font-display:swap;
+  src:url('assets/fonts/philosopher-latin-normal-400.woff2') format('woff2')}
+@font-face{font-family:'Philosopher';font-style:normal;font-weight:700;font-display:swap;
+  src:url('assets/fonts/philosopher-latin-normal-700.woff2') format('woff2')}
+@font-face{font-family:'Crimson Text';font-style:normal;font-weight:400;font-display:swap;
+  src:url('assets/fonts/crimson-text-latin-normal-400.woff2') format('woff2')}
+@font-face{font-family:'Crimson Text';font-style:normal;font-weight:600;font-display:swap;
+  src:url('assets/fonts/crimson-text-latin-normal-600.woff2') format('woff2')}
+@font-face{font-family:'Crimson Text';font-style:italic;font-weight:400;font-display:swap;
+  src:url('assets/fonts/crimson-text-latin-italic-400.woff2') format('woff2')}
+@font-face{font-family:'Noto Sans Devanagari';font-style:normal;font-weight:400 600;font-display:swap;
+  src:url('assets/fonts/noto-sans-devanagari-devanagari-normal-400600.woff2') format('woff2')}
+
+:root{
+  --void:#0D0506;
+  --shadow:#1F0B11;
+  --burgundy:#180A0F;
+  --temple:#2D0F18;
+  --maroon:#8B2635;
+  --wine:#4A0E17;
+  --gold:#C9A962;
+  --gold-soft:#E8C468;
+  --candle:#F4E4C1;
+  --parchment:#F0DCC8;
+  --white:#FFF8F0;
+
+  --cream-2:rgba(240,220,200,.86);
+  --cream-3:rgba(240,220,200,.72);
+  --rule:rgba(232,196,104,.16);
+  --rule-soft:rgba(232,196,104,.10);
+
+  --display:'Philosopher',Georgia,serif;
+  --body:'Crimson Text',Georgia,'Times New Roman',serif;
+  --deva:'Noto Sans Devanagari','Nirmala UI','Mangal',serif;
+
+  --page:min(1220px,100vw - 48px);
+  --noise:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;overflow-x:clip}
+body{
+  margin:0;
+  background:var(--void);
+  color:var(--parchment);
+  font-family:var(--body);
+  font-size:18px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:clip;
+}
+/* the temple: a warm wash from above, a maroon floor, and a little grain */
+body::before{
+  content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;
+  background:
+    radial-gradient(120% 62% at 50% -6%, rgba(232,196,104,.10), transparent 58%),
+    radial-gradient(90% 50% at 50% 108%, rgba(74,14,23,.55), transparent 72%),
+    radial-gradient(ellipse at top, #2D0F18 0%, #1F0B11 46%, #0D0506 100%);
+}
+body::after{
+  content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background-image:var(--noise);opacity:.035;mix-blend-mode:overlay;
+}
+
+a{color:inherit}
+img{display:block;max-width:100%}
+h1,h2,h3,p,ul{margin:0}
+ul{list-style:none;padding:0}
+
+.wrap{width:var(--page);margin-inline:auto}
+.deva{font-family:var(--deva);font-weight:500}
+
+:focus-visible{outline:2px solid var(--gold-soft);outline-offset:3px;border-radius:4px}
+
+.skip{position:absolute;left:-9999px}
+.skip:focus{left:16px;top:16px;z-index:100;background:var(--burgundy);padding:12px 18px;border-radius:10px;border:1px solid var(--gold)}
+
+/* ------------------------------------------------------------ header */
+
+.site-head{
+  position:sticky;top:0;z-index:50;
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  background:linear-gradient(180deg, rgba(13,5,6,.86), rgba(13,5,6,.55));
+  border-bottom:1px solid var(--rule-soft);
+}
+.site-head__in{
+  width:var(--page);margin-inline:auto;
+  display:flex;align-items:center;gap:18px;
+  min-height:72px;
+}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--candle)}
+.brand svg{width:26px;height:23px;display:block}
+.brand b{
+  font-family:var(--display);font-weight:700;font-size:19px;
+  letter-spacing:.22em;text-indent:.22em;color:var(--white);
+}
+.site-nav{margin-left:auto;display:flex;align-items:center;gap:6px}
+.site-nav a{
+  text-decoration:none;font-size:16px;color:var(--cream-3);
+  padding:12px 14px;border-radius:999px;transition:color .2s, background .2s;
+}
+.site-nav a:hover{color:var(--white);background:rgba(232,196,104,.08)}
+.site-nav .ext{color:var(--gold-soft)}
+@media (max-width:820px){ .site-nav a:not(.header-cta){display:none} }
+.header-cta{
+  border:1px solid rgba(232,196,104,.42);color:var(--gold-soft)!important;
+  padding:11px 18px!important;white-space:nowrap;
+}
+@media (max-width:420px){
+  .site-head__in{min-height:64px;gap:10px}
+  .brand b{font-size:16px;letter-spacing:.16em;text-indent:.16em}
+  .brand svg{width:22px;height:20px}
+  .header-cta{padding:10px 14px!important;font-size:15px}
+}
+
+/* -------------------------------------------------------------- hero */
+
+.hero{
+  position:relative;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,.82fr);
+  align-items:center;
+  gap:clamp(28px,5vw,72px);
+  padding:clamp(40px,5.5vw,80px) 0 clamp(28px,3.6vw,44px);
+}
+@media (max-width:900px){ .hero{grid-template-columns:1fr;padding-top:40px;gap:40px} }
+
+.eyebrow{
+  font-family:var(--body);font-size:13px;font-weight:600;
+  letter-spacing:.28em;text-transform:uppercase;color:var(--gold);
+}
+.hero h1{
+  font-family:var(--display);font-weight:400;
+  /* min 44px: at 56px the wordmark filled a 320px screen edge to edge */
+  font-size:clamp(44px,14.4vw,116px);
+  line-height:.92;letter-spacing:.06em;
+  margin:18px 0 0;text-indent:.06em;
+  color:var(--white);
+}
+.hero h1 em{font-style:normal;color:var(--gold-soft);font-weight:700}
+.hero .lede{
+  margin-top:22px;max-width:31ch;
+  font-size:clamp(19px,2.4vw,23px);line-height:1.5;color:var(--cream-2);
+}
+.hero .lede b{font-weight:600;color:var(--white)}
+.actions{display:flex;flex-wrap:wrap;align-items:center;gap:18px;margin-top:36px}
+.button{
+  display:inline-flex;align-items:center;gap:10px;
+  min-height:60px;padding:0 32px;border-radius:999px;
+  font-family:var(--display);font-weight:700;font-size:19px;letter-spacing:.02em;
+  color:#2A1708;text-decoration:none;
+  background:linear-gradient(180deg,#F4E4C1 0%,#E8C468 55%,#C9A962 100%);
+  box-shadow:0 12px 30px rgba(201,169,98,.22), inset 0 1px 0 rgba(255,248,240,.6);
+  transition:transform .14s ease, box-shadow .2s ease;
+}
+.button:hover{transform:translateY(-1px);box-shadow:0 16px 36px rgba(201,169,98,.3), inset 0 1px 0 rgba(255,248,240,.65)}
+.button:active{transform:scale(.985)}
+.button svg{width:16px;height:16px}
+.quiet-link{
+  font-size:17px;color:var(--cream-3);text-decoration:none;
+  border-bottom:1px solid rgba(232,196,104,.32);padding-bottom:2px;
+}
+.quiet-link:hover{color:var(--white);border-color:var(--gold)}
+.trust{
+  display:flex;flex-wrap:wrap;gap:10px 22px;margin-top:34px;
+  font-size:15px;color:var(--cream-3);letter-spacing:.01em;
+}
+.trust li{display:flex;align-items:center;gap:9px}
+.trust li::before{
+  content:"";width:5px;height:5px;border-radius:50%;
+  background:var(--gold-soft);opacity:.8;flex:0 0 auto;
+}
+
+/* the trikoṇa — the same mark as the app icon and opening screen */
+.yantra{
+  position:relative;
+  width:min(100%,460px);margin-inline:auto;
+  aspect-ratio:280/244;
+  filter:drop-shadow(0 26px 60px rgba(0,0,0,.6));
+}
+/* The halo deliberately bleeds past the mark, but the bleed has to stay inside
+   the column or it becomes horizontal scroll on phones. A percentage inset
+   overflowed at every width under ~1000px; a capped one cannot. */
+.yantra::before{
+  content:"";position:absolute;
+  inset:calc(-1 * min(16%, 54px));
+  background:radial-gradient(circle, rgba(232,196,104,.20), transparent 66%);
+  pointer-events:none;
+}
+.yantra svg{position:relative;display:block;width:100%;height:100%}
+
+/* ---------------------------------------------------------- sections */
+
+section{position:relative}
+.divider{
+  display:flex;align-items:baseline;gap:18px;flex-wrap:wrap;
+  border-top:1px solid var(--rule);padding-top:22px;
+}
+@media (max-width:640px){
+  .divider{gap:4px}
+  .divider span{margin-left:0;width:100%}
+}
+.divider b{
+  font-family:var(--body);font-size:13px;font-weight:600;letter-spacing:.24em;
+  text-transform:uppercase;color:var(--gold);
+}
+.divider span{
+  margin-left:auto;font-size:15px;font-style:italic;color:var(--cream-3);
+}
+
+.showcase{padding:clamp(34px,4.2vw,62px) 0}
+.showcase h2{
+  font-family:var(--display);font-weight:400;
+  font-size:clamp(32px,5vw,52px);line-height:1.08;letter-spacing:-.01em;
+  color:var(--white);margin-top:26px;max-width:22ch;
+}
+.showcase h2 em{font-style:normal;color:var(--gold-soft);font-weight:700}
+.showcase > .lede{margin-top:16px;max-width:52ch;font-size:18px;color:var(--cream-2)}
+
+.pillars{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:0;margin-top:clamp(36px,5vw,58px);
+  border-top:1px solid var(--rule);
+}
+@media (max-width:820px){ .pillars{grid-template-columns:1fr} }
+.pillar{padding:34px 34px 34px 0}
+.pillar + .pillar{padding-left:34px;border-left:1px solid var(--rule-soft)}
+@media (max-width:820px){
+  .pillar{padding:28px 0}
+  .pillar + .pillar{border-left:0;border-top:1px solid var(--rule-soft);padding-left:0}
+}
+.pillar h3{
+  font-family:var(--display);font-weight:700;font-size:22px;
+  letter-spacing:.01em;color:var(--candle);margin-bottom:10px;
+}
+/* keep the measure readable when the columns collapse to one on tablet */
+.pillar p{font-size:17px;line-height:1.6;color:var(--cream-2);max-width:42ch}
+
+/* ----------------------------------------------------------- altars */
+
+.altars{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:clamp(10px,1.6vw,20px);
+  margin-top:clamp(36px,5vw,54px);
+}
+@media (max-width:900px){ .altars{grid-template-columns:repeat(2,minmax(0,1fr))} }
+.altar{
+  position:relative;display:block;
+  aspect-ratio:3/4;border-radius:10px;overflow:hidden;
+  border:1px solid rgba(232,196,104,.18);
+  text-decoration:none;color:inherit;
+  background:var(--temple);
+}
+.altar img{
+  width:100%;height:100%;object-fit:cover;object-position:50% 18%;
+  transition:transform .6s cubic-bezier(.2,.8,.3,1);
+}
+.altar:hover img{transform:scale(1.04)}
+.altar__veil{
+  position:absolute;inset:0;
+  background:linear-gradient(180deg, rgba(13,5,6,0) 34%, rgba(13,5,6,.72) 62%, rgba(13,5,6,.96) 100%);
+}
+.altar__text{position:absolute;left:0;right:0;bottom:0;padding:16px 15px 18px}
+.altar__name{
+  font-family:var(--display);font-weight:700;font-size:17px;
+  line-height:1.2;color:var(--white);
+}
+.altar__mantra{font-family:var(--deva);font-size:15px;line-height:1.45;color:var(--candle);margin-top:3px}
+.altar__note{font-size:13.5px;line-height:1.45;color:var(--cream-3);margin-top:7px}
+/* Phones: two columns leave ~130px cards, too narrow to carry a mantra, and one
+   column makes the section 1,800px tall. A snapped strip matches the screens
+   section below and keeps every mantra readable. */
+@media (max-width:560px){
+  .altars{
+    display:flex;gap:12px;grid-template-columns:none;
+    overflow-x:auto;scroll-snap-type:x mandatory;
+    padding-bottom:10px;-webkit-overflow-scrolling:touch;
+  }
+  .altar{flex:0 0 auto;width:min(74%,282px);scroll-snap-align:center;aspect-ratio:3/4}
+  .altar__text{padding:12px 12px 14px}
+  .altar__name{font-size:15px}
+  .altar__mantra{font-size:13px;line-height:1.4}
+  .altar__note{display:none}
+  .altars::-webkit-scrollbar{height:6px}
+  .altars::-webkit-scrollbar-thumb{background:rgba(232,196,104,.24);border-radius:99px}
+}
+
+/* ------------------------------------------------------------ shots */
+
+.shots{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:clamp(18px,3vw,40px);margin-top:clamp(40px,5vw,64px);
+  align-items:start;
+}
+/* On a phone, three full-width screenshots make the page absurdly long:
+   a snapped horizontal strip keeps the flavour and a third of the height.
+   The card width is capped so a tablet does not get one enormous phone. */
+@media (max-width:820px){
+  .shots{
+    display:flex;gap:14px;grid-template-columns:none;
+    overflow-x:auto;scroll-snap-type:x mandatory;
+    max-width:none;margin-inline:0;
+    padding-bottom:10px;
+    -webkit-overflow-scrolling:touch;
+  }
+  .shot{flex:0 0 auto;width:min(76%,320px);scroll-snap-align:center}
+  .shot:nth-child(n){transform:none}
+  .shots::-webkit-scrollbar{height:6px}
+  .shots::-webkit-scrollbar-thumb{background:rgba(232,196,104,.24);border-radius:99px}
+}
+.shot{margin:0}
+.shot__frame{
+  border-radius:26px;overflow:hidden;
+  border:1px solid rgba(232,196,104,.2);
+  background:var(--burgundy);
+  box-shadow:0 30px 70px rgba(0,0,0,.5);
+}
+.shot img{width:100%;height:auto}
+.shot figcaption{
+  margin-top:16px;font-size:15px;line-height:1.5;color:var(--cream-3);
+}
+.shot figcaption b{
+  display:block;font-family:var(--display);font-weight:700;
+  font-size:16px;letter-spacing:.02em;color:var(--candle);margin-bottom:4px;
+}
+/* a little rhythm rather than three boxes in a row */
+@media (min-width:821px){
+  .shot:nth-child(2){transform:translateY(-26px)}
+  .shot:nth-child(3){transform:translateY(14px)}
+}
+
+/* ---------------------------------------------------------- install */
+
+.install-grid{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:clamp(24px,4vw,56px);margin-top:clamp(36px,5vw,56px);
+  border-top:1px solid var(--rule);padding-top:clamp(28px,4vw,44px);
+}
+@media (max-width:820px){ .install-grid{grid-template-columns:1fr} }
+.install-col h3{
+  font-family:var(--display);font-weight:700;font-size:21px;color:var(--candle);
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px;
+}
+.install-col h3 span{
+  font-family:var(--body);font-size:13px;font-weight:600;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--gold);
+}
+.steps{counter-reset:step}
+.steps li{
+  position:relative;padding-left:40px;margin-bottom:14px;
+  font-size:17px;line-height:1.55;color:var(--cream-2);
+  counter-increment:step;max-width:52ch;
+}
+.steps li::before{
+  content:counter(step);
+  position:absolute;left:0;top:1px;
+  width:26px;height:26px;border-radius:50%;
+  display:grid;place-items:center;
+  font-family:var(--display);font-size:14px;color:var(--gold-soft);
+  border:1px solid rgba(232,196,104,.42);
+}
+.steps b{font-weight:600;color:var(--white)}
+.install-note{
+  margin-top:34px;padding:18px 22px;border-radius:12px;
+  border:1px solid rgba(232,196,104,.22);
+  background:rgba(232,196,104,.05);
+  font-size:16px;line-height:1.6;color:var(--cream-2);
+  max-width:74ch;
+}
+.install-note b{color:var(--candle)}
+
+/* ----------------------------------------------------------- odes */
+
+.closing{
+  padding:clamp(48px,6vw,84px) 0;
+  text-align:center;
+  border-top:1px solid var(--rule);
+}
+.closing p{
+  font-family:var(--display);font-weight:400;
+  font-size:clamp(24px,3.6vw,34px);line-height:1.35;color:var(--candle);
+  max-width:22ch;margin-inline:auto;
+}
+.closing p em{font-style:normal;color:var(--gold-soft);font-weight:700}
+.closing .button{margin-top:34px}
+
+.site-foot{
+  border-top:1px solid var(--rule);
+  padding:44px 0 60px;
+}
+.site-foot__in{
+  display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start;justify-content:space-between;
+}
+.foot-blessing{
+  font-family:var(--display);font-weight:400;font-size:17px;
+  color:var(--gold-soft);letter-spacing:.01em;
+}
+.foot-desc{margin-top:7px;font-size:15.5px;color:var(--cream-3);max-width:44ch}
+.foot-links{display:flex;flex-wrap:wrap;gap:6px 20px;font-size:15.5px}
+.foot-links a{color:var(--cream-3);text-decoration:none;border-bottom:1px solid transparent;padding-bottom:2px}
+.foot-links a:hover{color:var(--candle);border-color:rgba(232,196,104,.4)}
+.foot-legal{width:100%;margin-top:26px;font-size:13.5px;color:rgba(240,220,200,.66)}
+
+@media (prefers-reduced-motion:reduce){
+  *{transition-duration:.001ms!important;animation-duration:.001ms!important}
+  .altar:hover img{transform:none}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-head">
+  <div class="site-head__in">
+    <a class="brand" href="/" aria-label="MANTRINI home">
+      <svg viewBox="0 0 280 244" aria-hidden="true">
+        <polygon points="140,241 2,3 278,3" fill="none" stroke="#E8C468" stroke-width="26" stroke-linejoin="round"/>
+      </svg>
+      <b>MANTRINI</b>
+    </a>
+    <nav class="site-nav" aria-label="Sections">
+      <a href="#what">What it does</a>
+      <a href="#altars">The altars</a>
+      <a href="#install">Install</a>
+      <a class="ext" href="https://jaikhyapaparampara.com/">Jai Khyapa Parampara ↗</a>
+      <a class="header-cta" href="/app/">Open app</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <div class="wrap">
+
+    <!-- ------------------------------------------------------- hero -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div>
+        <p class="eyebrow">Jai Khyapa Parampara</p>
+        <h1 id="hero-title">MANTRINI</h1>
+        <p class="lede">
+          A respectful, offline japa counter. <b>Four altars, 108 beads</b>, and a
+          lamp that stays lit on your own device.
+        </p>
+        <div class="actions">
+          <a class="button" href="/app/">
+            Open MANTRINI
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a class="quiet-link" href="#install">How to install</a>
         </div>
-        <nav class="top-nav" aria-label="Primary">
-          <a href="https://mantrini.jaikhyapaparampara.com/app/">Open Web App</a>
-          <a href="#download">Download APK</a>
-          <a href="#features">What It Offers</a>
-          <a href="https://github.com/09ashishkapoor/Project_Apex11/releases/latest">Latest Release</a>
-          <a href="https://github.com/09ashishkapoor/Project_Apex11">Repository</a>
-        </nav>
+        <ul class="trust">
+          <li>Works offline</li>
+          <li>No account</li>
+          <li>Nothing leaves your device</li>
+        </ul>
       </div>
-    </header>
 
-    <main id="main-content">
-      <section class="hero" aria-labelledby="hero-title">
-        <div class="intro-visual">
-          <img src="app-intro.jpg" alt="MANTRINI app interface preview">
-        </div>
-
-        <div class="hero-grid">
-          <div class="hero-copy">
-            <div class="section-kicker">Focused practice. No cloud dependence.</div>
-            <h1 id="hero-title">A quieter way to keep daily japa.</h1>
-            <p class="lead">
-              MANTRINI is a Japa companion for web and Android, built for people who want counting,
-              continuity, and devotional privacy without accounts, ads, telemetry, or social noise.
-            </p>
-            <p class="sublead">
-              Open the web app in your browser, or download the official Android APK from GitHub.
-              Your practice history stays on the device and browser where you use it. Use JSON
-              export and import to transfer a backup between the two versions.
-            </p>
-
-            <div class="hero-actions">
-              <a class="button" href="https://mantrini.jaikhyapaparampara.com/app/">Open Web App</a>
-              <a class="button-secondary" href="https://github.com/09ashishkapoor/Project_Apex11/releases/latest/download/app-release.apk">Download Android APK</a>
-            </div>
-
-            <div class="hero-stats" aria-label="Highlights">
-              <article class="stat-card">
-                <strong>4 devotional paths</strong>
-                <div>Bundled deity and mantra flows available inside the app.</div>
-              </article>
-              <article class="stat-card">
-                <strong>100% local history</strong>
-                <div>Session records stay in your browser or on your Android device.</div>
-              </article>
-              <article class="stat-card">
-                <strong>No tracking layer</strong>
-                <div>No login, no analytics, no cloud account boundary.</div>
-              </article>
-            </div>
-          </div>
-
-          <aside class="download-card" id="download" aria-labelledby="download-title">
-            <div class="section-kicker">Official release channel</div>
-            <h2 id="download-title">Install on Android in minutes.</h2>
-            <p class="download-copy">
-              Use the direct APK on your phone for the fastest path. If the direct file does not
-              open immediately, use the GitHub release page and download the attached APK there.
-            </p>
-
-            <a class="download-badge" href="https://github.com/09ashishkapoor/Project_Apex11/releases/latest">
-              <img
-                src="https://img.shields.io/github/downloads/09ashishkapoor/Project_Apex11/latest/total?style=for-the-badge&amp;label=APK%20downloads&amp;color=8B2635"
-                alt="Live APK download counter for the latest MANTRINI GitHub release"
-              >
-            </a>
-
-            <div class="download-actions">
-              <a class="button" href="https://github.com/09ashishkapoor/Project_Apex11/releases/latest/download/app-release.apk">Get The Latest APK</a>
-              <a class="button-secondary" href="https://github.com/09ashishkapoor/Project_Apex11/releases/latest">Open Latest GitHub Release</a>
-            </div>
-
-            <div class="device-note">
-              Install only from release pages controlled by this repository. Avoid forwarded APKs,
-              mirrors, and third-party reposts.
-            </div>
-
-            <div class="qr-card">
-              <img
-                src="mantrini-download-qr.png"
-                alt="QR code that opens the official MANTRINI Android APK download"
-              >
-              <div>
-                <h3>Scan from another screen</h3>
-                <p>
-                  Open your phone camera, point it at the QR code, then follow the prompt to the
-                  official download. If Android requests permission, allow installation from that
-                  trusted browser or file source.
-                </p>
-              </div>
-            </div>
-          </aside>
-        </div>
-      </section>
-
-      <section class="section" id="screenshots" aria-labelledby="screenshots-title">
-        <div class="section-heading">
-          <div class="section-kicker">App walkthrough</div>
-          <h2 id="screenshots-title">Screens in natural capture order.</h2>
-          <p>
-            These screenshots are arranged in ascending timestamp order so the flow reads the same
-            way the app was captured.
-          </p>
-        </div>
-
-        <div class="screenshot-grid" aria-labelledby="screenshots-title">
-          <article class="feature-card screenshot-card">
-            <p class="screenshot-label">Screen 01</p>
-            <img src="screenshots/screen-01.jpg" alt="MANTRINI app screenshot 01">
-          </article>
-          <article class="feature-card screenshot-card">
-            <p class="screenshot-label">Screen 02</p>
-            <img src="screenshots/screen-02.jpg" alt="MANTRINI app screenshot 02">
-          </article>
-          <article class="feature-card screenshot-card">
-            <p class="screenshot-label">Screen 03</p>
-            <img src="screenshots/screen-03.jpg" alt="MANTRINI app screenshot 03">
-          </article>
-          <article class="feature-card screenshot-card">
-            <p class="screenshot-label">Screen 04</p>
-            <img src="screenshots/screen-04.jpg" alt="MANTRINI app screenshot 04">
-          </article>
-          <article class="feature-card screenshot-card">
-            <p class="screenshot-label">Screen 05</p>
-            <img src="screenshots/screen-05.jpg" alt="MANTRINI app screenshot 05">
-          </article>
-          <article class="feature-card screenshot-card">
-            <p class="screenshot-label">Screen 06</p>
-            <img src="screenshots/screen-06.jpg" alt="MANTRINI app screenshot 06">
-          </article>
-          <article class="feature-card screenshot-card">
-            <p class="screenshot-label">Screen 07</p>
-            <img src="screenshots/screen-07.jpg" alt="MANTRINI app screenshot 07">
-          </article>
-          <article class="feature-card screenshot-card">
-            <p class="screenshot-label">Screen 08</p>
-            <img src="screenshots/screen-08.jpg" alt="MANTRINI app screenshot 08">
-          </article>
-          <article class="feature-card screenshot-card">
-            <p class="screenshot-label">Screen 09</p>
-            <img src="screenshots/screen-09.jpg" alt="MANTRINI app screenshot 09">
-          </article>
-          <article class="feature-card screenshot-card">
-            <p class="screenshot-label">Screen 10</p>
-            <img src="screenshots/screen-10.jpg" alt="MANTRINI app screenshot 10">
-          </article>
-          <article class="feature-card screenshot-card">
-            <p class="screenshot-label">Screen 11</p>
-            <img src="screenshots/screen-11.jpg" alt="MANTRINI app screenshot 11">
-          </article>
-          <article class="feature-card screenshot-card">
-            <p class="screenshot-label">Screen 12</p>
-            <img src="screenshots/screen-12.jpg" alt="MANTRINI app screenshot 12">
-          </article>
-        </div>
-      </section>
-
-      <section class="section" id="features" aria-labelledby="features-title">
-        <div class="section-heading">
-          <div class="section-kicker">Web and Android</div>
-          <h2 id="features-title">Choose how you practice.</h2>
-          <p>
-            The web app opens directly in your browser. Load it online once before using it offline
-            or installing it to your home screen. The Android version is available as an APK through
-            GitHub Releases. Both versions keep practice history locally, without an account or cloud sync.
-          </p>
-        </div>
-
-        <div class="feature-grid">
-          <div class="section-panel">
-            <h3>What the app is for</h3>
-            <p>
-              This is a respectful, offline practice companion for repeatable daily japa. It keeps
-              the experience narrow on purpose: focused counting, session continuity, and private
-              local record-keeping without network dependence.
-            </p>
-            <div class="ritual-strip" aria-label="Core principles">
-              <div class="pill">Offline first</div>
-              <div class="pill">Private by design</div>
-              <div class="pill">Android primary</div>
-              <div class="pill">GitHub distributed</div>
-            </div>
-            <div class="callout">
-              The absence of cloud features is part of the product boundary. MANTRINI is not trying
-              to become a social, monetized, account-driven platform.
-            </div>
-          </div>
-
-          <div class="feature-column">
-            <article class="feature-card">
-              <h3>Counting modes</h3>
-              <ul class="feature-list">
-                <li>Manual counting for direct control.</li>
-                <li>Audio-guided counting for supported flow.</li>
-                <li>Timed automatic chanting for uninterrupted sessions.</li>
-              </ul>
-            </article>
-            <article class="feature-card">
-              <h3>History and backup</h3>
-              <ul class="feature-list">
-                <li>Today totals, lifetime totals, malas, recent sessions, and per-deity counts.</li>
-                <li>Export backups as JSON text.</li>
-                <li>Import those backups back into the app when needed.</li>
-              </ul>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <section class="section" id="install" aria-labelledby="install-title">
-        <div class="section-heading">
-          <div class="section-kicker">Android install flow</div>
-          <h2 id="install-title">Three steps, no account creation.</h2>
-          <p>
-            Most users only need the APK. The page keeps the install sequence visible so the sideload
-            path feels predictable rather than technical.
-          </p>
-        </div>
-
-        <div class="flow-grid">
-          <article class="flow-step">
-            <div class="flow-index">1</div>
-            <h3>Download the APK</h3>
-            <p>
-              Tap the direct download on your Android phone, or scan the QR code to open the same
-              file on your device.
-            </p>
-          </article>
-          <article class="flow-step">
-            <div class="flow-index">2</div>
-            <h3>Open the downloaded file</h3>
-            <p>
-              Use your browser, downloads list, or file manager. If the direct link stalls, open the
-              latest release page and download the attached APK there.
-            </p>
-          </article>
-          <article class="flow-step">
-            <div class="flow-index">3</div>
-            <h3>Approve the trusted install</h3>
-            <p>
-              If Android blocks the first attempt, allow installation from that trusted source and
-              confirm the app name shown is MANTRINI.
-            </p>
-          </article>
-        </div>
-      </section>
-
-      <section class="section" aria-labelledby="trust-title">
-        <div class="section-heading">
-          <div class="section-kicker">Trust boundary</div>
-          <h2 id="trust-title">Private by default, narrow by intent.</h2>
-          <p>
-            The app avoids common growth layers that would expand the trust surface and distract from
-            devotional use.
-          </p>
-        </div>
-
-        <div class="trust-grid">
-          <article>
-            <h3>No account system</h3>
-            <p>No login, no passwords, no cloud profile, and no backend identity layer to maintain.</p>
-          </article>
-          <article>
-            <h3>No monetization surfaces</h3>
-            <p>No subscriptions, no ad slots, and no payment interruptions around practice.</p>
-          </article>
-          <article>
-            <h3>No telemetry layer</h3>
-            <p>No analytics, no hidden sync channel, and no social feed attached to your history.</p>
-          </article>
-        </div>
-      </section>
-
-      <section class="section" aria-labelledby="notes-title">
-        <div class="section-panel">
-          <div class="section-kicker">Install notes</div>
-          <h2 id="notes-title">A few practical details before you install.</h2>
-          <ul class="install-notes">
-            <li>MANTRINI is currently distributed through GitHub Releases, not the Google Play Store.</li>
-            <li>If the direct APK link does not start immediately, use the latest release page and download the attached APK there.</li>
-            <li>Some phones require enabling installs from the browser or file manager that opened the APK the first time.</li>
-            <li>Use only APKs distributed through the official GitHub release pages for this repository.</li>
-          </ul>
-        </div>
-      </section>
-    </main>
-
-    <footer class="site-footer">
-      <div class="footer-panel">
-        <p>MANTRINI source code is available under the MIT License.</p>
-        <div class="footer-links">
-          <a href="https://mantrini.jaikhyapaparampara.com/">Project Website</a>
-          <a href="https://jaikhyapaparampara.com/">Jai Khyapa Parampara</a>
-          <a href="https://github.com/09ashishkapoor/Project_Apex11">GitHub Repository</a>
-          <a href="https://github.com/09ashishkapoor/Project_Apex11/blob/main/LICENSE">License</a>
+      <div class="hero__mark">
+        <div class="yantra">
+          <svg viewBox="0 0 280 244" role="img" aria-label="Ma Adya Mahakali within the trikoṇa">
+            <defs>
+              <clipPath id="tri"><polygon points="140,241 2,3 278,3"/></clipPath>
+              <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#F7E3BB"/>
+                <stop offset="42%" stop-color="#E8C468"/>
+                <stop offset="100%" stop-color="#C0803A"/>
+              </linearGradient>
+              <radialGradient id="wash" cx="50%" cy="40%" r="64%">
+                <stop offset="0%" stop-color="#0D0506" stop-opacity="0"/>
+                <stop offset="58%" stop-color="#0D0506" stop-opacity=".10"/>
+                <stop offset="100%" stop-color="#0D0506" stop-opacity=".66"/>
+              </radialGradient>
+            </defs>
+            <image href="assets/altars/adya-mahakali.jpg" clip-path="url(#tri)"
+                   x="0" y="0" width="280" height="244" preserveAspectRatio="xMidYMin slice"/>
+            <g clip-path="url(#tri)"><rect width="280" height="244" fill="url(#wash)"/></g>
+            <polygon points="140,241 2,3 278,3" fill="none" stroke="url(#gold)"
+                     stroke-width="2.4" stroke-linejoin="round"/>
+          </svg>
         </div>
       </div>
-    </footer>
-  </body>
+    </section>
+
+    <!-- ------------------------------------------------------ what -->
+    <section class="showcase" id="what" aria-labelledby="what-title">
+      <div class="divider"><b>The practice</b><span>Three things that shape a sitting.</span></div>
+      <h2 id="what-title">Built for the counting surface, <em>not the dashboard</em>.</h2>
+
+      <div class="pillars">
+        <article class="pillar">
+          <h3>Count the way you sit</h3>
+          <p>Tap each mantra, chant with the audio, sit for a set time, or let the
+             mala count itself. Four ways in, one practice.</p>
+        </article>
+        <article class="pillar">
+          <h3>The mala, not a progress bar</h3>
+          <p>108 beads ride the edge of the darshan and fill one by one. When the
+             mala closes, you offer it — the beads go to her.</p>
+        </article>
+        <article class="pillar">
+          <h3>It stays on your device</h3>
+          <p>Your ledger lives in your browser. No account, no sync, no analytics.
+             Export the whole record as text whenever you like.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- ---------------------------------------------------- altars -->
+    <section class="showcase" id="altars" aria-labelledby="altars-title">
+      <div class="divider"><b>The altars</b><span>Each with its own chant.</span></div>
+      <h2 id="altars-title">Four names, four darshans, <em>four mantras</em>.</h2>
+      <p class="lede">Every altar carries its own darshan and its own recorded mantra.</p>
+
+      <div class="altars">
+        <article class="altar">
+          <img src="assets/altars/adya-mahakali.jpg" alt="Adya Mahakali" loading="lazy" width="420" height="559">
+          <div class="altar__veil"></div>
+          <div class="altar__text">
+            <h3 class="altar__name">Adya Mahakali</h3>
+            <p class="altar__mantra deva" lang="sa">ॐ आद्यायै नमः</p>
+            <p class="altar__note">At the lotus feet of the primordial Mother.</p>
+          </div>
+        </article>
+        <article class="altar">
+          <img src="assets/altars/batuk-bhairav.jpg" alt="Batuk Bhairav" loading="lazy" width="420" height="577">
+          <div class="altar__veil"></div>
+          <div class="altar__text">
+            <h3 class="altar__name">Batuk Bhairav</h3>
+            <p class="altar__mantra deva" lang="sa">ॐ बटुक भैरवाय नमः</p>
+            <p class="altar__note">Guardian of swift grace and fearless protection.</p>
+          </div>
+        </article>
+        <article class="altar">
+          <img src="assets/altars/swarnaakarshana-bhairav.jpg" alt="Swarnaakarshana Bhairav" loading="lazy" width="420" height="581">
+          <div class="altar__veil"></div>
+          <div class="altar__text">
+            <h3 class="altar__name">Swarnaakarshana</h3>
+            <p class="altar__mantra deva" lang="sa">ॐ श्री स्वर्णाकर्षण भैरवाय नमः</p>
+            <p class="altar__note">For radiance, dignified prosperity, and clear intent.</p>
+          </div>
+        </article>
+        <article class="altar">
+          <img src="assets/altars/skanda-bhairav.jpg" alt="Skanda Bhairav" loading="lazy" width="420" height="560">
+          <div class="altar__veil"></div>
+          <div class="altar__text">
+            <h3 class="altar__name">Skanda Bhairav</h3>
+            <p class="altar__mantra deva" lang="sa">ॐ सर्वान्भवाय नमः</p>
+            <p class="altar__note">For disciplined courage and focused tapas.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ---------------------------------------------------- shots -->
+    <section class="showcase" aria-labelledby="shots-title">
+      <div class="divider"><b>The app</b><span>Nothing to learn.</span></div>
+      <h2 id="shots-title">A surface for counting, <em>a ledger for keeping</em>.</h2>
+
+      <div class="shots">
+        <figure class="shot">
+          <div class="shot__frame">
+            <img src="assets/shots/session.jpg" alt="The counting screen: Adya Mahakali's darshan with 47 of 108 beads lit, and a Count chant button." loading="lazy" width="700" height="1516">
+          </div>
+          <figcaption><b>The counting surface</b>The darshan, the mala seam, and one thumb-sized action.</figcaption>
+        </figure>
+        <figure class="shot">
+          <div class="shot__frame">
+            <img src="assets/shots/today.jpg" alt="Today's screen showing chants today and the altar last used." loading="lazy" width="700" height="1516">
+          </div>
+          <figcaption><b>Arriving</b>Where the practice stands today, and one way back in.</figcaption>
+        </figure>
+        <figure class="shot">
+          <div class="shot__frame">
+            <img src="assets/shots/ledger.jpg" alt="The ledger: today, lifetime, malas, the week and recent sittings." loading="lazy" width="700" height="1516">
+          </div>
+          <figcaption><b>The record</b>Today, the week, each deity, and sittings kept locally.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- -------------------------------------------------- install -->
+    <section class="showcase" id="install" aria-labelledby="install-title">
+      <div class="divider"><b>Install</b><span>One visit, then it is yours.</span></div>
+      <h2 id="install-title">Add it to your phone <em>in two taps</em>.</h2>
+      <p class="lede">MANTRINI is a website that installs like an app. After the first
+        visit it opens without a connection and keeps working at the altar.</p>
+
+      <div class="install-grid">
+        <div class="install-col">
+          <h3><span>Android</span> Chrome, Edge, Brave</h3>
+          <ol class="steps">
+            <li>Open <b>Open MANTRINI</b> above.</li>
+            <li>Tap the <b>Install</b> prompt, or open the menu <b>⋮</b> and choose <b>Add to Home screen</b>.</li>
+            <li>It appears with the trikoṇa icon, and opens full screen.</li>
+          </ol>
+        </div>
+        <div class="install-col">
+          <h3><span>iPhone &amp; iPad</span> Safari</h3>
+          <ol class="steps">
+            <li>Open <b>Open MANTRINI</b> in Safari.</li>
+            <li>Tap <b>Share</b>, then <b>Add to Home Screen</b>.</li>
+            <li>Launch it from the Home Screen, not from a bookmark.</li>
+          </ol>
+        </div>
+      </div>
+
+      <p class="install-note">
+        <b>On iPhone, please install rather than bookmark.</b> Safari may clear a
+        website's stored data after seven days of no use; an app added to the Home
+        Screen is kept. Your ledger is only ever on your own device, so a backup
+        from the Ledger screen is the safest habit.
+      </p>
+    </section>
+
+    <!-- -------------------------------------------------- closing -->
+    <section class="closing" aria-label="Begin">
+      <p>The lamp is lit. <em>Begin where you are.</em></p>
+      <a class="button" href="/app/">
+        Open MANTRINI
+        <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </section>
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap site-foot__in">
+    <div>
+      <p class="foot-blessing">Om Shri Gurubhyo Namaha | Jai Khyapa Parampara</p>
+      <p class="foot-desc">May every Japa bring you closer to Ma Adya Mahakali.</p>
+    </div>
+    <nav class="foot-links" aria-label="Footer">
+      <a href="https://jaikhyapaparampara.com/">Jai Khyapa Parampara</a>
+      <a href="/app/">Open MANTRINI</a>
+      <a href="https://github.com/09ashishkapoor/Project_Apex11">Source</a>
+    </nav>
+    <p class="foot-legal">
+      MANTRINI is free and has no accounts, advertising or tracking. Bundled
+      devotional images and audio are project assets for MANTRINI distribution
+      only. Source code is MIT licensed.
+    </p>
+  </div>
+</footer>
+</body>
 </html>

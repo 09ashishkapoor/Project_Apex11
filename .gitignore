@@ -1,4 +1,4 @@
-# Miscellaneous
+﻿# Miscellaneous
 *.class
 *.log
 *.pyc
@@ -47,3 +47,6 @@ upgradeplan.md
 PLAN1.md
 web/*.js.map
 web/*.js.deps
+
+# local landing preview (assembled by app/tools/preview-site.mjs)
+.preview-site/

@@ -54,6 +54,28 @@ Only install APKs downloaded from GitHub release pages controlled by this projec
 - Computes today totals, lifetime totals, malas of 108, per-deity totals, and recent session history from local data.
 - Exports and imports session backups as JSON text.
 
+## Two builds in this repository
+
+This repository currently contains **two** implementations, on purpose, while the
+redesign is proven:
+
+| | Where | State |
+|---|---|---|
+| **Flutter app** (original) | `lib/`, `android/`, `web/`, `test/` | Unchanged, still builds, still ships the current APK |
+| **Rebuilt app** (Direction 02 · "The Lamp") | `app/` | New. Web app + Capacitor APK from one codebase |
+
+The rebuild is documented in [`app/README.md`](app/README.md), the design
+direction is in [`design-demos/design-brief.md`](design-demos/design-brief.md),
+and the defects it was written to fix are in [`docs/ux-audit.md`](docs/ux-audit.md).
+
+The two apps keep their history **separately**. To move practice history from the
+Flutter app to the rebuilt one: open the old app → Sadhana Tracker → Export
+backup, then in the new app → Ledger → Restore → paste. The backup format is
+identical by design.
+
+Nothing in `app/` changes or removes the Flutter implementation. The Flutter
+tree can be retired in a separate commit once the rebuild has been validated.
+
 ## What it does not do
 
 - No backend

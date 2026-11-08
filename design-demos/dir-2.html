@@ -1,0 +1,987 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1600">
+<title>MANTRINI · 02 The Lamp</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   MANTRINI · direction 02 — THE LAMP (the room)
+   Headspace warmth  ×  Endel emptiness
+   Full-bleed darshan. No cards. One accent. One thumb pill.
+   ============================================================ */
+
+:root{
+  --cream:#F6E9D6;
+  --cream-2:rgba(246,233,214,.84);
+  --cream-3:rgba(246,233,214,.68);
+  --cream-4:rgba(246,233,214,.50);
+  --accent:#EDAE55;
+  --accent-2:#F4C77E;
+  --ink:#241408;
+  --ground:#17100C;
+  --ground-2:#1E1510;
+  --board:#1A100C;
+  --rule:rgba(246,233,214,.10);
+  --fig:'Figtree',-apple-system,'Segoe UI',sans-serif;
+  --deva:'Noto Sans Devanagari','Nirmala UI',sans-serif;
+  --noise:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scrollbar-width:none}
+html::-webkit-scrollbar{display:none}
+body{
+  margin:0;width:1600px;background:#140C09;
+  font-family:var(--fig);color:var(--cream);
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;touch-action:manipulation}
+img{display:block;max-width:100%}
+.deva{font-family:var(--deva);font-weight:500}
+
+/* ---------------- board ---------------- */
+.board{
+  position:relative;width:1600px;height:1804px;overflow:hidden;
+  background:
+    radial-gradient(1200px 900px at 470px 860px, rgba(233,158,80,.085), rgba(233,158,80,.02) 52%, transparent 74%),
+    radial-gradient(900px 620px at 1230px 1150px, rgba(198,110,52,.05), transparent 70%),
+    radial-gradient(1600px 1300px at 50% -10%, rgba(255,196,120,.035), transparent 62%),
+    linear-gradient(178deg,#1C110D 0%, #190F0C 42%, #150D0A 100%);
+}
+.board::after{
+  content:"";position:absolute;inset:0;background-image:var(--noise);
+  opacity:.05;mix-blend-mode:overlay;pointer-events:none;
+}
+.board::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(1500px 1100px at 48% 46%, transparent 52%, rgba(8,4,3,.42) 100%);
+}
+
+/* ---------------- title block ---------------- */
+.tb{position:absolute;left:64px;top:50px;width:860px;z-index:4}
+.mk{font-size:15px;font-weight:700;letter-spacing:.34em;color:#D9C6AC;line-height:1;margin-bottom:22px}
+.mk b{color:var(--accent);font-weight:700}
+.tb h1{font-size:88px;line-height:.9;font-weight:300;letter-spacing:-.045em;color:#F2E3CD;margin-bottom:18px}
+.tb h1 em{font-style:normal;font-weight:600;color:var(--accent);letter-spacing:-.05em}
+.tb .pos{font-size:19px;line-height:1.45;font-weight:400;color:#E3D2BB;max-width:700px;margin-bottom:13px}
+.tb .rules{font-size:13px;line-height:1.6;color:#B3A08A;max-width:620px;letter-spacing:.005em}
+.tb .rules b{color:#DFCEB6;font-weight:600}
+
+/* ---------------- index ---------------- */
+.ix{position:absolute;right:64px;top:52px;width:404px;z-index:4}
+.ixh{font-size:12px;font-weight:600;letter-spacing:.2em;color:#9C8A76;padding-bottom:12px;border-bottom:1px solid var(--rule)}
+.ix ol{list-style:none}
+.ix li{display:grid;grid-template-columns:44px 1fr auto;align-items:baseline;gap:10px;padding:9.5px 0;border-bottom:1px solid rgba(246,233,214,.07)}
+.ix li b{font-size:12px;font-weight:600;color:var(--accent);letter-spacing:.08em}
+.ix li span{font-size:14.5px;font-weight:500;color:#EADAC4}
+.ix li i{font-size:12.5px;font-style:normal;color:#AC9A86}
+.ixf{margin-top:14px;font-size:12px;letter-spacing:.03em;color:#9A8874}
+
+/* ---------------- stage & slots ---------------- */
+.stage{position:absolute;inset:0;z-index:2}
+.slot{position:absolute;--s:1;width:calc(432px * var(--s));height:calc(912px * var(--s))}
+.slot .cap{position:absolute;left:1px;top:-30px;white-space:nowrap;display:flex;align-items:baseline;gap:9px}
+.cap b{font-size:12px;font-weight:600;letter-spacing:.08em;color:var(--accent)}
+.cap span{font-size:13.5px;font-weight:500;color:#E4D3BC}
+.cap i{font-size:12.5px;font-style:normal;color:#AC9A86}
+.slot .cap::before{content:"";position:absolute;left:0;top:19px;width:24px;height:1px;background:rgba(237,174,85,.5)}
+.slot[data-hero] .cap{top:-36px}
+.slot[data-hero] .cap span{font-size:15px}
+.slot[data-hero] .cap i{font-size:13px}
+.scaler{transform:scale(var(--s));transform-origin:0 0;width:432px;height:912px}
+
+/* hero annotation — the design reads as a design, not a phone rack */
+.hero-note{
+  position:absolute;left:480px;top:1560px;width:562px;display:grid;grid-template-columns:repeat(3,1fr);gap:24px;
+  border-top:1px solid rgba(246,233,214,.12);padding-top:16px;
+}
+.hero-note div{display:flex;flex-direction:column;gap:5px}
+.hero-note b{font-size:12px;font-weight:600;letter-spacing:.13em;color:var(--accent);text-transform:uppercase}
+.hero-note span{font-size:12px;line-height:1.5;color:#B6A38D}
+
+/* ---------------- Android frame (from android_frame.jsx) ---------------- */
+.dev{
+  display:inline-block;padding:10px;background:#1a1a1a;border-radius:44px;
+  box-shadow:0 0 0 2px #2a2a2a, 0 20px 60px rgba(0,0,0,.3);
+  position:relative;
+}
+.dev-screen{
+  position:relative;border-radius:36px;overflow:hidden;
+  width:412px;height:892px;background:#17100C;
+  transition:background-color .75s ease;
+}
+.dev-screen{--g:#17100C;background-color:var(--g)}
+.dev-screen.lit{--g:#301C15;background-color:var(--g)}
+.sb{
+  position:absolute;top:0;left:0;right:0;height:32px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;font-size:14px;font-weight:500;font-family:var(--fig);
+  z-index:20;pointer-events:none;color:#EFE1CA;
+}
+.sbi{display:flex;align-items:center;gap:6px}
+.bat{width:22px;height:10px;border:1.5px solid currentColor;border-radius:2px;padding:1px;position:relative}
+.bat i{display:block;width:100%;height:100%;background:currentColor;border-radius:1px}
+.bpct{font-size:11px;font-weight:600;margin-left:2px}
+.punch{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:14px;height:14px;background:#000;border-radius:50%;z-index:30}
+.scr{position:absolute;top:32px;left:0;right:0;bottom:24px;overflow:auto;scrollbar-width:none}
+.scr::-webkit-scrollbar{display:none}
+.nav{position:absolute;bottom:0;left:0;right:0;height:24px;display:flex;align-items:center;justify-content:center;z-index:10}
+.nav i{width:100px;height:4px;background:rgba(255,255,255,.5);border-radius:999px}
+
+/* ---------------- app base ---------------- */
+.app{position:relative;width:412px;height:836px;color:var(--cream);user-select:none;overflow:hidden}
+.app::after{
+  content:"";position:absolute;inset:0;z-index:9;pointer-events:none;opacity:0;transition:opacity .9s ease;
+  background:radial-gradient(90% 46% at 50% 4%, rgba(255,201,132,.26), rgba(255,176,96,.07) 52%, transparent 78%);
+}
+.app.is-lit::after{opacity:1}
+.view{position:absolute;inset:0;opacity:0;visibility:hidden;overflow:hidden;
+  transition:opacity .3s ease, visibility .3s}
+.view.on{opacity:1;visibility:visible}
+.v-today,.v-altar,.v-ledger{overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
+.v-today::-webkit-scrollbar,.v-altar::-webkit-scrollbar,.v-ledger::-webkit-scrollbar{display:none}
+
+/* tiny top pill nav — the only chrome */
+.navpill{
+  display:inline-flex;align-items:stretch;height:48px;padding:0 5px;border-radius:999px;
+  background:rgba(16,10,8,.42);border:1px solid rgba(246,233,214,.11);
+  backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);
+}
+.navpill button{height:48px;padding:0 13px;font-size:12.5px;font-weight:500;letter-spacing:.015em;
+  color:rgba(246,233,214,.70);transition:color .2s}
+.navpill button.on{color:#F8EDDA;font-weight:600}
+
+/* the one pill */
+.pill{
+  display:flex;align-items:center;justify-content:center;border-radius:999px;
+  background:linear-gradient(180deg,#F7D197 0%,#EDB05D 52%,#E2A24C 100%);
+  color:#2A1708;font-weight:600;font-size:16px;letter-spacing:.01em;
+  box-shadow:0 10px 26px rgba(226,162,76,.22), inset 0 1px 0 rgba(255,241,214,.55);
+  transition:transform .12s ease, box-shadow .2s;
+}
+.pill:active{transform:scale(.985);box-shadow:0 6px 16px rgba(226,162,76,.18), inset 0 1px 0 rgba(255,241,214,.45)}
+.app.paused .pill{background:linear-gradient(180deg,rgba(246,233,214,.20),rgba(246,233,214,.12));color:#F2E3CD;box-shadow:none}
+
+/* ============================================================
+   TODAY — arriving
+   ============================================================ */
+.v-today{padding:0 0 0 0}
+.v-today .navpill{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:4}
+.t-date{position:absolute;top:74px;left:26px;font-size:13px;font-weight:500;color:rgba(246,233,214,.72);letter-spacing:.02em}
+.t-h{position:absolute;top:96px;left:26px;right:26px;font-size:37px;line-height:1.06;font-weight:300;letter-spacing:-.028em;color:#F5E7D1}
+.t-h em{font-style:normal;font-weight:700;color:var(--accent);letter-spacing:-.03em}
+.t-photo{position:absolute;top:168px;left:0;right:0;height:348px;overflow:hidden;display:block;
+  -webkit-mask-image:linear-gradient(180deg,transparent 0%,rgba(0,0,0,.42) 2.4%,#000 8%,#000 100%);
+  mask-image:linear-gradient(180deg,transparent 0%,rgba(0,0,0,.42) 2.4%,#000 8%,#000 100%);
+}
+.t-photo img{width:100%;height:100%;object-fit:cover;object-position:50% 0}
+.t-photo .t-pfade{
+  position:absolute;inset:0;
+  background:
+    linear-gradient(180deg, #17100C 0%, rgba(23,16,12,.90) 2.6%, rgba(23,16,12,.42) 5.4%, transparent 9%),
+    linear-gradient(0deg, var(--g,#17100C) 0%, rgba(23,16,12,.92) 8%, rgba(23,16,12,.35) 30%, transparent 54%),
+    radial-gradient(80% 60% at 50% 100%, rgba(240,170,90,.13), transparent 62%);
+}
+.t-today{position:absolute;top:540px;left:26px;right:26px;display:flex;align-items:flex-end;gap:16px}
+.t-big{font-size:54px;line-height:.86;font-weight:300;letter-spacing:-.05em;color:#FBF0DD;font-variant-numeric:tabular-nums}
+.t-words{display:flex;flex-direction:column;gap:4px;padding-bottom:5px}
+.t-words b{font-size:14.5px;font-weight:500;color:#EBDAC2}
+.t-words span{font-size:12.5px;font-weight:400;color:rgba(246,233,214,.66)}
+.t-resume{
+  position:absolute;top:612px;left:26px;right:26px;height:72px;
+  display:flex;align-items:center;justify-content:space-between;gap:14px;text-align:left;
+  border-top:1px solid rgba(246,233,214,.13);padding-top:10px;
+}
+.t-rl{display:flex;flex-direction:column;gap:5px;min-width:0}
+.t-rk{font-size:15px;font-weight:400;color:#EADAC2;white-space:nowrap}
+.t-rk b{font-weight:600;color:#FBF0DD}
+.t-rd{font-size:12.5px;color:rgba(246,233,214,.66);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:250px}
+.t-rr{font-size:13px;font-weight:600;color:var(--accent-2);white-space:nowrap;font-variant-numeric:tabular-nums}
+.t-ledger{
+  position:absolute;top:700px;left:26px;right:26px;height:48px;display:flex;align-items:center;justify-content:space-between;
+  font-size:14.5px;font-weight:500;color:#E4D3BC;
+}
+.t-ledger .t-lg{font-size:12.5px;font-weight:400;color:rgba(246,233,214,.64)}
+.t-begin{position:absolute;left:22px;right:22px;bottom:14px;height:74px}
+
+/* ============================================================
+   ALTAR — four paths
+   ============================================================ */
+.v-altar .navpill{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:5}
+.a-head{position:absolute;top:64px;left:22px;right:14px;height:48px;display:flex;align-items:center;justify-content:space-between}
+.a-h{font-size:27px;font-weight:300;letter-spacing:-.02em;color:#F2E3CD}
+.a-h em{font-style:normal;font-weight:600;color:var(--accent)}
+.a-target{display:flex;align-items:center;gap:2px;height:48px}
+.tgt{width:48px;height:48px;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:400;color:rgba(246,233,214,.78)}
+.a-target span{font-size:13px;color:#D8C7B0;white-space:nowrap;padding:0 2px}
+.a-target span b{font-weight:600;color:#FBF0DD;font-size:15px}
+.a-plates{position:absolute;top:120px;left:0;right:0}
+.plate{position:relative;width:412px;height:138px;overflow:hidden;display:block;text-align:left;background:var(--pc,#3A2A18)}
+.plate .plate-photo{position:absolute;top:0;bottom:0;left:8%;right:-10%;overflow:hidden;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.28) 14%,rgba(0,0,0,.72) 32%,#000 68%);
+  mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.28) 14%,rgba(0,0,0,.72) 32%,#000 68%);}
+.plate .plate-photo img{width:100%;height:100%;object-fit:cover;object-position:50% 12%;filter:brightness(var(--pb,.9)) saturate(.82) contrast(1.06)}
+.plate .plate-col{position:absolute;inset:0;background:
+  linear-gradient(90deg,var(--pc) 0%,var(--pc) 34%,color-mix(in srgb,var(--pc) 74%,transparent) 46%,color-mix(in srgb,var(--pc) 34%,transparent) 63%,transparent 86%),
+  radial-gradient(95% 150% at 100% 50%, color-mix(in srgb,var(--pc) 14%,transparent), transparent 78%),
+  linear-gradient(90deg, transparent 46%, color-mix(in srgb,var(--pc) 30%,transparent) 100%)}
+.plate .plate-txt{position:absolute;left:22px;top:24px;width:184px}
+.plate .plate-name{font-size:15px;font-weight:600;letter-spacing:-.01em;color:#F8EBD8;line-height:1.15}
+.plate .plate-mantra{font-family:var(--deva);font-weight:500;font-size:16.5px;line-height:1.5;color:#FFF3E1;margin-top:3px;white-space:nowrap}
+.plate .plate-inv{font-size:12.5px;line-height:1.36;color:rgba(255,246,232,.80);margin-top:3px}
+.plate:after{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);opacity:0;transition:opacity .25s}
+.plate.on:after{opacity:1}
+.plate.on .plate-name{color:#F8D9A6}
+.plate .plate-mark{position:absolute;right:16px;top:14px;width:7px;height:7px;border-radius:50%;background:var(--accent);opacity:0;box-shadow:0 0 10px rgba(237,174,85,.75);transition:opacity .25s}
+.plate.on .plate-mark{opacity:1}
+.a-foot{position:absolute;left:18px;right:18px;bottom:10px}
+.a-modes{display:flex;gap:2px;margin-bottom:4px}
+.mode-t{
+  flex:1 1 0;height:48px;display:flex;align-items:center;justify-content:center;position:relative;
+  font-size:13px;font-weight:500;letter-spacing:.01em;color:rgba(246,233,214,.60);
+  transition:color .2s;
+}
+.mode-t.on{color:#FCF1DE;font-weight:600}
+.mode-t:after{content:"";position:absolute;left:50%;bottom:9px;width:22px;height:2px;border-radius:2px;
+  background:var(--accent);transform:translateX(-50%) scaleX(0);transition:transform .25s ease}
+.mode-t.on:after{transform:translateX(-50%) scaleX(1)}
+.a-desc{height:19px;font-size:12.5px;line-height:1.4;color:rgba(246,233,214,.72);
+  text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:9px}
+.a-begin{width:100%;height:66px}
+
+/* ============================================================
+   SESSION — the counting surface
+   ============================================================ */
+.v-session{overflow:hidden}
+.s-photo{
+  position:absolute;left:0;right:0;top:0;height:517px;overflow:hidden;
+  clip-path:path("M0,0 H412 V463 Q206,571 0,463 Z");
+  -webkit-mask-image:linear-gradient(180deg,transparent 0%,rgba(0,0,0,.5) 1.2%,#000 3.6%,#000 52%,rgba(0,0,0,.95) 65%,rgba(0,0,0,.66) 78%,rgba(0,0,0,.26) 89%,transparent 99%);
+  mask-image:linear-gradient(180deg,transparent 0%,rgba(0,0,0,.5) 1.2%,#000 3.6%,#000 52%,rgba(0,0,0,.95) 65%,rgba(0,0,0,.66) 78%,rgba(0,0,0,.26) 89%,transparent 99%);
+}
+.s-photo img{width:100%;height:100%;object-fit:cover;object-position:50% 0}
+.s-lit-glow{position:absolute;inset:0;background:radial-gradient(70% 46% at 50% 102%, rgba(246,170,88,.20), transparent 62%);pointer-events:none}
+.s-stl,.s-str{position:absolute;top:0;height:190px;width:62%;pointer-events:none}
+.s-stl{left:0;background:radial-gradient(130% 130% at 0% 0%, rgba(16,10,8,.90), rgba(16,10,8,.40) 42%, transparent 70%)}
+.s-str{right:0;background:radial-gradient(130% 130% at 100% 0%, rgba(16,10,8,.82), rgba(16,10,8,.30) 44%, transparent 70%)}
+.s-sbot{position:absolute;left:0;right:0;bottom:0;height:230px;pointer-events:none;
+  background:linear-gradient(0deg, rgba(23,16,12,.92) 0%, rgba(23,16,12,.72) 18%, rgba(23,16,12,.28) 46%, transparent 78%)}
+.s-beads{position:absolute;inset:0;pointer-events:none;z-index:2}
+.bead{position:absolute;width:2.6px;height:2.6px;border-radius:50%;transform:translate(-50%,-50%);
+  background:rgba(246,233,214,.15);transition:background .25s ease, box-shadow .25s ease, width .18s, height .18s}
+.bead.done{width:3.4px;height:3.4px;background:#FFF6E6;box-shadow:0 0 8px rgba(255,246,230,.6)}
+.bead.cur{width:7.5px;height:7.5px;background:var(--accent);box-shadow:0 0 16px rgba(237,174,85,1),0 0 5px rgba(255,214,150,.95)}
+.s-altar{position:absolute;top:28px;left:10px;height:48px;padding:0 14px;z-index:4;
+  font-size:16.5px;font-weight:600;letter-spacing:-.012em;color:#F8EBd6;color:#F8EBD6;text-shadow:0 1px 12px rgba(0,0,0,.5)}
+.s-finish{position:absolute;top:28px;right:10px;height:48px;padding:0 16px;z-index:4;
+  font-size:13px;font-weight:500;color:rgba(246,233,214,.80);text-shadow:0 1px 10px rgba(0,0,0,.6)}
+.s-low{position:absolute;left:0;right:0;top:517px;bottom:0;display:flex;flex-direction:column;align-items:center;padding:10px 22px 14px;z-index:3}
+.s-mantra{font-size:29px;line-height:1.58;color:#FFF4E3;letter-spacing:.005em;text-align:center}
+.s-count{display:flex;align-items:baseline;gap:9px;margin-top:0}
+.s-num{font-size:84px;line-height:.94;font-weight:300;letter-spacing:-.052em;color:#FCF1DE;font-variant-numeric:tabular-nums;display:inline-block;transform-origin:50% 60%}
+.s-num.pop{animation:pop .22s ease}
+@keyframes pop{0%{transform:scale(.965)}62%{transform:scale(1.03)}100%{transform:scale(1)}}
+.s-of{font-size:15px;font-weight:400;color:rgba(246,233,214,.66);letter-spacing:.01em}
+.s-meta{font-size:13px;font-weight:400;color:rgba(246,233,214,.66);margin-top:3px;letter-spacing:.01em}
+.s-meta b{font-weight:500;color:rgba(246,233,214,.78)}
+.s-ctrl{display:flex;align-items:center;justify-content:center;gap:0;margin-top:4px}
+.ctl{height:48px;padding:0 18px;font-size:13px;font-weight:500;color:rgba(246,233,214,.78);position:relative}
+.ctl+.ctl:before{content:"";position:absolute;left:0;top:16px;bottom:16px;width:1px;background:rgba(246,233,214,.14)}
+.s-low .pill{width:100%;height:74px;margin-top:auto}
+
+/* ============================================================
+   BLESSING — the lamp is raised
+   ============================================================ */
+.v-blessing{overflow:hidden;background:
+  radial-gradient(120% 66% at 50% 34%, rgba(255,184,110,.13), rgba(255,170,90,.04) 52%, transparent 72%)}
+.b-photo{position:absolute;left:0;right:0;top:0;height:360px;overflow:hidden;
+  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 52%,rgba(0,0,0,.94) 64%,rgba(0,0,0,.62) 78%,rgba(0,0,0,.2) 90%,transparent 98%);
+  mask-image:linear-gradient(180deg,#000 0%,#000 52%,rgba(0,0,0,.94) 64%,rgba(0,0,0,.62) 78%,rgba(0,0,0,.2) 90%,transparent 98%);
+}
+.b-photo img{width:100%;height:100%;object-fit:cover;object-position:50% 0;filter:brightness(1.22) saturate(1.1)}
+.b-pfade{position:absolute;inset:0;
+  background:
+    radial-gradient(86% 64% at 50% 0%, rgba(255,199,132,.26), transparent 60%),
+    linear-gradient(0deg, rgba(48,28,21,.96) 0%, rgba(48,28,21,.72) 16%, rgba(48,28,21,.24) 38%, transparent 58%);
+}
+.b-ring{position:absolute;left:50%;top:452px;width:176px;height:176px;transform:translate(-50%,-50%)}
+.b-ring:before{content:"";position:absolute;inset:-110px;border-radius:50%;
+  background:radial-gradient(circle, rgba(245,171,92,.17), rgba(245,171,92,.06) 48%, transparent 70%);pointer-events:none}
+.b-ring .bdot{position:absolute;width:2.8px;height:2.8px;border-radius:50%;transform:translate(-50%,-50%);background:rgba(246,233,214,.24);transition:background .3s, box-shadow .3s}
+.b-ring.full .bdot{background:#F6C379;box-shadow:0 0 7px rgba(246,195,121,.85)}
+.b-ring.part .bdot.done{background:#F7E9D0;box-shadow:0 0 5px rgba(247,233,208,.55)}
+.b-core{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.b-n{font-size:46px;line-height:.92;font-weight:300;letter-spacing:-.05em;color:#FFF5E2;font-variant-numeric:tabular-nums;text-shadow:0 0 34px rgba(255,190,120,.35)}
+.b-c{font-size:12px;font-weight:500;letter-spacing:.06em;color:rgba(246,233,214,.74)}
+.b-line{position:absolute;left:22px;right:22px;top:560px;text-align:center;font-size:24px;font-weight:300;letter-spacing:-.014em;color:#F8EBD8}
+.b-line em{font-style:normal;font-weight:600;color:var(--accent)}
+.b-thanks{position:absolute;left:26px;right:26px;top:600px;text-align:center;font-size:14px;line-height:1.5;color:rgba(246,233,214,.78)}
+.b-ded{position:absolute;left:34px;right:34px;top:638px;text-align:center;font-size:12px;line-height:1.55;color:rgba(246,233,214,.64)}
+.b-second{position:absolute;left:22px;right:22px;top:702px;height:48px;font-size:13.5px;font-weight:500;color:rgba(246,233,214,.74)}
+.b-rest{position:absolute;left:22px;right:22px;bottom:12px;height:68px}
+
+/* ============================================================
+   LEDGER — the record
+   ============================================================ */
+.l-photo{position:absolute;left:0;right:0;top:0;height:270px;overflow:hidden}
+.l-photo img{width:100%;height:100%;object-fit:cover;object-position:50% 30%}
+.l-scrim{position:absolute;inset:0;background:
+  linear-gradient(180deg, rgba(18,11,9,.95) 0%, rgba(18,11,9,.84) 18%, rgba(18,11,9,.66) 42%, rgba(18,11,9,.60) 58%, rgba(20,14,11,.95) 86%, var(--g,#17100C) 100%),
+  radial-gradient(70% 50% at 50% 100%, rgba(240,170,90,.10), transparent 60%)}
+.v-ledger .navpill{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:5}
+.l-title{position:absolute;top:56px;left:24px;font-size:29px;font-weight:300;letter-spacing:-.022em;color:#F3E4CE;z-index:2}
+.l-title em{font-style:normal;font-weight:600;color:var(--accent)}
+.l-date{position:absolute;top:94px;left:24px;font-size:12.5px;color:rgba(246,233,214,.78);z-index:2}
+.l-stats{position:absolute;top:148px;left:24px;right:24px;display:flex;z-index:2}
+.l-stat{flex:1;display:flex;flex-direction:column;gap:5px;padding-left:14px;border-left:1px solid rgba(246,233,214,.18)}
+.l-stat:first-child{padding-left:0;border-left:0}
+.l-stat b{font-size:31px;line-height:1;font-weight:300;letter-spacing:-.04em;color:#FCF2E0;font-variant-numeric:tabular-nums;text-shadow:0 1px 18px rgba(0,0,0,.35)}
+.l-stat span{font-size:12px;font-weight:400;color:rgba(246,233,214,.74)}
+.l-week{position:absolute;top:256px;left:24px;right:24px}
+.l-week .lh{display:flex;justify-content:space-between;align-items:baseline}
+.l-week .lh b{font-size:12px;font-weight:600;letter-spacing:.1em;color:rgba(246,233,214,.70)}
+.l-week .lh i{font-size:12px;font-style:normal;color:rgba(246,233,214,.60)}
+.l-bars{position:relative;display:flex;align-items:flex-end;gap:22px;height:86px;margin-top:14px;padding-left:2px}
+.l-bars:after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:rgba(246,233,214,.16)}
+.l-bcol{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}
+.l-bcol .bv{font-size:12px;font-weight:500;color:rgba(246,233,214,.64);margin-bottom:6px;font-variant-numeric:tabular-nums}
+.l-bcol .bb{width:26px;border-radius:5px 5px 0 0;background:rgba(246,233,214,.19)}
+.l-bcol.today .bv{color:#F7D198}
+.l-bcol.today .bb{background:linear-gradient(180deg,#F4C77E,#E4A44E);box-shadow:0 0 18px rgba(237,174,85,.28)}
+.l-bcol.future .bv{color:rgba(246,233,214,.56)}
+.l-bcol.future .bb{background:rgba(246,233,214,.08)}
+.l-days{display:flex;gap:22px;padding-left:2px;margin-top:9px}
+.l-days span{flex:1;text-align:center;font-size:12px;color:rgba(246,233,214,.64)}
+.l-days span.today{color:#F7D198;font-weight:600}
+.l-days span.future{color:rgba(246,233,214,.56)}
+.l-dev{position:absolute;top:440px;left:24px;right:24px}
+.l-sub{font-size:12px;font-weight:600;letter-spacing:.1em;color:rgba(246,233,214,.62);margin-bottom:14px}
+.d-row{margin-bottom:12px}
+.d-top{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.d-nm{font-size:15px;font-weight:500;color:#EBDAC2;white-space:nowrap}
+.d-tot{font-size:16.5px;font-weight:500;color:#FBF0DD;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.d-track{height:2px;background:rgba(246,233,214,.13);margin-top:7px;position:relative;border-radius:2px;overflow:hidden}
+.d-track i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,#D99A46,#F4C77E);border-radius:2px}
+.d-foot{display:flex;justify-content:space-between;margin-top:5px}
+.d-foot span{font-size:12px;color:rgba(246,233,214,.62)}
+.l-recent{position:absolute;top:730px;left:24px;right:24px}
+.r-row{display:flex;align-items:baseline;justify-content:space-between;padding:12px 0;border-top:1px solid rgba(246,233,214,.11)}
+.r-row .rl{font-size:14.5px;font-weight:500;color:#E7D6BE}
+.r-row .rl i{font-style:normal;font-weight:400;color:rgba(246,233,214,.62)}
+.r-row .rr{font-size:13px;color:rgba(246,233,214,.66);font-variant-numeric:tabular-nums}
+.r-row .rr b{font-weight:500;color:rgba(246,233,214,.82)}
+.l-colophon{position:absolute;top:1010px;left:24px;right:24px;padding-top:20px;border-top:1px solid rgba(246,233,214,.11);padding-bottom:10px}
+.l-ded{font-size:12px;line-height:1.6;color:rgba(246,233,214,.66);max-width:330px}
+.l-backup{display:inline-flex;align-items:center;height:48px;margin-top:4px;font-size:12px;color:rgba(246,233,214,.66);letter-spacing:.02em}
+
+/* ---------------- board footer ---------------- */
+.bf{position:absolute;left:64px;right:64px;top:1714px;display:flex;justify-content:space-between;align-items:flex-end;gap:40px;z-index:4;
+  border-top:1px solid rgba(246,233,214,.11);padding-top:22px}
+.bf .bfa{font-size:13px;line-height:1.55;color:#BFAD97;max-width:640px}
+.bf .bfb{text-align:right;display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+.bf .ded{font-size:12.5px;color:#B4A28C;letter-spacing:.005em}
+.bf .num{font-size:12px;letter-spacing:.2em;color:var(--accent)}
+</style>
+</head>
+<body>
+
+<div class="board">
+
+  <header class="tb">
+    <div class="mk">MANTRINI <b>·</b> 02 <b>·</b> THE ROOM</div>
+    <h1>The <em>Lamp</em></h1>
+    <p class="pos">An offline japa companion for one devotee, one hand, a dim room.</p>
+    <p class="rules"><b>Headspace</b> warmth · <b>Endel</b> emptiness — no cards: the photograph is the ground, the mala is the seam.</p>
+  </header>
+
+  <aside class="ix">
+    <div class="ixh">THE FIVE SCREENS</div>
+    <ol>
+      <li><b>01</b><span>Today</span><i>arriving, not a dashboard</i></li>
+      <li><b>02</b><span>Altar</span><i>four paths, one lamp</i></li>
+      <li><b>03</b><span>Session</span><i>the counting surface</i></li>
+      <li><b>04</b><span>Blessing</span><i>the lamp is raised</i></li>
+      <li><b>05</b><span>Ledger</span><i>the record, no cards</i></li>
+    </ol>
+  </aside>
+
+  <div class="stage">
+
+    <div class="slot" style="left:96px;top:392px;--s:.66">
+      <div class="cap"><b>01</b><span>Today</span><i>arriving</i></div>
+      <div class="scaler" data-screen="today"></div>
+    </div>
+
+    <div class="slot" style="left:152px;top:1052px;--s:.62">
+      <div class="cap"><b>05</b><span>Ledger</span><i>the record</i></div>
+      <div class="scaler" data-screen="ledger"></div>
+    </div>
+
+    <div class="slot" data-hero style="left:480px;top:330px;--s:1.3">
+      <div class="cap"><b>03</b><span>Session</span><i>the counting surface</i></div>
+      <div class="scaler" data-screen="session"></div>
+    </div>
+
+    <div class="slot" style="left:1128px;top:330px;--s:.74">
+      <div class="cap"><b>02</b><span>Altar</span><i>four paths</i></div>
+      <div class="scaler" data-screen="altar"></div>
+    </div>
+
+    <div class="slot" style="left:1074px;top:1064px;--s:.68">
+      <div class="cap"><b>04</b><span>Blessing</span><i>the lamp raised</i></div>
+      <div class="scaler" data-screen="blessing"></div>
+    </div>
+
+    <div class="hero-note">
+      <div><b>The ground</b><span>The portrait is who you chant to — never a thumbnail in a card.</span></div>
+      <div><b>The seam</b><span>108 beads ride the edge of the photograph; 47 lit, 61 to go.</span></div>
+      <div><b>The pill</b><span>Every action lands under the thumb, one accent at a time.</span></div>
+    </div>
+
+  </div>
+
+  <footer class="bf">
+    <div class="bfa">412 × 892 dp · Android · every phone on this board is live. Tap any phone: choose a deity,
+      switch the mode, count — the beads light one at a time. At 108 the whole scrim brightens and the Blessing
+      arrives. Undo, pause and the ledger all work.</div>
+    <div class="bfb">
+      <div class="ded">GuruShreshta Maa Adya Mahakali · My Guru Shri Praveen RadhaKrishnan</div>
+      <div class="num">02 / 03</div>
+    </div>
+  </footer>
+
+</div>
+
+<!-- ================= ANDROID FRAME · written once, cloned five times ================= -->
+<template id="frame-tpl">
+  <div class="dev">
+    <div class="dev-screen">
+      <div class="sb">
+        <span>9:41</span>
+        <span class="sbi">
+          <svg width="14" height="10" viewBox="0 0 14 10" fill="currentColor"><rect x="0" y="6" width="2" height="4" rx="0.5"/><rect x="4" y="4" width="2" height="6" rx="0.5"/><rect x="8" y="2" width="2" height="8" rx="0.5"/><rect x="12" y="0" width="2" height="10" rx="0.5"/></svg>
+          <svg width="14" height="10" viewBox="0 0 14 10" fill="none"><path d="M7 9a1 1 0 100-2 1 1 0 000 2z" fill="currentColor"/><path d="M3 6a5 5 0 018 0" stroke="currentColor" stroke-width="1.2"/><path d="M0.5 3.5a11 11 0 0113 0" stroke="currentColor" stroke-width="1.2" opacity="0.6"/></svg>
+          <span class="bat"><i></i></span>
+          <span class="bpct">100%</span>
+        </span>
+      </div>
+      <div class="punch"></div>
+      <div class="scr"></div>
+      <div class="nav"><i></i></div>
+    </div>
+  </div>
+</template>
+
+<!-- ================= THE APP · written once, cloned five times ================= -->
+<template id="app-tpl">
+<div class="app" data-view="today">
+
+  <!-- ---------- TODAY ---------- -->
+  <section class="view v-today" data-view="today">
+    <nav class="navpill">
+      <button data-go="today">Today</button>
+      <button data-go="altar">Altar</button>
+      <button data-go="ledger">Ledger</button>
+    </nav>
+    <div class="t-date">Saturday, 7 November</div>
+    <h2 class="t-h">The lamp is <em>lit</em>.</h2>
+    <button class="t-photo" data-go="session" aria-label="Resume at the altar">
+      <img class="js-tdeityimg" src="assets/maha1.jpg" alt="">
+      <span class="t-pfade"></span>
+    </button>
+    <div class="t-today">
+      <div class="t-big js-tcount">47</div>
+      <div class="t-words">
+        <b class="js-tchants">chants today</b>
+        <span class="js-tmalas">no mala yet · 61 to the first</span>
+      </div>
+    </div>
+    <button class="t-resume" data-go="session">
+      <span class="t-rl">
+        <span class="t-rk">Resume with <b class="js-tdeity">Adya Mahakali</b></span>
+        <span class="t-rd js-tinv">At the lotus feet of the primordial Mother.</span>
+      </span>
+      <span class="t-rr js-tfrac">47 / 108</span>
+    </button>
+    <button class="t-ledger" data-go="ledger">
+      <span>The ledger</span><span class="t-lg">39 malas · 4,212 chants</span>
+    </button>
+    <button class="pill t-begin" data-go="session">Begin japa</button>
+  </section>
+
+  <!-- ---------- ALTAR ---------- -->
+  <section class="view v-altar" data-view="altar">
+    <nav class="navpill">
+      <button data-go="today">Today</button>
+      <button data-go="altar">Altar</button>
+      <button data-go="ledger">Ledger</button>
+    </nav>
+    <div class="a-head">
+      <h2 class="a-h">The <em>altar</em></h2>
+      <div class="a-target">
+        <button class="tgt js-tgt" data-d="-1" aria-label="Fewer malas">−</button>
+        <span><b class="js-target">1</b> <span class="js-tword">mala</span></span>
+        <button class="tgt js-tgt" data-d="1" aria-label="More malas">+</button>
+      </div>
+    </div>
+    <div class="a-plates js-plates"></div>
+    <div class="a-foot">
+      <div class="a-modes js-modes"></div>
+      <div class="a-desc js-mdesc">Tap each mantra — count with your thumb; the chant stays silent.</div>
+      <button class="pill a-begin" data-go="session">Begin japa</button>
+    </div>
+  </section>
+
+  <!-- ---------- SESSION ---------- -->
+  <section class="view v-session" data-view="session">
+    <div class="s-photo">
+      <img class="js-sdeityimg" src="assets/maha1.jpg" alt="">
+      <span class="s-lit-glow"></span>
+      <span class="s-stl"></span><span class="s-str"></span><span class="s-sbot"></span>
+    </div>
+    <div class="s-beads js-beads"></div>
+    <button class="s-altar" data-go="altar"><span class="js-sdeity">Adya Mahakali</span></button>
+    <button class="s-finish js-finish">Finish</button>
+    <div class="s-low">
+      <div class="s-mantra deva js-smantra">ॐ आद्यायै नमः</div>
+      <div class="s-count"><span class="s-num js-scount">47</span><span class="s-of">of 108</span></div>
+      <div class="s-meta"><b class="js-selapsed">9:12</b> elapsed · <span class="js-smode">manual</span></div>
+      <div class="s-ctrl">
+        <button class="ctl js-pause">Pause</button>
+        <button class="ctl js-undo">Undo last</button>
+      </div>
+      <button class="pill js-countbtn">Count chant</button>
+    </div>
+  </section>
+
+  <!-- ---------- BLESSING ---------- -->
+  <section class="view v-blessing" data-view="blessing">
+    <div class="b-photo">
+      <img class="js-bdeityimg" src="assets/maha1.jpg" alt="">
+      <span class="b-pfade"></span>
+    </div>
+    <div class="b-ring js-bring"><div class="b-core"><div class="b-n js-bcount">108</div><div class="b-c">chants</div></div></div>
+    <div class="b-line js-bline">One mala, <em>complete</em>.</div>
+    <div class="b-thanks">Gratitude to Maa, and to my Guru.</div>
+    <div class="b-ded">GuruShreshta Maa Adya Mahakali · My Guru Shri Praveen RadhaKrishnan</div>
+    <button class="b-second js-bsecond">Begin another mala</button>
+    <button class="pill b-rest js-brest">Rest at the altar</button>
+  </section>
+
+  <!-- ---------- LEDGER ---------- -->
+  <section class="view v-ledger" data-view="ledger">
+    <div class="l-photo">
+      <img src="assets/skanda.jpg" alt="">
+      <span class="l-scrim"></span>
+    </div>
+    <nav class="navpill">
+      <button data-go="today">Today</button>
+      <button data-go="altar">Altar</button>
+      <button data-go="ledger">Ledger</button>
+    </nav>
+    <h2 class="l-title">The <em>ledger</em></h2>
+    <div class="l-date">Saturday, 7 November</div>
+    <div class="l-stats">
+      <div class="l-stat"><b class="js-ltoday">47</b><span>today</span></div>
+      <div class="l-stat"><b>4,212</b><span>lifetime</span></div>
+      <div class="l-stat"><b>39</b><span>malas</span></div>
+    </div>
+
+    <div class="l-week">
+      <div class="lh"><b>THIS WEEK</b><i>chants a day · 108 is one mala</i></div>
+      <div class="l-bars js-bars"></div>
+      <div class="l-days"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span class="today">S</span><span class="future">S</span></div>
+    </div>
+
+    <div class="l-dev">
+      <div class="l-sub">BY DEITY</div>
+      <div class="js-devrows"></div>
+    </div>
+
+    <div class="l-recent">
+      <div class="l-sub">RECENT SITTINGS</div>
+      <div class="r-row"><span class="rl">108 <i>· Manual</i></span><span class="rr"><b>9m41s</b> · today</span></div>
+      <div class="r-row"><span class="rl">54 <i>· Timed</i></span><span class="rr"><b>5m00s</b> · yesterday</span></div>
+      <div class="r-row"><span class="rl">108 <i>· Audio</i></span><span class="rr"><b>11m12s</b> · Nov 5</span></div>
+      <div class="r-row"><span class="rl">27 <i>· Manual</i></span><span class="rr"><b>3m08s</b> · Nov 4</span></div>
+    </div>
+
+    <div class="l-colophon">
+      <div class="l-ded">GuruShreshta Maa Adya Mahakali · My Guru Shri Praveen RadhaKrishnan</div>
+      <button class="l-backup">Backup &amp; restore</button>
+    </div>
+  </section>
+
+</div>
+</template>
+
+<script>
+(function () {
+  'use strict';
+
+  var DEITIES = [
+    { name: 'Adya Mahakali', deva: 'ॐ आद्यायै नमः', inv: 'At the lotus feet of the primordial Mother.',
+      img: 'assets/maha1.jpg', c: '#6E1A22', py: '16%', pb: .97 },
+    { name: 'Batuk Bhairav', deva: 'ॐ बटुक भैरवाय नमः', inv: 'Guardian of swift grace and fearless protection.',
+      img: 'assets/batuk1.jpg', c: '#1D2E44', py: '9%', pb: .92 },
+    { name: 'Swarnaakarshana Bhairav', deva: 'ॐ श्री स्वर्णाकर्षण भैरवाय नमः', inv: 'For radiance, dignified prosperity, and clear intent.',
+      img: 'assets/swarna.jpg', c: '#5A3E12', py: '28%', pb: .9 },
+    { name: 'Skanda Bhairav', deva: 'ॐ सर्वान्भवाय नमः', inv: 'For disciplined courage and focused tapas.',
+      img: 'assets/skanda.jpg', c: '#3A2A18', py: '12%', pb: .98 }
+  ];
+
+  var MODES = [
+    { label: 'Tap', full: 'Tap each mantra', short: 'manual',
+      desc: 'Tap each mantra — count with your thumb; the chant stays silent.' },
+    { label: 'Audio', full: 'Chant with audio', short: 'audio',
+      desc: 'Chant with audio — the mantra sounds once for every count.' },
+    { label: 'Timer', full: 'Sit for a set time', short: 'timed',
+      desc: 'Sit for a set time — a timer keeps the sitting; the chant loops.' },
+    { label: 'Auto', full: 'Auto-count malas', short: 'auto',
+      desc: 'Auto-count malas — the chant loops and the malas count themselves.' }
+  ];
+
+  var WEEK = [21, 108, 0, 54, 108, 47, 0];
+  var DEITY_TOTALS = [2180, 1296, 528, 208];
+
+  var frameTpl = document.getElementById('frame-tpl');
+  var appTpl = document.getElementById('app-tpl');
+
+  function q(root, sel) { return root.querySelector(sel); }
+  function qa(root, sel) { return Array.prototype.slice.call(root.querySelectorAll(sel)); }
+
+  /* ---------------- shared sub-builders ---------------- */
+
+  function buildPlates(host) {
+    DEITIES.forEach(function (d, i) {
+      var b = document.createElement('div');
+      b.className = 'plate';
+      b.setAttribute('role', 'button');
+      b.setAttribute('tabindex', '0');
+      b.dataset.deity = String(i);
+      b.style.setProperty('--pc', d.c);
+      b.style.setProperty('--pb', String(d.pb));
+      b.innerHTML =
+        '<div class="plate-photo"><img src="' + d.img + '" alt="" style="object-position:50% ' + d.py + '"></div>' +
+        '<div class="plate-col"></div>' +
+        '<div class="plate-txt">' +
+          '<div class="plate-name">' + d.name + '</div>' +
+          '<div class="plate-mantra">' + d.deva + '</div>' +
+          '<div class="plate-inv">' + d.inv + '</div>' +
+        '</div>' +
+        '<span class="plate-mark"></span>';
+      host.appendChild(b);
+    });
+  }
+
+  function buildModes(host) {
+    MODES.forEach(function (m, i) {
+      var b = document.createElement('div');
+      b.className = 'mode-t';
+      b.setAttribute('role', 'radio');
+      b.setAttribute('tabindex', '0');
+      b.dataset.mode = String(i);
+      b.textContent = m.label;
+      host.appendChild(b);
+    });
+  }
+
+  function buildWeek(host) {
+    WEEK.forEach(function (v, i) {
+      var col = document.createElement('div');
+      col.className = 'l-bcol' + (i === 5 ? ' today' : '') + (i > 5 ? ' future' : '');
+      var h = Math.max(2, Math.round((v / 108) * 68));
+      col.innerHTML = '<span class="bv">' + v + '</span><span class="bb" style="height:' + h + 'px"></span>';
+      host.appendChild(col);
+    });
+  }
+
+  function buildDevRows(host) {
+    DEITIES.forEach(function (d, i) {
+      var total = DEITY_TOTALS[i];
+      var malas = Math.floor(total / 108);
+      var rem = total % 108;
+      var pct = Math.round((rem / 108) * 100);
+      var row = document.createElement('div');
+      row.className = 'd-row';
+      row.innerHTML =
+        '<div class="d-top"><span class="d-nm">' + d.name + '</span><span class="d-tot">' + total.toLocaleString('en-US') + '</span></div>' +
+        '<div class="d-track"><i style="width:' + pct + '%"></i></div>' +
+        '<div class="d-foot"><span>' + malas + (malas === 1 ? ' mala' : ' malas') + '</span>' +
+        '<span>' + (108 - rem) + ' to the next mala</span></div>';
+      host.appendChild(row);
+    });
+  }
+
+  function buildBeads(host) {
+    for (var i = 0; i < 108; i += 1) {
+      var t = i / 107;
+      var el = document.createElement('i');
+      el.className = 'bead';
+      el.style.left = (8 + 396 * t).toFixed(2) + 'px';
+      el.style.top = (463 + 216 * t * (1 - t) - 9).toFixed(2) + 'px';
+      host.appendChild(el);
+    }
+  }
+
+  function buildRing(host) {
+    for (var i = 0; i < 108; i += 1) {
+      var a = (i / 108) * Math.PI * 2 - Math.PI / 2;
+      var el = document.createElement('i');
+      el.className = 'bdot';
+      el.style.left = (88 + Math.cos(a) * 84).toFixed(2) + 'px';
+      el.style.top = (88 + Math.sin(a) * 84).toFixed(2) + 'px';
+      host.appendChild(el);
+    }
+  }
+
+  /* ---------------- one phone = one independent app ---------------- */
+
+  var PHONES = [];
+
+  function createPhone(slot, screen) {
+    var frame = frameTpl.content.cloneNode(true);
+    var dev = q(frame, '.dev');
+    var screenEl = q(frame, '.dev-screen');
+    var scr = q(frame, '.scr');
+    var app = appTpl.content.cloneNode(true).firstElementChild;
+    scr.appendChild(app);
+    slot.appendChild(frame);
+
+    var st = {
+      view: screen,
+      count: (screen === 'blessing') ? 108 : 47,
+      base: 0,
+      elapsed: '9:12',
+      mode: 0,
+      deity: 0,
+      target: 1,
+      paused: false,
+      lit: (screen === 'blessing')
+    };
+
+    /* build data-driven bits */
+    buildPlates(q(app, '.js-plates'));
+    buildModes(q(app, '.js-modes'));
+    buildWeek(q(app, '.js-bars'));
+    buildDevRows(q(app, '.js-devrows'));
+    buildBeads(q(app, '.js-beads'));
+    buildRing(q(app, '.js-bring'));
+
+    var beads = qa(app, '.js-beads .bead');
+    var bdots = qa(app, '.js-bring .bdot');
+    var plates = qa(app, '.js-plates .plate');
+    var modeTiles = qa(app, '.js-modes .mode-t');
+
+    var el = {
+      scount: q(app, '.js-scount'),
+      smantra: q(app, '.js-smantra'),
+      sdeity: q(app, '.js-sdeity'),
+      sdeityimg: q(app, '.js-sdeityimg'),
+      smode: q(app, '.js-smode'),
+      selapsed: q(app, '.js-selapsed'),
+      pause: q(app, '.js-pause'),
+      countbtn: q(app, '.js-countbtn'),
+      finish: q(app, '.js-finish'),
+      tcount: q(app, '.js-tcount'),
+      tchants: q(app, '.js-tchants'),
+      tmalas: q(app, '.js-tmalas'),
+      tdeity: q(app, '.js-tdeity'),
+      tinv: q(app, '.js-tinv'),
+      tfrac: q(app, '.js-tfrac'),
+      tdeityimg: q(app, '.js-tdeityimg'),
+      bdeityimg: q(app, '.js-bdeityimg'),
+      bcount: q(app, '.js-bcount'),
+      bline: q(app, '.js-bline'),
+      bsecond: q(app, '.js-bsecond'),
+      brest: q(app, '.js-brest'),
+      bring: q(app, '.js-bring'),
+      target: q(app, '.js-target'),
+      tword: q(app, '.js-tword'),
+      mdesc: q(app, '.js-mdesc'),
+      ltoday: q(app, '.js-ltoday')
+    };
+
+    function render() {
+      var d = DEITIES[st.deity];
+      var today = st.base + st.count;
+      var malas = Math.floor(today / 108);
+      var remToNext = 108 - (today % 108);
+      var modeShort = MODES[st.mode].short;
+
+      app.dataset.view = st.view;
+      app.classList.toggle('is-lit', st.lit);
+      app.classList.toggle('paused', st.paused);
+      screenEl.classList.toggle('lit', st.lit);
+
+      qa(app, '.view').forEach(function (v) {
+        v.classList.toggle('on', v.dataset.view === st.view);
+      });
+      qa(app, '.navpill button').forEach(function (b) {
+        b.classList.toggle('on', b.dataset.go === st.view);
+      });
+
+      /* today */
+      el.tcount.textContent = today;
+      el.tchants.textContent = 'chants today';
+      el.tmalas.textContent = malas > 0
+        ? malas + (malas === 1 ? ' mala today · ' : ' malas today · ') + remToNext + ' to the next'
+        : 'no mala yet · ' + remToNext + ' to the first';
+      el.tdeity.textContent = d.name;
+      el.tinv.textContent = d.inv;
+      el.tfrac.textContent = st.count + ' / 108';
+      el.tdeityimg.src = d.img;
+
+      /* session */
+      el.sdeity.textContent = d.name;
+      el.smantra.textContent = d.deva;
+      el.sdeityimg.src = d.img;
+      el.scount.textContent = st.count;
+      el.smode.textContent = modeShort;
+      el.selapsed.textContent = st.elapsed;
+      el.pause.textContent = st.paused ? 'Resume' : 'Pause';
+      el.countbtn.textContent = st.paused ? 'Tap to resume' : (st.count >= 108 ? 'Mala complete' : 'Count chant');
+
+      beads.forEach(function (b, i) {
+        b.className = 'bead' + (i < st.count ? ' done' : '') + (i === st.count - 1 ? ' cur' : '');
+      });
+
+      /* altar */
+      plates.forEach(function (p, i) { p.classList.toggle('on', i === st.deity); });
+      modeTiles.forEach(function (m, i) {
+        m.classList.toggle('on', i === st.mode);
+        m.setAttribute('aria-checked', i === st.mode ? 'true' : 'false');
+      });
+      el.mdesc.textContent = MODES[st.mode].desc;
+      el.target.textContent = st.target;
+      el.tword.textContent = st.target === 1 ? 'mala' : 'malas';
+
+      /* blessing */
+      el.bcount.textContent = st.count;
+      el.bdeityimg.src = d.img;
+      el.bline.innerHTML = st.count >= 108
+        ? 'One mala, <em>complete</em>.'
+        : 'The mala <em>rests</em> here.';
+      el.bsecond.textContent = st.count >= 108 ? 'Begin another mala' : 'Continue the mala';
+      el.bring.classList.toggle('full', st.count >= 108);
+      el.bring.classList.toggle('part', st.count < 108);
+      bdots.forEach(function (b, i) { b.classList.toggle('done', i < st.count); });
+
+      /* ledger */
+      el.ltoday.textContent = today;
+    }
+
+    function pop(el2) {
+      if (!el2) return;
+      el2.classList.remove('pop');
+      void el2.offsetWidth;
+      el2.classList.add('pop');
+    }
+
+    function countBy(delta) {
+      if (st.view !== 'session') return;
+      if (st.paused && delta > 0) return;
+      var next = Math.max(0, Math.min(108, st.count + delta));
+      if (next === st.count) return;
+      var was = st.count;
+      st.count = next;
+      st.lit = false;
+      if (delta > 0) { pop(el.scount); }
+      if (st.count >= 108 && delta > 0) {
+        st.lit = true;
+        render();
+        setTimeout(function () {
+          if (st.view !== 'session') return;
+          st.view = 'blessing';
+          st.lit = true;
+          render();
+        }, 620);
+        return;
+      }
+      render();
+      if (was < 108 && st.count < 108) { /* nothing else */ }
+    }
+
+    /* ---------- events ---------- */
+    qa(app, '[data-go]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var go = b.dataset.go;
+        st.view = go;
+        if (go !== 'blessing') st.lit = false;
+        render();
+      });
+    });
+
+    el.countbtn.addEventListener('click', function () { countBy(1); });
+    q(app, '.js-undo').addEventListener('click', function () { countBy(-1); });
+    el.pause.addEventListener('click', function () {
+      st.paused = !st.paused;
+      render();
+    });
+    el.finish.addEventListener('click', function () {
+      st.view = 'blessing';
+      st.lit = st.count >= 108;
+      render();
+    });
+
+    q(app, '.js-brest').addEventListener('click', function () {
+      st.view = 'today';
+      st.lit = false;
+      render();
+    });
+    q(app, '.js-bsecond').addEventListener('click', function () {
+      if (st.count >= 108) {
+        st.base += st.count;
+        st.count = 0;
+        st.view = 'session';
+        st.lit = false;
+      } else {
+        st.view = 'session';
+        st.lit = false;
+      }
+      render();
+    });
+
+    plates.forEach(function (p, i) {
+      p.addEventListener('click', function () {
+        st.deity = i;
+        render();
+      });
+      p.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); st.deity = i; render(); }
+      });
+    });
+
+    modeTiles.forEach(function (m, i) {
+      m.addEventListener('click', function () {
+        st.mode = i;
+        render();
+      });
+    });
+
+    qa(app, '.js-tgt').forEach(function (b) {
+      b.addEventListener('click', function () {
+        st.target = Math.max(1, Math.min(9, st.target + Number(b.dataset.d)));
+        render();
+      });
+    });
+
+    render();
+    PHONES.push({ root: app, state: st });
+    return app;
+  }
+
+  /* ---------------- mount the five phones ---------------- */
+  qa(document, '.slot .scaler').forEach(function (s) {
+    createPhone(s, s.dataset.screen || 'today');
+  });
+
+  /* expose a tiny hook for review tooling */
+  window.MANTRINI = { phones: PHONES, deities: DEITIES };
+})();
+</script>
+</body>
+</html>

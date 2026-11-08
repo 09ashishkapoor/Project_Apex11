@@ -1,0 +1,11 @@
+# Design working files
+node_modules/
+*.png
+.huashu-design/
+
+# Keep the tracked direction previews, drop regenerated screenshots and crops
+!preview/*.jpg
+
+# Python tool caches
+__pycache__/
+*.pyc
