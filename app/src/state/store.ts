@@ -101,7 +101,7 @@ export class AppStore {
     ready: false,
     view: 'today',
     deityId: DEITIES[0]!.id,
-    config: defaultConfig('manual'),
+    config: defaultConfig('audio'),
     live: null,
     blessing: null,
     stats: EMPTY_STATS,
