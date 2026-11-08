@@ -33,6 +33,39 @@ import {
 
 export type View = 'today' | 'altar' | 'session' | 'blessing' | 'ledger';
 
+/**
+ * Fail a promise that never settles.
+ *
+ * IndexedDB is the one thing the app cannot run without, and a blocked origin —
+ * Brave Shields, private mode, a storage policy — can leave `openDB` pending
+ * forever with no error event. Without this the tap simply does nothing and the
+ * app looks frozen.
+ */
+function withTimeout<T>(promise: Promise<T>, ms: number, message: string): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(message)), ms);
+    promise.then(
+      (value) => {
+        clearTimeout(timer);
+        resolve(value);
+      },
+      (error: unknown) => {
+        clearTimeout(timer);
+        reject(error instanceof Error ? error : new Error(String(error)));
+      },
+    );
+  });
+}
+
+/** Turn a storage failure into something a devotee can act on. */
+function beginErrorText(error: unknown): string {
+  const detail = error instanceof Error ? error.message : String(error);
+  if (/storage|database|indexeddb/i.test(detail)) {
+    return 'this browser is blocking the app\u2019s storage. Allow site data for this page, or open it in Chrome.';
+  }
+  return detail;
+}
+
 export interface LiveSession {
   id: number;
   deityId: string;
@@ -275,13 +308,17 @@ export class AppStore {
     const durationSeconds = config.mode === 'timed' ? config.timedMinutes * 60 : 0;
 
     try {
-      const id = await startSession({
-        deityId: deity.id,
-        mantraId: deity.mantraId,
-        mode: config.mode,
-        targetCount: target,
-        durationSeconds,
-      });
+      const id = await withTimeout(
+        startSession({
+          deityId: deity.id,
+          mantraId: deity.mantraId,
+          mode: config.mode,
+          targetCount: target,
+          durationSeconds,
+        }),
+        4000,
+        'storage did not answer in time',
+      );
 
       const now = Date.now();
       const live: LiveSession = {
@@ -305,8 +342,9 @@ export class AppStore {
         await this.playLoop(deity.audio);
       }
     } catch (error) {
+      console.error('[mantrini] could not begin the sitting', error);
       this.patch({ busy: false });
-      this.toast(`Could not begin: ${String(error)}`);
+      this.toast(`Could not begin: ${beginErrorText(error)}`);
     }
   }
 
