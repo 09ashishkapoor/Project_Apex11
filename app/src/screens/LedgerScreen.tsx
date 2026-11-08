@@ -68,7 +68,47 @@ export function LedgerScreen({ state, onGo }: { state: AppState; onGo: (view: Vi
       setDialog(null);
       store.notify('Backup copied.');
     } catch {
-      store.notify('The browser blocked the clipboard — select the text and copy it.');
+      store.notify('The browser blocked the clipboard — use Download file instead.');
+    }
+  };
+
+  /**
+   * Save the backup as a real file.
+   *
+   * Copying JSON to the clipboard assumes the devotee has somewhere to paste it
+   * and will remember where. A file with a dated name is something they can
+   * actually find again — Files, Downloads, or a Drive folder — which is the
+   * whole point of a backup.
+   */
+  const downloadExport = () => {
+    const day = new Date().toISOString().slice(0, 10);
+    const blob = new Blob([exported], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `mantrini-backup-${day}.json`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    // Give the browser a moment to start the save before releasing the blob.
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+    setDialog(null);
+    store.notify('Backup saved to your downloads.');
+  };
+
+  /** Restore from the file the devotee saved, rather than making them paste. */
+  const loadBackupFile = async (event: Event) => {
+    const input = event.currentTarget as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    try {
+      setImportText(await file.text());
+      store.notify(`Loaded ${file.name}.`);
+    } catch {
+      store.notify('Could not read that file.');
+    } finally {
+      // Allow picking the same file again after a failed restore.
+      input.value = '';
     }
   };
 
@@ -224,16 +264,19 @@ export function LedgerScreen({ state, onGo }: { state: AppState; onGo: (view: Vi
       {dialog === 'export' ? (
         <Sheet title="Backup" onDismiss={() => setDialog(null)}>
           <p>
-            Copy this and keep it somewhere safe. It restores into this app, and it is the same format
-            the Android app exports.
+            Save this file somewhere you will find it again. It restores into this app on any
+            device, and it is the same format the old Android app exports.
           </p>
           <textarea readOnly value={exported} aria-label="Backup JSON" onFocus={(e) => (e.target as HTMLTextAreaElement).select()} />
           <div class="sheet__actions">
             <button type="button" class="btn btn--ghost" onClick={() => setDialog(null)}>
               Close
             </button>
-            <button type="button" class="btn btn--primary" onClick={() => void copyExport()}>
-              Copy
+            <button type="button" class="btn btn--ghost" onClick={() => void copyExport()}>
+              Copy text
+            </button>
+            <button type="button" class="btn btn--primary" onClick={downloadExport}>
+              Download file
             </button>
           </div>
         </Sheet>
@@ -241,7 +284,11 @@ export function LedgerScreen({ state, onGo }: { state: AppState; onGo: (view: Vi
 
       {dialog === 'import' ? (
         <Sheet title="Restore" onDismiss={() => setDialog(null)}>
-          <p>Paste a backup. Merging keeps what is here; replacing clears the ledger first.</p>
+          <p>Choose the backup file you saved. Merging keeps what is here; replacing clears the ledger first.</p>
+          <label class="sheet__file">
+            <input type="file" accept="application/json,.json" onChange={(e) => void loadBackupFile(e)} />
+            Choose backup file
+          </label>
           <textarea
             value={importText}
             placeholder="Paste backup JSON…"
