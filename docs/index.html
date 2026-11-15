@@ -188,6 +188,14 @@ ul{list-style:none;padding:0}
   color:var(--white);
 }
 .hero h1 em{font-style:normal;color:var(--gold-soft);font-weight:700}
+/* The descriptor sits inside the H1 for search and assistive tech, and is set
+   small beneath the wordmark so the hero still reads as one name. */
+.hero h1 .h1__kind{
+  display:block;margin-top:14px;
+  font-family:var(--display);font-weight:400;
+  font-size:clamp(18px,2.4vw,26px);line-height:1.3;letter-spacing:.02em;
+  color:var(--gold-soft);
+}
 .hero .lede{
   margin-top:22px;max-width:31ch;
   font-size:clamp(19px,2.4vw,23px);line-height:1.5;color:var(--cream-2);
@@ -520,7 +528,7 @@ section{position:relative}
     <section class="hero" aria-labelledby="hero-title">
       <div>
         <p class="eyebrow">Jai Khyapa Parampara</p>
-        <h1 id="hero-title">MANTRINI</h1>
+        <h1 id="hero-title">MANTRINI <span class="h1__kind">— Offline Japa Counter</span></h1>
         <p class="lede">
           A respectful, offline japa counter. <b>Four altars, 108 beads</b>, and a
           lamp that stays lit on your own device.
