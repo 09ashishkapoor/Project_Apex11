@@ -22,6 +22,8 @@ REPLACEMENTS = {
     "\u00e2\u20ac\u0153": "\u201c",  # left double quote
     "\u00e2\u20ac\u009d": "\u201d",  # right double quote
     "\u00c2\u00b7": "\u00b7",        # middle dot
+    "\u00c3\u201a\u00b7": "\u00b7",  # middle dot, damaged twice
+    "\u00c3\u2014": "\u00d7",        # multiplication sign
     "\u00c2\u00a0": "\u00a0",        # no-break space
     # second-order damage: the same file round-tripped twice
     "\u00c3\u0192\u2014": "\u00d7",  # multiplication sign
@@ -37,7 +39,7 @@ DRY_RUN = "--write" not in sys.argv
 
 
 def targets() -> list[pathlib.Path]:
-    files = [ROOT / "README.md", ROOT / "package.json", ROOT / "index.html"]
+    files = [ROOT / "README.md", ROOT / "package.json", ROOT / "index.html", ROOT / "vite.config.ts"]
     for pattern in ("*.ts", "*.tsx", "*.css", "*.mjs", "*.py", "*.md"):
         for folder in ("src", "tools"):
             files += sorted((ROOT / folder).rglob(pattern))

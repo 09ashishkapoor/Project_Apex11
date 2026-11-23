@@ -1,4 +1,4 @@
-﻿"""Encode the promo clips from the raw Playwright captures.
+"""Encode the promo clips from the raw Playwright captures.
 
 Playwright records video only, so the sound version is built by laying the app's
 own chant loop against the measured moment the chant starts. That keeps it the
@@ -25,7 +25,7 @@ def run(args: list[str]) -> None:
     result = subprocess.run(args, capture_output=True, text=True)
     if result.returncode != 0:
         print(result.stderr[-2000:], file=sys.stderr)
-        raise SystemExit(f"ffmpeg failed: {' '.join(args[:6])}â€¦")
+        raise SystemExit(f"ffmpeg failed: {' '.join(args[:6])}…")
 
 
 def probe(path: pathlib.Path, entries: str) -> str:

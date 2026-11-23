@@ -4,7 +4,7 @@
 // Playwright and leaves the conversion to the ffmpeg step in make-reel.sh.
 // The video is silent on purpose: music is added in Instagram.
 //
-// The pacing is deliberately slower than a test would use â€” a reel has to be
+// The pacing is deliberately slower than a test would use — a reel has to be
 // readable, and every screen needs long enough to register before the next tap.
 import fs from 'node:fs';
 import path from 'node:path';

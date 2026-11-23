@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
 import { deityById } from '../data/deities';
 import { CHANTS_PER_MALA, MODE_LABEL } from '../data/types';
 import { clock } from '../lib/format';
@@ -9,7 +9,7 @@ import { isAppleMobile } from '../lib/storage';
 import { MalaSeam } from '../components/MalaSeam';
 
 /**
- * SESSION â€” the counting surface.
+ * SESSION — the counting surface.
  *
  * The product. A full-bleed darshan, the mala seam riding the edge of the
  * photograph, the mantra, the count, and one thumb-sized action.
@@ -42,8 +42,8 @@ export function SessionScreen({ state }: { state: AppState }) {
 
   const meta =
     mode === 'timed'
-      ? `${clock(elapsed)} elapsed Â· ${clock(Math.ceil(remaining / 1000))} left`
-      : `${clock(elapsed)} elapsed Â· ${MODE_LABEL[mode]}`;
+      ? `${clock(elapsed)} elapsed · ${clock(Math.ceil(remaining / 1000))} left`
+      : `${clock(elapsed)} elapsed · ${MODE_LABEL[mode]}`;
 
   const target = live
     ? live.config.mode === 'timed'
@@ -105,7 +105,7 @@ export function SessionScreen({ state }: { state: AppState }) {
             class={`pill session__pill${state.audioPlaying ? ' is-muted' : ''}`}
             onClick={() => void store.playSingle()}
           >
-            {state.audioPlaying ? 'Chantingâ€¦' : 'Play chant'}
+            {state.audioPlaying ? 'Chanting…' : 'Play chant'}
           </button>
         ) : (
           <div class="session__status" role="status">

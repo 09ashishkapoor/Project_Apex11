@@ -1,4 +1,4 @@
-﻿// Renders the Instagram post set from the HTML templates: the square
+// Renders the Instagram post set from the HTML templates: the square
 // introduction, the taller 4:5 introduction, and the 4:5 mantras card.
 // Every canvas is checked against its declared size so nothing ships cropped.
 import fs from 'node:fs';
