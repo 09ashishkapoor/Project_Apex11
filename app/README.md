@@ -137,11 +137,26 @@ from clip length.
 | Timer | loops for the whole sitting |
 | Auto | loops; the malas count themselves |
 
-### The cadence, and what happens when audio fails
+### The count, and what happens when audio fails
 
-In the looping modes the count is derived: `floor(elapsed / clipLength)`. The
-clip length **is** the cadence, so the four deities finish a mala at different
-speeds — Batuk ~1m56s, Skanda ~3m29s, Adya ~4m28s, Swarna ~6m41s.
+In the looping modes the count comes from the chant itself: every time the clip
+actually wraps back to its start, one chant has been heard and the count moves
+one. The sitting clock is only the elapsed display and the Timer's deadline —
+never the count.
+
+It used to be derived as `floor(elapsed / clipLength)`, which runs ahead of the
+sound. A clip's measured duration is not how long a looping element really takes
+to repeat — the browser re-seeks to the start at every loop and the seam adds
+time — and the sitting clock starts before the first chant does. On a full mala
+the count could declare the sitting complete several chants before the last one
+had been heard. `tools/check-auto-count.mjs` measures both and fails if they
+diverge; `--full` sits a whole mala through and proves the Blessing lands on the
+108th heard chant.
+
+The clip length is still the cadence: the four deities finish a mala at
+different speeds — Batuk ~2m, Skanda ~3m35s, Adya ~4m35s, Swarna ~6m45s (a little
+longer on browsers whose loop seam is larger). The loop seam is also why these
+are approximate: the count follows the chant, so it cannot drift.
 
 Starting a sitting writes to IndexedDB before any sound plays, so the real
 `play()` lands several tasks after the tap. Browsers only grant playback
@@ -155,7 +170,9 @@ exactly, and fails if the fix is removed.
 If the audio cannot start at all — blocked autoplay, decode failure, data saver —
 the app falls back to the clip's known length, stored as `chantMs` on each deity
 record, so an automatic sitting still counts and still completes. The failure is
-announced once, honestly, and logged to the console for diagnosis.
+announced once, honestly, and logged to the console for diagnosis. A sitting that
+began with sound and then cannot resume pauses itself instead of counting
+silence.
 
 Before that fallback existed the count silently stayed at zero and the session
 could never finish, while the message claimed the count "still works".
@@ -285,6 +302,8 @@ APP_URL=http://127.0.0.1:5200/ node tools/platform-check.mjs       # wake lock, 
 APP_URL=http://127.0.0.1:5200/ node tools/check-audio-playback.mjs # clips decode and count
 APP_URL=http://127.0.0.1:5200/ node tools/check-audio-fallback.mjs # counting survives no audio
 APP_URL=http://127.0.0.1:5200/ node tools/check-audio-gesture.mjs  # sound starts inside the tap
+APP_URL=http://127.0.0.1:5200/ node tools/check-auto-count.mjs     # loop count == chants heard
+APP_URL=http://127.0.0.1:5200/ node tools/check-auto-count.mjs --full # ...through a whole mala
 APP_URL=http://127.0.0.1:5200/ node tools/check-offline.mjs        # network cut, app still works
 APP_URL=http://127.0.0.1:5200/ node tools/check-install.mjs        # install ask, and when it stays away
 npm test                                                          # domain logic

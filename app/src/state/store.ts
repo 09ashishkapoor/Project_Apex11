@@ -28,6 +28,7 @@ import {
   malasCompleted,
   remainingMs,
   targetCountFor,
+  type LoopCountSource,
   type SessionConfig,
 } from './session';
 
@@ -76,6 +77,13 @@ export interface LiveSession {
   /** Timestamp the current running segment began, or null while paused. */
   runningSince: number | null;
   manualCount: number;
+  /** Chant loops the audio element has actually finished (loop modes only). */
+  loopCount: number;
+  /**
+   * Loop modes: where the count comes from. Absent for Tap and Audio modes,
+   * which count discrete events. See `LoopCountSource`.
+   */
+  loopSource?: LoopCountSource;
   /** Measured length of one chant, in ms. */
   chantMs: number;
   /** Correction applied to derived loop counts (used by Undo). */
@@ -156,6 +164,7 @@ export class AppStore {
   private audioWarnedFor: number | null = null;
   private audio: ChantAudio | null = null;
   private unsubEnded: (() => void) | null = null;
+  private unsubLoop: (() => void) | null = null;
 
   constructor(audio?: ChantAudio) {
     if (audio) this.attachAudio(audio);
@@ -164,6 +173,7 @@ export class AppStore {
   /** Wire the audio element up once, after the browser has a document. */
   attachAudio(audio: ChantAudio): void {
     this.unsubEnded?.();
+    this.unsubLoop?.();
     this.audio?.dispose();
     this.audio = audio;
     audio.onDuration((seconds) => {
@@ -179,6 +189,7 @@ export class AppStore {
         void this.count();
       }
     });
+    this.unsubLoop = audio.onLoop(() => this.onChantLooped());
   }
 
   // ---------------------------------------------------------------- plumbing
@@ -279,16 +290,22 @@ export class AppStore {
     return live.accumulatedMs + running;
   }
 
-  private completedNow(): number {
-    const live = this.state.live;
-    if (!live) return 0;
+  private completedFor(live: LiveSession): number {
     return completedCountFor({
       config: live.config,
       elapsedMs: this.elapsedMs(),
       chantMs: this.chantSecondsMs(),
       manualCount: live.manualCount,
       loopOffset: live.loopOffset,
+      loopCount: live.loopCount,
+      loopSource: live.loopSource,
     });
+  }
+
+  private completedNow(): number {
+    const live = this.state.live;
+    if (!live) return 0;
+    return this.completedFor(live);
   }
 
   private chantSecondsMs(): number {
@@ -334,6 +351,8 @@ export class AppStore {
         accumulatedMs: 0,
         runningSince: now,
         manualCount: 0,
+        loopCount: 0,
+        loopSource: isLoopMode(config.mode) ? 'pending' : undefined,
         chantMs: this.state.chantMs,
         loopOffset: 0,
       };
@@ -344,7 +363,15 @@ export class AppStore {
       void acquireWakeLock();
 
       if (isLoopMode(config.mode)) {
-        await this.playLoop(deity.audio);
+        const playing = await this.playLoop(deity.audio);
+        if (playing) {
+          this.setLoopSource('audio');
+        } else {
+          this.setLoopSource('clock');
+          this.warnAudioOnce(
+            "The chant audio could not start. Counting continues at this mantra's pace.",
+          );
+        }
       }
     } catch (error) {
       console.error('[mantrini] could not begin the sitting', error);
@@ -353,21 +380,44 @@ export class AppStore {
     }
   }
 
-  private async playLoop(src: string): Promise<void> {
-    if (!this.audio) return;
+  /** Start the looping chant. Returns false when it could not play at all. */
+  private async playLoop(src: string): Promise<boolean> {
+    if (!this.audio) return false;
     try {
       await this.audio.play(src, { loop: true });
       this.patch({ audioPlaying: true });
+      return true;
     } catch (error) {
-      // The sitting keeps its own clock, and the cadence falls back to the
-      // clip's known length (see `chantSecondsMs`), so the count genuinely does
-      // continue without sound. Say that, rather than the old claim that the
-      // count "still works" while it silently stayed at zero.
       console.warn('[mantrini] chant audio failed to start', error);
       this.patch({ audioPlaying: false });
-      this.warnAudioOnce(
-        "The chant audio could not start. Counting continues at this mantra's pace.",
-      );
+      return false;
+    }
+  }
+
+  private setLoopSource(source: LoopCountSource): void {
+    const live = this.state.live;
+    if (!live || !isLoopMode(live.config.mode)) return;
+    this.patch({ live: { ...live, loopSource: source } });
+  }
+
+  /**
+   * One chant has been heard end to end: the audio wrapped to the clip's start.
+   * This is the loop modes' count. It cannot run ahead of the chant, survives
+   * pauses and the browser's per-loop seek seam, and stops if the chant stalls.
+   */
+  private onChantLooped(): void {
+    const live = this.state.live;
+    if (!live) return;
+    if (!isLoopMode(live.config.mode) || live.loopSource !== 'audio') return;
+
+    const next: LiveSession = { ...live, loopCount: live.loopCount + 1 };
+    this.patch({ live: next });
+
+    // Close the sitting on the boundary that reached the target, so the audio
+    // does not slip even a fragment of a chant nobody asked for.
+    const completed = this.completedFor(next);
+    if (isSessionComplete({ config: next.config, completed, elapsedMs: this.elapsedMs() })) {
+      void this.finish(false);
     }
   }
 
@@ -495,8 +545,22 @@ export class AppStore {
     this.lastCompleted = this.completedNow();
     this.startTicker();
     void acquireWakeLock();
+    if (!isLoopMode(live.config.mode)) return;
+
     const deity = deityById(live.deityId);
-    if (isLoopMode(live.config.mode)) await this.playLoop(deity.audio);
+    const playing = await this.playLoop(deity.audio);
+    if (playing) {
+      // A sitting that began without sound keeps its documented clock
+      // fallback; switching sources mid-sitting would move the count.
+      if (live.loopSource !== 'clock') this.setLoopSource('audio');
+      return;
+    }
+    if (live.loopSource === 'audio') {
+      // Nothing can be heard, so nothing can be counted. Stop the clock rather
+      // than invent chants the devotee never heard.
+      this.warnAudioOnce('The chant could not resume. Tap Resume to try again.');
+      this.pause();
+    }
   }
 
   /** Close the session. `dueToTimer` is true when the session's own clock ran out. */
@@ -633,6 +697,7 @@ export class AppStore {
   dispose(): void {
     this.stopTicker();
     this.unsubEnded?.();
+    this.unsubLoop?.();
     this.audio?.dispose();
     this.listeners.clear();
   }

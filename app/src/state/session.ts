@@ -28,25 +28,46 @@ export function isLoopMode(mode: SessionMode): boolean {
 }
 
 /**
- * How long one chant is, in milliseconds.
+ * Fallback cadence: how long one chant lasts, in milliseconds.
+ *
+ * Only used when the audio cannot play at all (blocked autoplay, decode
+ * failure, data saver). While the chant is heard, the count comes from the
+ * audio element's real loop boundaries — see `completedCountFor`.
  *
  * Prefers the measured duration of the loaded clip. Falls back to the clip's
- * known length when the audio never reported one — blocked autoplay, a decode
- * failure, data saver. Without the fallback an automatic sitting would derive
- * a count of zero forever and never reach its target, which is a silent dead
- * end rather than a visible error.
+ * known length when the audio never reported one. Without the fallback an
+ * automatic sitting would derive a count of zero forever and never reach its
+ * target, which is a silent dead end rather than a visible error.
  */
 export function cadenceMs(measured: number, fallback: number): number {
   return measured > 0 ? measured : Math.max(0, fallback);
 }
 
 /**
+ * Where a looping session's count comes from.
+ *
+ * `audio` counts the chant loops the audio element actually finished. `clock`
+ * is the fallback for a sitting whose audio will not start at all: the clip's
+ * known length is the best cadence available, and counting continues (with the
+ * one-time notice) rather than stalling forever. `pending` is the moment
+ * between Start and the first successful play, when neither source is true yet.
+ */
+export type LoopCountSource = 'pending' | 'audio' | 'clock';
+
+/**
  * The count shown on the session screen.
  *
  * Manual and audio sessions count discrete events, so the count is whatever was
- * recorded. Loop modes derive the count from how long the chant has actually
- * been running — the same arithmetic the Flutter build used to keep its
- * automatic counting honest across pauses.
+ * recorded. Loop modes count the chant itself: the audio wrapper reports every
+ * real loop boundary and that is one completed chant (`loopSource: 'audio'`).
+ *
+ * Do not derive a playing loop's count from the sitting clock. The clip's
+ * measured duration is not how long a looping element really takes to repeat —
+ * the browser re-seeks to the start at every loop and the seam adds time — and
+ * the sitting clock starts before the first chant does. `floor(elapsed / clip)`
+ * therefore runs ahead of the chant, and the devotee watches the count outrun
+ * the sound. The clock is only used for the `clock` fallback, where counting at
+ * the clip's pace is better than never reaching the target at all.
  */
 export function completedCountFor(params: {
   config: SessionConfig;
@@ -54,13 +75,24 @@ export function completedCountFor(params: {
   chantMs: number;
   manualCount: number;
   loopOffset: number;
+  /** Loop modes: chant loops the audio has actually completed. */
+  loopCount?: number;
+  /** Loop modes: which source drives the count. Defaults to the clock. */
+  loopSource?: LoopCountSource;
 }): number {
   const { config, elapsedMs, chantMs, manualCount, loopOffset } = params;
   if (!isLoopMode(config.mode)) return Math.max(0, manualCount);
-  if (chantMs <= 0) return Math.max(0, manualCount);
-  const derived = Math.floor(Math.max(0, elapsedMs) / chantMs) + loopOffset;
+
+  const source = params.loopSource ?? 'clock';
+  if (source === 'pending') return 0;
+  if (source === 'clock' && chantMs <= 0) return Math.max(0, manualCount);
+
+  const derived =
+    source === 'audio'
+      ? (params.loopCount ?? 0) + loopOffset
+      : Math.floor(Math.max(0, elapsedMs) / chantMs) + loopOffset;
   const cap = config.mode === 'count' ? targetCountFor(config) : Number.MAX_SAFE_INTEGER;
-  return Math.max(0, Math.min(cap, derived));
+  return Math.max(0, Math.min(cap, Math.max(0, derived)));
 }
 
 /** Remaining milliseconds in a timed session; 0 for every other mode. */

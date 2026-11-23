@@ -6,12 +6,25 @@
  * the element itself so auto modes do not need to re-acquire playback
  * permission after every chant — the same problem the Flutter web build solved
  * with native media looping.
+ *
+ * A looped element is also the loop modes' clock. The clip's measured duration
+ * is *not* how long a looping element really takes to repeat — browsers re-seek
+ * to the start at every loop, and that seam adds time. So the wrapper watches
+ * `currentTime` and reports each real wrap; the app counts those instead of
+ * dividing the sitting clock by the clip length. See `onLoop`.
  */
+
+/** A jump smaller than this when time moves "backwards" is a seek, not a loop. */
+const LOOP_WRAP_S = 0.05;
+
 export class ChantAudio {
   private readonly el: HTMLAudioElement;
   private currentSrc: string | null = null;
   private durationListeners = new Set<(duration: number) => void>();
   private endedListeners = new Set<() => void>();
+  private loopListeners = new Set<() => void>();
+  /** Last `currentTime` seen while looping, used to detect the wrap. */
+  private lastTime = 0;
 
   constructor() {
     this.el = new Audio();
@@ -25,6 +38,7 @@ export class ChantAudio {
     this.el.addEventListener('ended', () => {
       for (const listener of this.endedListeners) listener();
     });
+    this.el.addEventListener('timeupdate', () => this.trackLoop());
   }
 
   get duration(): number {
@@ -46,11 +60,25 @@ export class ChantAudio {
     return () => this.endedListeners.delete(listener);
   }
 
+  /**
+   * One loop of the clip has finished and playback has gone back to the start:
+   * the devotee has heard exactly one more chant.
+   *
+   * Only fires for a looping element that is actually playing, and never for a
+   * programmatic seek (`prime`, `stop`, `replay` reset the tracker), so a count
+   * built on this can never run ahead of the chant.
+   */
+  onLoop(listener: () => void): () => void {
+    this.loopListeners.add(listener);
+    return () => this.loopListeners.delete(listener);
+  }
+
   async play(src: string, options: { loop: boolean }): Promise<void> {
     if (this.currentSrc !== src) {
       this.currentSrc = src;
       this.el.src = src;
       this.el.load();
+      this.resetLoopTracking();
     }
     this.el.loop = options.loop;
     try {
@@ -90,6 +118,7 @@ export class ChantAudio {
       this.el.muted = false;
       // Pausing mid-start rejects the promise with AbortError; that is expected.
       void started.catch(() => {});
+      this.resetLoopTracking();
     } catch {
       /* if priming fails the later play() reports the real problem */
     }
@@ -106,6 +135,7 @@ export class ChantAudio {
     } catch {
       /* seek can throw before metadata is ready; harmless */
     }
+    this.resetLoopTracking();
   }
 
   /** Re-arm the element for a fresh single chant. */
@@ -120,6 +150,7 @@ export class ChantAudio {
     } catch {
       /* seek can throw before metadata is ready; harmless */
     }
+    this.resetLoopTracking();
     try {
       await this.el.play();
     } catch (error) {
@@ -139,6 +170,30 @@ export class ChantAudio {
     this.el.load();
     this.durationListeners.clear();
     this.endedListeners.clear();
+    this.loopListeners.clear();
+  }
+
+  /**
+   * Detect a real loop boundary from the element's own clock.
+   *
+   * `currentTime` only moves backwards when the clip has reached its end and
+   * started again, so a backwards step is one completed chant. The element must
+   * still be looping and playing; a paused element owns the position and a
+   * programmatic seek resets the tracker before any `timeupdate` can be read.
+   */
+  private trackLoop(): void {
+    const current = this.el.currentTime;
+    if (this.el.loop && !this.el.paused && current + LOOP_WRAP_S < this.lastTime) {
+      this.lastTime = current;
+      for (const listener of this.loopListeners) listener();
+      return;
+    }
+    this.lastTime = current;
+  }
+
+  /** A deliberate seek is about to happen: do not read it as a completed chant. */
+  private resetLoopTracking(): void {
+    this.lastTime = 0;
   }
 
   private emitDuration(): void {

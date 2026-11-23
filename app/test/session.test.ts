@@ -98,6 +98,51 @@ describe('counting', () => {
   });
 });
 
+describe('audio-driven loop counting', () => {
+  const loop = (overrides: Partial<Parameters<typeof completedCountFor>[0]> = {}) => ({
+    config: config({ mode: 'count', malas: 1 }),
+    elapsedMs: 60_000,
+    chantMs: 1000,
+    manualCount: 0,
+    loopOffset: 0,
+    loopCount: 0,
+    loopSource: 'audio' as const,
+    ...overrides,
+  });
+
+  it('counts the chants the audio actually finished, not the clock', () => {
+    // A minute on the sitting clock would say 60; 41 chants were actually heard.
+    expect(completedCountFor(loop({ loopCount: 41 }))).toBe(41);
+  });
+
+  it('applies Undo to the heard count and never goes negative', () => {
+    expect(completedCountFor(loop({ loopCount: 5, loopOffset: -1 }))).toBe(4);
+    expect(completedCountFor(loop({ loopCount: 5, loopOffset: -99 }))).toBe(0);
+  });
+
+  it('does not advance until the audio has started', () => {
+    expect(completedCountFor(loop({ loopSource: 'pending', elapsedMs: 5000 }))).toBe(0);
+  });
+
+  it('caps a looped Auto sitting at its mala target', () => {
+    expect(completedCountFor(loop({ loopCount: 500 }))).toBe(108);
+  });
+
+  it('keeps counting at the clip pace when the audio never started', () => {
+    expect(
+      completedCountFor(loop({ loopSource: 'clock', elapsedMs: 40_000, chantMs: 4000 })),
+    ).toBe(10);
+  });
+
+  it('counts loops heard in a timed sitting too', () => {
+    expect(
+      completedCountFor(
+        loop({ config: config({ mode: 'timed' }), loopCount: 12, elapsedMs: 40_000 }),
+      ),
+    ).toBe(12);
+  });
+});
+
 describe('completion', () => {
   it('completes counting modes at their target', () => {
     const cfg = config({ mode: 'manual', malas: 1 });
