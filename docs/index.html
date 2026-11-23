@@ -164,6 +164,26 @@ ul{list-style:none;padding:0}
   .header-cta{padding:10px 14px!important;font-size:15px}
 }
 
+/* ------------------------------------------------------ announcement */
+
+.announce{
+  border-bottom:1px solid var(--rule);
+  background:
+    radial-gradient(140% 200% at 50% -20%, rgba(232,196,104,.12), transparent 70%),
+    rgba(74,14,23,.18);
+}
+.announce__in{
+  display:flex;align-items:center;justify-content:center;flex-wrap:wrap;
+  gap:6px 26px;padding:13px 0;text-align:center;
+}
+.announce p{margin:0;max-width:96ch;font-size:15.5px;line-height:1.5;color:var(--cream-2)}
+.announce p b{color:var(--candle);font-weight:600}
+.announce__link{
+  color:var(--gold-soft);text-decoration:none;font-size:15.5px;white-space:nowrap;
+  border-bottom:1px solid rgba(232,196,104,.42);padding-bottom:2px;
+}
+.announce__link:hover{color:var(--white);border-color:var(--gold)}
+
 /* -------------------------------------------------------------- hero */
 
 .hero{
@@ -522,6 +542,17 @@ section{position:relative}
   </div>
 </header>
 
+<!-- -------------------------------------------------- announcement -->
+<div class="announce" role="region" aria-label="Recent fixes">
+  <div class="wrap announce__in">
+    <p><b>Two bugs fixed.</b> The automatic count in Auto and Timer now follows the
+      chant itself, and the text on the counting screen renders correctly. Reopen
+      MANTRINI to update — there is nothing to install, and
+      <b>your ledger is untouched</b>.</p>
+    <a class="announce__link" href="app/">Open the updated app</a>
+  </div>
+</div>
+
 <main id="main">
   <div class="wrap">
 
@@ -739,10 +770,10 @@ section{position:relative}
 
       <p class="install-note">
         <b>Already have MANTRINI?</b> There is nothing to install: reopen it once and
-        the corrected version is there. The automatic count in Auto and Timer now
-        follows the chant itself, so a mala keeps its true length, and a text error
-        on the counting screen is fixed. <b>Your ledger is untouched</b> — no past
-        count is reset or rewritten.
+        the corrected version is there. Two bugs were fixed — the automatic count in
+        Auto and Timer now follows the chant itself, so a mala keeps its true length,
+        and the text on the counting screen renders correctly.
+        <b>Your ledger is untouched</b> — no past count is reset or rewritten.
       </p>
     </section>
 
