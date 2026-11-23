@@ -1,5 +1,9 @@
 # MANTRINI · UX audit
 
+> **Historical record.** This audit was written against the retired v1
+> Flutter/Android app (tag `v1.0.0`). It is kept because it set the bar for the v2
+> web app, but it does not describe the current codebase or the current PWA.
+
 Repo: `Project_Apex11` — Flutter, Android-first, offline Japa (mantra repetition) app.
 Version audited: `main` @ 2156535 · `flutter analyze`: clean (0 issues) · 83 files, 14 Dart sources.
 

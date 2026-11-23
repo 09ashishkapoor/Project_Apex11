@@ -138,7 +138,8 @@ test('refuses to overwrite a non-empty output or overlap with its inputs', async
 test('cache headers keep the worker and shell fresh and the bundles immutable', async (t) => {
   const options = await fixture(t);
   await packageSite(options);
-  const headers = await readFile(join(process.cwd(), 'hosting/_headers'), 'utf8');
+  // Normalise CRLF so the check also passes on Windows checkouts.
+  const headers = (await readFile(join(process.cwd(), 'hosting/_headers'), 'utf8')).replace(/\r\n/g, '\n');
   assert.match(headers, /\/app\/sw\.js\n {2}Cache-Control: no-store/);
   assert.match(headers, /\/app\/index\.html\n {2}Cache-Control: no-cache/);
   assert.match(headers, /\/app\/assets\/\*\n {2}Cache-Control: public, max-age=31536000, immutable/);

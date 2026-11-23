@@ -9,23 +9,20 @@ The app source code is licensed under the MIT License. See LICENSE.
 Fonts
 -----
 
-The bundled font files in assets/fonts are distributed under the SIL Open Font
-License. See assets/fonts/OFL.txt.
+The bundled fonts — the generated files under app/src/styles/fonts/ and the
+landing-page copies under docs/assets/fonts/ — are distributed under the SIL Open
+Font License 1.1. The licence text is in app/assets-src/fonts/OFL.txt.
 
 Media assets
 ------------
 
-The bundled devotional images and audio files in assets/images and assets/audio
-are included only for distribution with MANTRINI. They are not licensed for
-reuse outside this app unless separate permission has been granted by the
-rights holder.
+The devotional images and audio are included only for distribution with
+MANTRINI. They are not licensed for reuse outside this app unless separate
+permission has been granted by the rights holder.
+
+- Originals: app/assets-src/images/ and app/assets-src/audio/
+- Optimised copies shipped with the app: app/public/img/ and app/public/audio/
+- Landing-page copies: docs/assets/altars/
 
 If you publish a fork, replace any media asset whose provenance and
 redistribution rights you cannot verify.
-
-Web runtime
------------
-
-The sqlite3.wasm file in web/ is used by Drift/sqlite3 for the web target. The
-primary Android release does not depend on the web target, but the file is kept
-so Flutter web builds can initialize local database storage.

@@ -7,7 +7,6 @@ identity.
 
 Every icon the app needs is produced here:
   public/icons/*.png          PWA manifest, apple-touch, favicon
-  android/.../mipmap-*/       legacy launcher + adaptive foreground
 """
 import os
 from PIL import Image, ImageDraw, ImageFilter
@@ -18,7 +17,6 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 APP = os.path.normpath(os.path.join(HERE, ".."))
 DEITY = os.path.join(APP, "public", "img", "adya-mahakali.jpg")
 PUBLIC_ICONS = os.path.join(APP, "public", "icons")
-ANDROID_RES = os.path.join(APP, "android", "app", "src", "main", "res")
 
 # Brand tokens, from jaikhyapaparampara.com/styles.css
 VOID = (13, 5, 6)
@@ -159,32 +157,6 @@ def main() -> None:
             image = image.convert("RGB")
         image.save(os.path.join(PUBLIC_ICONS, name), "PNG", optimize=True)
         print(f"{name:26} {size}x{size}  {os.path.getsize(os.path.join(PUBLIC_ICONS, name)) / 1024:7.1f} KB")
-
-    # --- Android ------------------------------------------------------------
-    DENSITIES = {"mdpi": (48, 108), "hdpi": (72, 162), "xhdpi": (96, 216), "xxhdpi": (144, 324), "xxxhdpi": (192, 432)}
-    for density, (legacy_px, fg_px) in DENSITIES.items():
-        folder = os.path.join(ANDROID_RES, f"mipmap-{density}")
-        os.makedirs(folder, exist_ok=True)
-
-        legacy = build(legacy_px, 0.60, True).convert("RGB")
-        legacy.save(os.path.join(folder, "ic_launcher.png"), "PNG", optimize=True)
-
-        # Round slot: the square icon already reads as a mark; mask it.
-        big = legacy_px * SUPERSAMPLE
-        square = build(big, 0.60, True)
-        mask = Image.new("L", (big, big), 0)
-        ImageDraw.Draw(mask).ellipse((0, 0, big - 1, big - 1), fill=255)
-        rounded = Image.new("RGBA", (big, big), (0, 0, 0, 0))
-        rounded.paste(square, (0, 0), mask)
-        rounded.resize((legacy_px, legacy_px), Image.LANCZOS).convert("RGB").save(
-            os.path.join(folder, "ic_launcher_round.png"), "PNG", optimize=True
-        )
-
-        # Adaptive foreground: transparent, mark inside Android's 66% safe zone.
-        fg = build(fg_px, 0.44, False)
-        fg.save(os.path.join(folder, "ic_launcher_foreground.png"), "PNG", optimize=True)
-
-        print(f"mipmap-{density}: legacy {legacy_px}px, foreground {fg_px}px")
 
 
 if __name__ == "__main__":

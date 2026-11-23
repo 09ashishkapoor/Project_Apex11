@@ -53,12 +53,10 @@ scrims kept their structure and only changed colour.
 `tools/make-brand-icon.py` draws the icon rather than cropping a photograph: the
 gold trikoṇa on the temple-maroon gradient, with the deity inside toned down
 toward maroon so the installed app reads as a mark at 48 dp instead of a smeared
-photo. One run produces every size the app needs:
+photo. One run produces every web size the app needs:
 
 - `public/icons/` — 512, 192, 180 (apple-touch), 32 (favicon), and a 512 maskable
   variant whose mark is pulled inside Android's 80 % safe zone
-- `android/…/mipmap-*/` — legacy launcher, round launcher, and adaptive foreground
-  (transparent, inside the 66 % safe zone, over `#1F0B11`)
 
 Run it after changing any brand colour:
 
@@ -419,8 +417,8 @@ build for existing users.
 ## Relationship to the previous app
 
 This repository used to be a Flutter app (v1). It has been removed: the PWA
-replaces it, and the APK channel is gone with it. The old tree is still in git
-history if it is ever needed.
+replaces it. The old APK is frozen at v1.0.0 and kept only as a legacy release;
+it receives no fixes. The old tree is still in git history if it is ever needed.
 
 What carried over deliberately:
 
