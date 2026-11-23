@@ -10,10 +10,10 @@
 </p>
 
 <p align="center">
-  <a href="https://mantrini.jaikhyapaparampara.com/"><img alt="Live site" src="https://img.shields.io/badge/live-online-C9A962?style=flat-square&amp;labelColor=1F0B11"></a>
-  <a href="https://github.com/09ashishkapoor/Project_Apex11/actions/workflows/cloudflare-pages.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/09ashishkapoor/Project_Apex11/cloudflare-pages.yml?branch=main&amp;style=flat-square&amp;label=build&amp;labelColor=1F0B11&amp;color=C9A962"></a>
-  <img alt="Offline-first" src="https://img.shields.io/badge/offline-first-C9A962?style=flat-square&amp;labelColor=1F0B11">
-  <a href="LICENSE"><img alt="MIT licence" src="https://img.shields.io/badge/licence-MIT-C9A962?style=flat-square&amp;labelColor=1F0B11"></a>
+  <a href="https://mantrini.jaikhyapaparampara.com/"><img alt="Live site" src="https://img.shields.io/badge/live-online-8B2635?style=flat-square&amp;labelColor=1F0B11"></a>
+  <a href="https://github.com/09ashishkapoor/Project_Apex11/actions/workflows/cloudflare-pages.yml"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/09ashishkapoor/Project_Apex11/cloudflare-pages.yml?branch=main&amp;style=flat-square&amp;label=build&amp;labelColor=1F0B11&amp;color=8B2635"></a>
+  <img alt="Offline-first" src="https://img.shields.io/badge/offline-first-8B2635?style=flat-square&amp;labelColor=1F0B11">
+  <a href="LICENSE"><img alt="MIT licence" src="https://img.shields.io/badge/licence-MIT-8B2635?style=flat-square&amp;labelColor=1F0B11"></a>
 </p>
 
 <p align="center">
